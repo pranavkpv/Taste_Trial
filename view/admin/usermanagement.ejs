@@ -1,0 +1,264 @@
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="/dashboard.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <nav class="sidebar">
+    <ul class="nav">
+      <li class="nav-item">
+        <a class="nav-link " href="/admin/dashboard">
+          <i class="fas fa-gauge fs-5 p-2"></i>
+          <span class="menu-title fs-4">Dashboard</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/admin/banner">
+          <i class="fas fa-gauge fs-5 p-2"></i>
+          <span class="menu-title fs-4">Banner Updation</span>
+        </a>
+      </li>
+      <li class="nav-item category d-flex">
+        <a class="category px-2" href="/admin/usermanagement">
+          <i class="fas fa-user fs-5 p-2"></i>
+          <span class="menu-title fs-5">User Management</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/admin/category">
+          <i class="fas fa-tag fs-5 p-2 "></i>
+          <span class="menu-title fs-5 ">Category Registration</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/admin/hotel">
+          <i class="fas fa-building fs-5 p-2"></i>
+          <span class="menu-title fs-5">Hotel Registration</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/admin/food">
+          <i class="fas fa-drumstick-bite fs-5 p-2"></i>
+          <span class="menu-title fs-5">Food Registration</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link  text-danger" href="index.html">
+          <i class="fas fa-right-from-bracket fs-5 p-2 text-danger"></i>
+          <span class="menu-title fs-5">Logout</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+  <div class="d-flex searchkey">
+    <input type="text" id="searchUser" class="form-control w-75" placeholder="Search User with firstname and email" onkeyup="searchUser()">
+  </div>
+  <button class="additem" data-bs-toggle="modal" data-bs-target="#adduser">Add item +</button>
+  <table class="atable">
+    <thead>
+      <tr>
+        <th>Sl No</th>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="userTableBody">  
+        <% users.forEach((element,index) => { %>
+            <tr>
+              <td class="isblockedindex"><%= index+1 %></td>
+              <td class="isblockedfname"><%= element.firstname %></td>
+              <td class="isblockedemail"><%= element.email %></td>
+              <td style="display:flex;gap:15px">
+                <a href="" data-bs-toggle="modal" data-bs-target="#edituser" onclick="edituserfun('<%= element.firstname %>','<%= element.lastname %>','<%= element.phonenumber %>','<%= element.email %>','<%= element.password %>','<%= element._id %>')">
+                  <i class="fa-solid fa-pen-to-square"></i>
+                </a>
+                <a href=""data-bs-toggle="modal" data-bs-target="#deleteuser" onclick="deleteuserfun('<%= element._id %>')">
+                  <i class="fa-solid fa-trash"></i>
+                </a>
+                
+                <a href="" data-bs-toggle="modal" data-bs-target="#blockuser" onclick="blockuserfun('<%= element._id %>')">
+                  <i class="bi bi-ban"></i>
+                </a>
+                <a href="" data-bs-toggle="modal" data-bs-target="#unblockuser" onclick="unblockuserfun('<%= element._id %>')">
+                  <i class="bi bi-unlock"></i>
+                </a>
+              </td>
+              <td class="isblockedstatus" style="color:white"><%= element.is_blocked %></td>
+            </tr>
+        <% }) %> 
+    </tbody>
+  </table>
+  <!-- add category -->
+  <!-- Sidebar and Navbar Content (No changes) -->
+
+<!-- Add user Modal -->
+<div class="modal fade" id="adduser" tabindex="-1" aria-labelledby="addCategoryLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-body">
+        <form action="/admin/adduser" method="post" onsubmit="return validatefun()">
+          <h3>Add User</h3>
+          <input class="form-control" type="text" name="firstname" id="firstname" placeholder="Enter firstname" required> <br>
+          <input class="form-control" type="text" name="lastname" id="lastname" placeholder="Enter Lastname" required> <br>
+          <input class="form-control" type="text" name="phonenumber" id="phonenumber" placeholder="Enter phone number" required> <br>
+          <input class="form-control" type="text" name="email" id="email" placeholder="Enter email address" required> <br>
+          <input class="form-control" type="text" name="password" id="password" placeholder="Enter password" required> <br>
+          <input class="form-control" type="text" name="confirmpassword" id="confirmpassword" placeholder="Enter confirm password" required> <br>
+          <div class="d-flex justify-content-end mt-3">
+            <button type="submit" class="btn btn-primary">Add User</button>
+          </div>
+        </form>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit user Modal -->
+<div class="modal fade" id="edituser" tabindex="-1" aria-labelledby="addCategoryLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-body">
+        <form action="/admin/editUser" method="post">
+          <h3>Edit User</h3>
+          <input type="text" name="id" id="id">
+          <input class="form-control" type="text" name="firstname" id="editfirstname" placeholder="Enter firstname" required> <br>
+          <input class="form-control" type="text" name="lastname" id="editlastname" placeholder="Enter Lastname" required> <br>
+          <input class="form-control" type="text" name="phonenumber" id="editphonenumber" placeholder="Enter phone number" required> <br>
+          <input class="form-control" type="text" name="email" id="editemail" placeholder="Enter email address" required> <br>
+          <input class="form-control" type="text" name="password" id="editpassword" placeholder="Enter password" required> <br>
+          <div class="d-flex justify-content-end mt-3">
+            <button type="submit" class="btn btn-primary">Edit User</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- delete user modal-->
+<div class="modal fade" id="deleteuser" tabindex="-1" aria-labelledby="editCategoryLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-body">
+          <form action="/admin/deleteUser" method="post">
+            <input type="hidden" id="deleteid" name="deleteid">
+            <h2>Are you sure</h2>
+            <p>Do you want to delete the user!</p>
+            <div class="d-flex justify-content-end">
+              <button type="button" class="btn btn-primary me-2" data-bs-dismiss="modal">cancel</button>
+              <button class="btn btn-danger" type="submit">Delete</button>
+            </div>
+          </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- block user modal -->
+<div class="modal fade" id="blockuser" tabindex="-1" aria-labelledby="editCategoryLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-body">
+           <form action="/admin/blockUser" method="post">
+            <input type="hidden" id="blockid" name="blockid">
+            <h2>Are you sure</h2>
+           <p>Do you want to block the user!</p>
+           <div class="d-flex justify-content-end">
+            <button type="button" class="btn btn-primary me-2" data-bs-dismiss="modal">cancel</button>
+            <button class="btn btn-danger" type="submit">Block</button>
+          </div>
+           </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- unblockuser-->
+<div class="modal fade" id="unblockuser" tabindex="-1" aria-labelledby="editCategoryLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-body">
+           <form action="/admin/unblockUser" method="post">
+            <input type="hidden" id="unblockid" name="unblockid">
+            <h2>Are you sure</h2>
+           <p>Do you want to unblock the user!</p>
+           <div class="d-flex justify-content-end">
+            <button type="button" class="btn btn-primary me-2" data-bs-dismiss="modal">cancel</button>
+            <button class="btn btn-danger" type="submit">Unblock</button>
+          </div>
+           </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+<script>
+function validatefun(){
+  if(document.getElementById("password").value!==document.getElementById("confirmpassword").value){
+  alert("password is not match")
+ }
+}
+function edituserfun(firstname,lastname,phonenumber,email,password,id){
+  document.getElementById("editfirstname").value=firstname
+  document.getElementById("editlastname").value=lastname
+  document.getElementById("editphonenumber").value=phonenumber
+  document.getElementById("editemail").value=email
+  document.getElementById("editpassword").value=password
+  document.getElementById("id").value=id
+}
+function deleteuserfun(id){
+  document.getElementById("deleteid").value=id
+}
+function blockuserfun(id){
+  document.getElementById("blockid").value=id
+}
+function unblockuserfun(id){
+  document.getElementById("unblockid").value=id
+}
+document.querySelectorAll(".isblockedstatus").forEach((statusElement, index) => {
+    if (statusElement.textContent.trim() === "true") {
+        // Apply color to the corresponding category name
+        document.querySelectorAll(".isblockedfname")[index].style.color = "red";
+    }
+});
+document.querySelectorAll(".isblockedstatus").forEach((statusElement, index) => {
+    if (statusElement.textContent.trim() === "true") {
+        // Apply color to the corresponding category name
+        document.querySelectorAll(".isblockedemail")[index].style.color = "red";
+    }
+});
+document.querySelectorAll(".isblockedstatus").forEach((statusElement, index) => {
+    if (statusElement.textContent.trim() === "true") {
+        // Apply color to the corresponding category name
+        document.querySelectorAll(".isblockedindex")[index].style.color = "red";
+    }
+});
+function searchUser() {
+  const input = document.getElementById("searchUser").value.toLowerCase();
+  const rows = document.querySelectorAll("#userTableBody tr");
+  let serialNumber = 1;
+
+  rows.forEach((row) => {
+    const username = row.querySelector(".isblockedfname").textContent.toLowerCase();
+    const useremail = row.querySelector(".isblockedemail").textContent.toLowerCase();
+
+    if (username.includes(input) || useremail.includes(input)) {
+      row.style.display = ""; // Show the row
+      row.querySelector(".isblockedindex").textContent = serialNumber++; // Update serial number
+    } else {
+      row.style.display = "none"; // Hide the row
+    }
+  });
+}
+
+
+
+
+
+
+</script>
+

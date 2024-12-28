@@ -1,0 +1,245 @@
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="/dashboard.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <nav class="sidebar">
+    <ul class="nav">
+      <li class="nav-item">
+        <a class="nav-link " href="/admin/dashboard">
+          <i class="fas fa-gauge fs-5 p-2"></i>
+          <span class="menu-title fs-4">Dashboard</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/admin/banner">
+          <i class="fas fa-gauge fs-5 p-2"></i>
+          <span class="menu-title fs-4">Banner Updation</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link " href="/admin/usermanagement">
+          <i class="fas fa-user fs-5 p-2"></i>
+          <span class="menu-title fs-5">User Management</span>
+        </a>
+      </li>
+      <li class="nav-item category d-flex">
+        <a class="category px-2" href="/admin/category">
+          <i class="fas fa-tag fs-5 p-2 "></i>
+          <span class="menu-title fs-5 ">Category Registration</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/admin/hotel">
+          <i class="fas fa-building fs-5 p-2"></i>
+          <span class="menu-title fs-5">Hotel Registration</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/admin/food">
+          <i class="fas fa-drumstick-bite fs-5 p-2"></i>
+          <span class="menu-title fs-5">Food Registration</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link  text-danger" href="index.html">
+          <i class="fas fa-right-from-bracket fs-5 p-2 text-danger"></i>
+          <span class="menu-title fs-5">Logout</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+  <div class="d-flex searchkey">
+    <input type="text" id="searchCategory" class="form-control w-50" placeholder="Search Category" onkeyup="searchCategories()">
+  </div>
+  <button class="additem" data-bs-toggle="modal" data-bs-target="#addCategory">Add item +</button>
+  <table class="atable">
+    <thead>
+      <tr>
+        <th>Sl No</th>
+        <th>Category</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="categoryTableBody">
+      <% if (categories && categories.length > 0) { %>
+        <% categories.forEach(function(category, index) { %>
+            <tr>
+                <td class="isblockedindex"><%= index + 1 %></td>
+                <td class="isblockedcategoryname"><%= category.categoryname %></td>
+                <td class="d-flex gap-5">
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#editCategory" onclick="editFun('<%= category.categoryname %>','<%= category._id %>','<%= category.image %>')">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </a>
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#deleteCategory" onclick="deleteFun('<%= category.categoryname %>')">
+                      <i class="bi bi-ban"></i>
+                    </a>   
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#unblockcategory" onclick="deleteFun('<%= category.categoryname %>')">
+                      <i class="bi bi-unlock"></i>
+                    </a>            
+                </td>
+                <td style="color:white" class="isdeletedstatus"><%= category.isdeleted %></td>
+            </tr>
+        <% }) %>
+    <% } else { %>
+        <tr>
+            <td colspan="3">No categories found.</td>
+        </tr>
+    <% } %>
+    
+    
+    </tbody>
+  </table>
+  <!-- add category -->
+  <!-- Sidebar and Navbar Content (No changes) -->
+
+<!-- Add Category Modal -->
+<div class="modal fade" id="addCategory" tabindex="-1" aria-labelledby="addCategoryLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-body">
+        <form action="/admin/addcategory" method="post" enctype="multipart/form-data">
+          <h3>Add Category</h3>
+          <label for="addCategoryInput" class="form-label">Category Name</label>
+          <input class="form-control" type="text" name="categoryname" id="addCategoryInput" placeholder="Enter category name" required>
+          
+          <label for="imageInput" class="form-label">Upload Image</label>
+          <input class="form-control" type="file" name="image" id="imageInput" accept="image/*" >
+          <img src="" alt="" id="categoryImage">
+          <div class="d-flex justify-content-end mt-3">
+            <button type="submit" class="btn btn-primary">Add Category</button>
+          </div>
+        </form>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Category Modal -->
+<div class="modal fade" id="editCategory" tabindex="-1" aria-labelledby="editCategoryLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-body">
+        <form action="/admin/editcategory" method="post" enctype="multipart/form-data">
+          <h3>Edit Category</h3>
+          <input type="hidden" id="editId" name="id">
+          <label for="addCategoryInput" class="form-label">categoryname</label>
+          <input class="form-control" type="text" name="categoryname" id="editCategoryInput" placeholder="Enter category name" required>
+          
+          <label for="imageInput" class="form-label">Upload Image</label>
+          <input class="form-control" type="file" name="image" id="editimageInput" accept="image/*" required>
+          <img src="" alt="">
+          
+          <div class="d-flex justify-content-end mt-3">
+            <button type="submit" class="btn btn-primary">Edit Category</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- block category modal -->
+<div class="modal fade" id="deleteCategory" tabindex="-1" aria-labelledby="editCategoryLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-body">
+           <form action="/admin/deletecategory" method="post">
+            <input type="hidden" id="deletecategory" name="categoryname">
+            <h2>Are you sure</h2>
+           <p>Do you want to block the category!</p>
+           <div class="d-flex justify-content-end">
+            <button type="button" class="btn btn-primary me-2" data-bs-dismiss="modal">cancel</button>
+            <button class="btn btn-danger" type="submit">Block</button>
+          </div>
+           </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- unblockcategory -->
+<div class="modal fade" id="unblockcategory" tabindex="-1" aria-labelledby="editCategoryLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-body">
+           <form action="/admin/unblockcategory" method="post">
+            <input type="hidden" id="unblockcategoryinput" name="categoryname">
+            <h2>Are you sure</h2>
+           <p>Do you want to unblock the category!</p>
+           <div class="d-flex justify-content-end">
+            <button type="button" class="btn btn-primary me-2" data-bs-dismiss="modal">cancel</button>
+            <button class="btn btn-danger" type="submit">Unblock</button>
+          </div>
+           </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+<script>
+function validateadd(){
+  const addCategory=document.getElementById("addCategoryInput").value
+  if(addCategory===""){
+    Swal.fire("please enter category");
+    return false
+  }
+  return true
+}
+function validateedit(){
+  const editCategory=document.getElementById("editCategoryInput").value
+  if(editCategory===""){
+    Swal.fire("please enter category");
+    return false
+  }
+  return true
+}
+function editFun(categoryName,id,image){
+  console.log(image)
+  document.getElementById("editCategoryInput").value=categoryName
+  document.getElementById("editId").value=id
+  document.getElementById("editimageInput").value=`/uploads/${file.filename}`
+}
+function deleteFun(categoryName){
+  document.getElementById("deletecategory").value=categoryName
+  document.getElementById("unblockcategoryinput").value=categoryName
+}
+
+
+function searchCategories() {
+    const input = document.getElementById("searchCategory").value.toLowerCase();
+    const rows = document.querySelectorAll("#categoryTableBody tr");
+    let serialNumber = 1;
+
+    rows.forEach(row => {
+        const category = row.children[1].textContent.toLowerCase(); 
+        if (category.includes(input)) {
+            row.style.display = ""; 
+            row.children[0].textContent = serialNumber++; 
+        } else {
+            row.style.display = "none";
+        }
+    });
+}
+document.querySelectorAll(".isdeletedstatus").forEach((statusElement, index) => {
+    if (statusElement.textContent.trim() === "true") {
+        // Apply color to the corresponding category name
+        document.querySelectorAll(".isblockedcategoryname")[index].style.color = "red";
+    }
+});
+document.querySelectorAll(".isdeletedstatus").forEach((statusElement, index) => {
+    if (statusElement.textContent.trim() === "true") {
+        // Apply color to the corresponding category name
+        document.querySelectorAll(".isblockedindex")[index].style.color = "red";
+    }
+});
+
+
+
+
+</script>
+

@@ -1,0 +1,426 @@
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="/dashboard.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<nav class="sidebar">
+  <ul class="nav">
+    <li class="nav-item">
+      <a class="nav-link " href="/admin/dashboard">
+        <i class="fas fa-gauge fs-5 p-2"></i>
+        <span class="menu-title fs-4">Dashboard</span>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="/admin/banner">
+        <i class="fas fa-gauge fs-5 p-2"></i>
+        <span class="menu-title fs-4">Banner Updation</span>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link " href="/admin/usermanagement">
+        <i class="fas fa-user fs-5 p-2"></i>
+        <span class="menu-title fs-5">User Management</span>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="/admin/category">
+        <i class="fas fa-tag fs-5 p-2 "></i>
+        <span class="menu-title fs-5 ">Category Registration</span>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="/admin/hotel">
+        <i class="fas fa-building fs-5 p-2"></i>
+        <span class="menu-title fs-5">Hotel Registration</span>
+      </a>
+    </li>
+    <li class="nav-item category d-flex">
+      <a class="category px-2" href="/admin/food">
+        <i class="fas fa-drumstick-bite fs-5 p-2"></i>
+        <span class="menu-title fs-5">Food Registration</span>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link  text-danger" href="index.html">
+        <i class="fas fa-right-from-bracket fs-5 p-2 text-danger"></i>
+        <span class="menu-title fs-5">Logout</span>
+      </a>
+    </li>
+  </ul>
+</nav>
+<div class="d-flex searchkey">
+  <input type="text" id="searchCategory" class="form-control w-50" placeholder="Search Category"
+    onkeyup="searchCategories()">
+</div>
+<button class="additem" data-bs-toggle="modal" data-bs-target="#addCategory">Add item +</button>
+<table class="atable">
+  <thead>
+    <tr>
+      <th>Sl No</th>
+      <th>Food Name</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% foods.forEach((element,index) => { %>
+      <tr>
+        <td class="blockedfoodindex"><%= index+1 %></td>
+        <td class="blockedfoodname"><%= element.foodname %></td>
+        <td class="d-flex gap-5">
+          <a href="#" data-bs-toggle="modal" data-bs-target="#editFoodModal" onclick="editFun('<%= element.foodname %>','<%= element.category_id %>','<%= element.hotel_id %>','<%= element.rate %>','<%= element.gst_per %>','<%= element.delivery_charge %>','<%= element.packing_charge %>','<%= element.is_veg %>','<%= element.duration_time %>','<%= element._id %>')">
+            <i class="fa-solid fa-pen-to-square"></i>
+          </a>
+          <a href="#" data-bs-toggle="modal" data-bs-target="#blockFood" onclick="blockFun('<%= element._id %>')">
+            <i class="bi bi-ban"></i>
+          </a>   
+          <a href="#" data-bs-toggle="modal" data-bs-target="#unblockFood" onclick="unblockFun('<%= element._id %>')">
+            <i class="bi bi-unlock"></i>
+          </a> 
+        </td>
+        <td class="isblockedstatus" style="color:white"><%= element.is_blocked %></td>
+      </tr>
+      <% }) %>
+  </tbody>
+
+
+</table>
+<!-- addfood -->
+<div class="modal fade" id="addCategory" tabindex="-1" aria-labelledby="addCategoryLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-body">
+        <form action="/admin/addFood" method="post">
+          <h3>Add Food</h3>
+          <input class="form-control" type="text" name="foodname" id="addfoodinput" placeholder="Enter food name" required><br>
+      
+          <select class="form-control" name="categoryname" id="addcategoryInput" required>
+              <option value="">Select Category</option>
+              <% categories.forEach(element => { %>
+                  <option value="<%= element._id %>"><%= element.categoryname %></option>
+              <% }) %>
+          </select><br>
+      
+          <select class="form-control" name="hotelname" id="addhotelinput" required>
+              <option value="">Select Hotel</option>
+              <% hotels.forEach(element => { %>
+                  <option value="<%= element._id %>"><%= element.hotelname %></option>
+              <% }) %>
+          </select><br>
+      
+          <label for="Rate">Rate</label>
+          <input class="form-control" value="0" type="number" name="rate" id="addRateinput" placeholder="Enter Rate" required><br>
+      
+          <label for="Gstper">Gst %</label>
+          <input class="form-control" value="0" type="number" name="gst_per" id="addgstperinput" placeholder="Enter Gst%" required><br>
+      
+          <label for="Gstamnt">Gst Amount</label>
+          <input class="form-control" value="0" type="number" name="Gstamnt" id="addgstamntinput" readonly><br>
+      
+          <label for="deliveryper">Delivery Percentage</label>
+          <input class="form-control" value="0" type="number" name="delivery_charge" id="deliveryper" placeholder="Enter deliverycharge %"><br>
+      
+          <label for="deliverycharge">Delivery Charge</label>
+          <input class="form-control" value="0" type="number" name="deliverycharge" id="deliverycharge" readonly><br>
+      
+          <label for="packingper">Packing Charge %</label>
+          <input class="form-control" value="0" type="number" name="packing_charge" id="packingper" placeholder="Enter packingcharge %"><br>
+      
+          <label for="packingcharge">Packing Charge</label>
+          <input class="form-control" value="0" type="number" name="packingcharge" id="packingcharge" readonly><br>
+      
+          <label for="totalRate">Total Rate</label>
+          <input class="form-control" value="0" type="number" name="totalRate" id="totalRate" readonly><br>
+      
+          <select class="form-control" id="is_veg" required>
+            <option value="">Veg or Non-veg</option>
+              <option value="true">Veg</option>
+              <option value="false">Non-veg</option>
+              
+          </select><br>
+          <input type="hidden" name="is_veg" id="sampleveg">
+      
+          <label for="deliverytime">Delivery Time (minutes)</label>
+          <input class="form-control" value="0" type="text" name="duration_time" id="deliverytime" placeholder="Enter delivery time"><br>
+      
+          <div class="d-flex justify-content-end mt-3">
+              <button type="submit" class="btn btn-primary">Add Food</button>
+          </div>
+      </form>
+      
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Food Modal -->
+<div class="modal fade" id="editFoodModal" tabindex="-1" aria-labelledby="addCategoryLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-body">
+        <form action="/admin/editFood" method="post">
+          <h3>Edit Food</h3>
+          <input type="hidden" id="id" name="id">
+          <input class="form-control" type="text" name="foodname" id="editfoodname" placeholder="Enter food name" required><br>
+      
+          <select class="form-control" name="categoryname" id="editcategory" required>
+              <option value="">Select Category</option>
+              <% categories.forEach(element => { %>
+                  <option value="<%= element._id %>"><%= element.categoryname %></option>
+              <% }) %>
+          </select><br>
+      
+          <select class="form-control" name="hotelname" id="edithotel" required>
+              <option value="">Select Hotel</option>
+              <% hotels.forEach(element => { %>
+                  <option value="<%= element._id %>"><%= element.hotelname %></option>
+              <% }) %>
+          </select><br>
+      
+          <label for="Rate">Rate</label>
+          <input class="form-control" value="0" type="number" name="rate" id="editrate" placeholder="Enter Rate" required><br>
+      
+          <label for="Gstper">Gst %</label>
+          <input class="form-control" value="0" type="number" name="gst_per" id="editgst" placeholder="Enter Gst%" required><br>
+      
+          <label for="Gstamnt">Gst Amount</label>
+          <input class="form-control" value="0" type="number" name="Gstamnt" id="editgstamount" readonly><br>
+      
+          <label for="deliveryper">Delivery Percentage</label>
+          <input class="form-control" value="0" type="number" name="delivery_charge" id="editdeliverycharge" placeholder="Enter deliverycharge %"><br>
+      
+          <label for="deliverycharge">Delivery Charge</label>
+          <input class="form-control" value="0" type="number" name="deliverycharge" id="editdeliveryamount" readonly><br>
+      
+          <label for="packingper">Packing Charge %</label>
+          <input class="form-control" value="0" type="number" name="packing_charge" id="editpackingcharge" placeholder="Enter packingcharge %"><br>
+      
+          <label for="packingcharge">Packing Charge</label>
+          <input class="form-control" value="0" type="number" name="packingcharge" id="editpackingamount" readonly><br>
+      
+          <label for="totalRate">Total Rate</label>
+          <input class="form-control" value="0" type="number" name="totalRate" id="edittotalrate" readonly><br>
+      
+          <select class="form-control" id="editisveg" name="is_veg" required>
+            <option value="">Veg or Non-veg</option>
+              <option value="true">Veg</option>
+              <option value="false">Non-veg</option>
+              
+          </select><br>
+          <input type="hidden" name="is_veg" id="sampleveg">
+      
+          <label for="deliverytime">Delivery Time (minutes)</label>
+          <input class="form-control" value="0" type="text" name="duration_time" id="editdurationtime" placeholder="Enter delivery time"><br>
+      
+          <div class="d-flex justify-content-end mt-3">
+              <button type="submit" class="btn btn-primary">Edit Food</button>
+          </div>
+      </form>
+      
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Block Food modal -->
+<div class="modal fade" id="blockFood" tabindex="-1" aria-labelledby="editCategoryLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-body">
+        <form action="/admin/blockFood" method="post">
+          <input type="hidden" id="blockid" name="blockid">
+          <h2>Are you sure</h2>
+          <p>Do you want to block the food!</p>
+          <div class="d-flex justify-content-end">
+            <button type="button" class="btn btn-primary me-2" data-bs-dismiss="modal">Cancel</button>
+            <button class="btn btn-danger" type="submit">Block</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Unblock Food Modal-->
+<div class="modal fade" id="unblockFood" tabindex="-1" aria-labelledby="editCategoryLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-body">
+        <form action="/admin/unblockFood" method="post">
+          <input type="hidden" id="unblockid" name="unblockid">
+          <h2>Are you sure</h2>
+          <p>Do you want to unblock the food!</p>
+          <div class="d-flex justify-content-end">
+            <button type="button" class="btn btn-primary me-2" data-bs-dismiss="modal">Cancel</button>
+            <button class="btn btn-danger" type="submit">Unblock</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+  integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+<script>
+
+  document.getElementById('addgstperinput').addEventListener('input', function () {
+    const rateInput = parseFloat(document.getElementById("addRateinput").value)
+    const gstPercentage = parseFloat(this.value)
+    document.getElementById("addgstamntinput").value = (rateInput * gstPercentage / 100)
+  })
+
+  document.getElementById("deliveryper").addEventListener('input', function () {
+    const rateInput = parseFloat(document.getElementById("addRateinput").value)
+    const deliveryper = parseFloat(this.value)
+    document.getElementById("deliverycharge").value = (rateInput * deliveryper / 100)
+  })
+  document.getElementById("packingper").addEventListener('input', function () {
+    const rateInput = parseFloat(document.getElementById("addRateinput").value)
+    const packingper = parseFloat(this.value)
+    document.getElementById("packingcharge").value = (rateInput * packingper / 100)
+  })
+  document.getElementById("addRateinput").addEventListener('input', function () {
+    const rateInput = parseFloat(this.value)
+    const gstamount = parseFloat(document.getElementById("addgstamntinput").value)
+    const deliveryamount = parseFloat(document.getElementById("deliverycharge").value)
+    const packingamount = parseFloat(document.getElementById("packingcharge").value)
+    document.getElementById("totalRate").value = rateInput + gstamount + deliveryamount + packingamount
+  })
+  document.getElementById("addgstperinput").addEventListener('input', function () {
+    const rateInput = parseFloat(document.getElementById("addRateinput").value)
+    const gstamount = rateInput * parseFloat(this.value) / 100
+    const deliveryamount = parseFloat(document.getElementById("deliverycharge").value)
+    const packingamount = parseFloat(document.getElementById("packingcharge").value)
+    document.getElementById("totalRate").value = rateInput + gstamount + deliveryamount + packingamount
+  })
+  document.getElementById("deliveryper").addEventListener('input', function () {
+    const rateInput = parseFloat(document.getElementById("addRateinput").value)
+    const gstamount = parseFloat(document.getElementById("addgstamntinput").value)
+    const deliveryamount = rateInput * parseFloat(this.value) / 100
+    const packingamount = parseFloat(document.getElementById("packingcharge").value)
+    document.getElementById("totalRate").value = rateInput + gstamount + deliveryamount + packingamount
+  })
+  document.getElementById("packingper").addEventListener('input', function () {
+    const rateInput = parseFloat(document.getElementById("addRateinput").value)
+    const gstamount = parseFloat(document.getElementById("addgstamntinput").value)
+    const deliveryamount = parseFloat(document.getElementById("deliverycharge").value)
+    const packingamount = rateInput * parseFloat(this.value) / 100
+    document.getElementById("totalRate").value = rateInput + gstamount + deliveryamount + packingamount
+  })
+  document.getElementById("addRateinput").addEventListener('input', function () {
+    const rateInput = parseFloat(this.value)
+    const gstPercentage = parseFloat(document.getElementById('addgstperinput').value)
+    const deliveryper = parseFloat(document.getElementById("deliveryper").value)
+    const packingper = parseFloat(document.getElementById("packingper").value)
+    document.getElementById("addgstamntinput").value = rateInput * gstPercentage / 100
+    document.getElementById("deliverycharge").value = rateInput * deliveryper / 100
+    document.getElementById("packingcharge").value = rateInput * packingper / 100
+    document.getElementById('totalRate').value=rateInput+(rateInput*gstPercentage/100)+(rateInput * deliveryper / 100)+(rateInput * packingper / 100)
+  })
+
+  document.getElementById("is_veg").addEventListener("change", function () {
+    const isVegValue = this.value;
+    document.getElementById("sampleveg").value = isVegValue;
+  });
+  function editFun(foodname,category,hotel,rate,gst,delivery,packing,veg,duration,id,gstamount,deliveryamount,packingamount,totalrate){
+    document.getElementById('editfoodname').value=foodname
+    document.getElementById('editcategory').value=category
+    document.getElementById('edithotel').value=hotel
+    document.getElementById('editrate').value=rate
+    document.getElementById('editgst').value=gst
+    document.getElementById('editdeliverycharge').value=delivery
+    document.getElementById('editpackingcharge').value=packing
+    document.getElementById('editisveg').value=veg
+    document.getElementById('editdurationtime').value=duration
+    gstamount=rate*gst/100
+    deliveryamount=rate*delivery/100
+    packingamount=rate*packing/100
+    totalrate=parseFloat(rate)+parseFloat(gstamount)+parseFloat(deliveryamount)+parseFloat(packingamount)
+    document.getElementById('editgstamount').value=gstamount
+    document.getElementById('editdeliveryamount').value=deliveryamount
+    document.getElementById('editpackingamount').value=packingamount
+    document.getElementById('edittotalrate').value=totalrate
+    document.getElementById('id').value=id
+  }
+
+  // editfunctions
+
+  document.getElementById('editgst').addEventListener('change', function () {
+    const rateInput = parseFloat(document.getElementById("editrate").value)
+    const gstPercentage = parseFloat(this.value)
+    document.getElementById("editgstamount").value = (rateInput * gstPercentage / 100)
+  })
+
+  document.getElementById("editdeliverycharge").addEventListener('change', function () {
+    const rateInput = parseFloat(document.getElementById("editrate").value)
+    const deliveryper = parseFloat(this.value)
+    document.getElementById("editdeliveryamount").value = (rateInput * deliveryper / 100)
+  })
+  document.getElementById("editpackingcharge").addEventListener('change', function () {
+    const rateInput = parseFloat(document.getElementById("editrate").value)
+    const packingper = parseFloat(this.value)
+    document.getElementById("editpackingamount").value = (rateInput * packingper / 100)
+  })
+  document.getElementById("editrate").addEventListener('change', function () {
+    const rateInput = parseFloat(this.value)
+    const gstamount = parseFloat(document.getElementById("editgstamount").value)
+    const deliveryamount = parseFloat(document.getElementById("editdeliveryamount").value)
+    const packingamount = parseFloat(document.getElementById("editpackingamount").value)
+    document.getElementById("edittotalrate").value = rateInput + gstamount + deliveryamount + packingamount
+  })
+  document.getElementById("editgst").addEventListener('change', function () {
+    const rateInput = parseFloat(document.getElementById("editrate").value)
+    const gstamount = rateInput * parseFloat(this.value) / 100
+    const deliveryamount = parseFloat(document.getElementById("editdeliveryamount").value)
+    const packingamount = parseFloat(document.getElementById("editpackingamount").value)
+    document.getElementById("edittotalrate").value = rateInput + gstamount + deliveryamount + packingamount
+  })
+  document.getElementById("editdeliverycharge").addEventListener('change', function () {
+    const rateInput = parseFloat(document.getElementById("editrate").value)
+    const gstamount = parseFloat(document.getElementById("editgstamount").value)
+    const deliveryamount = rateInput * parseFloat(this.value) / 100
+    const packingamount = parseFloat(document.getElementById("editpackingamount").value)
+    document.getElementById("edittotalrate").value = rateInput + gstamount + deliveryamount + packingamount
+  })
+  document.getElementById("editpackingcharge").addEventListener('change', function () {
+    const rateInput = parseFloat(document.getElementById("editrate").value)
+    const gstamount = parseFloat(document.getElementById("editgstamount").value)
+    const deliveryamount = parseFloat(document.getElementById("editdeliveryamount").value)
+    const packingamount = rateInput * parseFloat(this.value) / 100
+    document.getElementById("edittotalrate").value = rateInput + gstamount + deliveryamount + packingamount
+  })
+  document.getElementById("editrate").addEventListener('change', function () {
+    const rateInput = parseFloat(this.value)
+    const gstPercentage = parseFloat(document.getElementById('editgst').value)
+    const deliveryper = parseFloat(document.getElementById("editdeliverycharge").value)
+    const packingper = parseFloat(document.getElementById("editpackingcharge").value)
+    document.getElementById("editgstamount").value = rateInput * gstPercentage / 100
+    document.getElementById("editdeliveryamount").value = rateInput * deliveryper / 100
+    document.getElementById("editpackingamount").value = rateInput * packingper / 100
+    document.getElementById('edittotalrate').value=rateInput+(rateInput*gstPercentage/100)+(rateInput * deliveryper / 100)+(rateInput * packingper / 100)
+
+  })
+  function blockFun(id){
+    document.getElementById('blockid').value=id
+  }
+  function unblockFun(id){
+    document.getElementById('unblockid').value=id
+  }
+  document.querySelectorAll(".isblockedstatus").forEach((statusElement, index) => {
+    if (statusElement.textContent.trim() === "true") {
+        // Apply color to the corresponding category name
+        document.querySelectorAll(".blockedfoodindex")[index].style.color = "red";
+    }
+});
+document.querySelectorAll(".isblockedstatus").forEach((statusElement, index) => {
+    if (statusElement.textContent.trim() === "true") {
+        // Apply color to the corresponding category name
+        document.querySelectorAll(".blockedfoodname")[index].style.color = "red";
+    }
+});
+
+</script>

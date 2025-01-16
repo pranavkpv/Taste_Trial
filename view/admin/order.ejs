@@ -1,0 +1,125 @@
+<%- include('partials/admin') %>
+<link rel="stylesheet" href="/order.css">
+<div class="content">
+   <div class="d-flex justify-content-between align-items-center mb-4">
+      <h3 class="">Order Management</h3>
+   </div>
+
+  
+
+   <!-- Table -->
+   <div class="table-responsive">
+      <table class="table table-bordered table-hover text-center">
+         <thead class="table-dark">
+            <tr>
+               <th scope="col">Date</th>
+               <th scope="col">Invoice Number</th>
+               <th scope="col">Client Name</th>
+               <th scope="col">Product Name</th>
+               <th scope="col">Rate</th>
+               <th scope="col">Status</th>
+            </tr>
+         </thead>
+         <tbody>
+            <% orders.forEach(element => { %>
+            <tr>
+               <td><%= element.createdAtFormatted %></td>
+               <td>INV-<%= element._id %></td>
+               <td><%= element.userDetails[0].firstname %></td>
+               <td><img src="<%= element.rateDetails[0].images[0] %>" alt=""><br>
+               <p><%= element.foodDetails[0].foodname %></p></td>
+               <td>
+                  <ul class="list-unstyled text-start m-auto" style="max-width: 200px;">
+
+                     <li><%= element.items.total_amount %></li>
+                  </ul>
+               </td>
+
+               <td>
+                  <div class="dropdown">
+                     <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        <%= element.items.status %>
+                     </button>
+                     <% if (element.items.status === "cancelled" || element.items.status === "delivered") { %>
+                     <!-- Dropdown hidden for 'cancelled' and 'delivered' -->
+                     <ul class="dropdown-menu d-none">
+                     </ul>
+                     <% } else { %>
+                     <ul class="dropdown-menu">
+                        <% if (element.items.status === "processing") { %>
+                        <li><a class="dropdown-item" href="#"
+                              onclick="updateStatus('<%= element._id %>','<%= element.items._id %>' ,'packing')">Packing</a>
+                        </li>
+                        <li><a class="dropdown-item" href="#"
+                              onclick="updateStatus('<%= element._id %>','<%= element.items._id %>', 'onTheWay')">On the
+                              Way</a></li>
+                        <li><a class="dropdown-item" href="#"
+                              onclick="updateStatus('<%= element._id %>','<%= element.items._id %>', 'delivered')">Delivered</a>
+                        </li>
+                        <% } else if (element.items.status === "packing") { %>
+                        <li><a class="dropdown-item" href="#"
+                              onclick="updateStatus('<%= element._id %>','<%= element.items._id %>', 'onTheWay')">On the
+                              Way</a></li>
+                        <li><a class="dropdown-item" href="#"
+                              onclick="updateStatus('<%= element._id %>','<%= element.items._id %>', 'delivered')">Delivered</a>
+                        </li>
+                        <% } else if (element.items.status === "onTheWay") { %>
+                        <li><a class="dropdown-item" href="#"
+                              onclick="updateStatus('<%= element._id %>','<%= element.items._id %>', 'delivered')">Delivered</a>
+                        </li>
+                        <% } %>
+                     </ul>
+                     <% } %>
+                  </div>
+               </td>
+
+
+            </tr>
+            <% }) %>
+         </tbody>
+      </table>
+   </div>
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+
+
+function updateStatus(orderId, itemId, newStatus) {
+   fetch('/admin/updateStatus', {
+      method: 'POST',
+      headers: {
+         'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ orderId, itemId, newStatus }),
+   })
+      .then(response => response.json())
+      .then(data => {
+         if (data.success) {
+            Swal.fire({
+               text: "Status changed successfully",
+               icon: "success",
+               timer: 3000, // Adjust duration here
+               showConfirmButton: false,
+            });
+            setTimeout(() => {
+               location.reload(); // Reload the page to reflect changes
+            }, 3000); // Match the timer duration
+         } else {
+            Swal.fire({
+               text: "Failed to update status. Please try again.",
+               icon: "error",
+               timer: 3000,
+               showConfirmButton: false,
+            });
+         }
+      })
+      .catch(error => console.error('Error:', error));
+}
+
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

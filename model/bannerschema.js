@@ -15,6 +15,11 @@ const bannerschema = new mongoose.Schema(
          required: true,
          default: Date.now, 
       },
+      is_blocked:{
+         type:Boolean,
+         required:true,
+         default:false
+      }
    }
 );
 

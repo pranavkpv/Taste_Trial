@@ -1,0 +1,332 @@
+<%- include('partials/admin') %>
+<link rel="stylesheet" href="/varient.css">
+<div class="content">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="">Varient Management</h3>
+    <button class=" addItem" onclick="addItem()" data-bs-toggle="modal" data-bs-target="#addvarientModal"> + Add
+      Item</button>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="row search-bar">
+    <div class="col-md-6 ">
+      <div class="input-group">
+        <span class="input-group-text bg-secondary text-light"><i class="fas fa-search"></i></span>
+        <input type="text" 
+       id="searchInput" 
+       oninput="searchVarient(this.value)" 
+       class="form-control" 
+       placeholder="Search by Category..." 
+       value="<%= searchedvarientname || '' %>">
+
+     </div>
+     
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="table-responsive custom-table-bg">
+    <table class="table table-hover text-center">
+        <thead>
+            <tr>
+                <th>Sl No</th>
+                <th>Food Name</th>
+                <th>Varient Name</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody class="tableBody">
+            <!-- loop of food data -->
+            <% varients.forEach((element, index) => { %>
+            <tr>
+                <td class="tableindex"><%= startIndex+index %></td>
+                <td class="tablefood"><%= element.foodDetails[0].foodname %></td>
+                <td class="tabledata"><%= element.varientname %></td>
+                <td class="action-icons">
+                    <a class="text-dark" href="" data-bs-toggle="modal" data-bs-target="#editvarientModal" onclick="editfun('<%= element.food_id %>','<%= element.varientname %>','<%= element._id %>')"><i class="bi bi-pencil-square"></i></a>
+                    <a class="text-dark" href="" data-bs-toggle="modal" data-bs-target="#deletevarientModal" onclick="deletefun('<%= element._id %>')"><i class="bi bi-trash3-fill"></i></a>
+                    <a class="text-dark" href="" data-bs-toggle="modal" data-bs-target="#blockvarientModal" onclick="hidefun('<%= element._id %>')"><i class="bi bi-eye-slash"></i></a>
+                    <a class="text-dark" href="" data-bs-toggle="modal" data-bs-target="#unblockvarientModal" onclick="unhidefun('<%= element._id %>')"><i class="bi bi-eye"></i></a>
+                </td>
+                <td class=" isblocked d-none" id="isblocked"><%= element.is_blocked %></td>
+            </tr>
+            <% }) %>
+            <!-- /close the loop -->
+        </tbody>
+    </table>
+    <div id="pagination" style="text-align: center; margin-bottom: 20px;">
+      <% for (let i = 1; i <= page; i++) { %>
+         <button onclick="loadPage('<%= i %>')" class="btn btn-success">
+            <%= i %>
+         </button>
+      <% } %>
+   </div>
+</div>
+
+</div>
+
+<!-- Add Modal -->
+<div class="modal fade" id="addvarientModal" tabindex="-1" aria-labelledby="addVarientModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered custom-modal-width">
+    <div class="modal-content">
+      <form action="/admin/addvarient" method="post" onsubmit="return validateForm()">
+        <div class="modal-body">
+          <div class="mb-3">
+            <h2>Add Varient</h2>
+            <label for="foodname" class="form-label">Select Foodname</label>
+            <select name="food_id" id="foodname" class="form-control" >
+              <!-- loop -->
+               <option value="">select</option>
+              <% foods.forEach(element => { %>
+               <option value="<%= element._id %>"><%= element.foodname %></option>
+              <% }) %>
+              <!-- /loop -->
+            </select>
+            <p class="text-danger d-none error-message" id="hiddenfoodname">Please Select Food !</p>
+          </div>
+          <div class="mb-3">
+            <label for="varientname" class="form-label">Enter Varient Name</label>
+            <input type="text" class="form-control" id="varientname" placeholder="Enter Varient Name" name="varientname">
+            <p class="text-danger d-none error-message" id="hiddenvarientname">Please Enter Varient Name !</p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-success">Save</button>
+        </div>
+      </form>
+      
+    </div>
+  </div>
+</div>
+
+<!-- Edit Food -->
+<div class="modal fade" id="editvarientModal" tabindex="-1" aria-labelledby="editfoodModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered custom-modal-width">
+    <div class="modal-content">
+      <form action="/admin/editvarient" method="post" onsubmit="return editvalidateForm()">
+        <input type="hidden" name="editid" id="editid">
+         <div class="modal-body">
+           <div class="mb-3">
+             <h2>Edit Varient</h2>
+             <label for="foodname" class="form-label">Select Foodname</label>
+             <select name="food_id" id="editfoodname" class="form-control">
+               <!-- loop -->
+                <option value="">select</option>
+               <% foods.forEach(element => { %>
+                <option value="<%= element._id %>"><%= element.foodname %></option>
+               <% }) %>
+               <!-- /loop -->
+             </select>
+             <p class="text-danger d-none error-message" id="edithiddenfoodname">Please Select Food !</p>
+           </div>
+           <div class="mb-3">
+             <label for="varientname" class="form-label">Enter Varient Name</label>
+             <input type="text" class="form-control" id="editvarientname" placeholder="Enter Varient Name" name="varientname">
+             <p class="text-danger d-none error-message" id="edithiddenvarientname">Please Enter Varient Name !</p>
+           </div>
+         </div>
+         <div class="modal-footer">
+           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+           <button type="submit" class="btn btn-success">Save</button>
+         </div>
+       </form>
+    </div>
+  </div>
+</div>
+
+<!-- block Food -->
+<div class="modal fade" id="blockvarientModal" tabindex="-1" aria-labelledby="blockvarientModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered custom-modal-width">
+    <div class="modal-content">
+      <form action="/admin/blockvarient" method="post">
+        <input type="hidden" id="hideid" name="hideid">
+        <div class="modal-body">
+          <p>Do you want to hide the varient?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+          <button type="submit" class="btn btn-success">Yes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- unblock Food -->
+<div class="modal fade" id="unblockvarientModal" tabindex="-1" aria-labelledby="unblockvarientModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered custom-modal-width">
+    <div class="modal-content">
+      <form action="/admin/unblockvarient" method="post">
+        <input type="hidden" id="unhideid" name="unhideid">
+        <div class="modal-body">
+          <p>Do you want to unhide the varient?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+          <button type="submit" class="btn btn-success">Yes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- delete Food -->
+<div class="modal fade" id="deletevarientModal" tabindex="-1" aria-labelledby="deletevarientModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered custom-modal-width">
+    <div class="modal-content">
+      <form action="/admin/deletevarient" method="post">
+        <input type="hidden" id="deleteid" name="deleteid">
+        <div class="modal-body">
+          <p>Do you want to delete the varient?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+          <button type="submit" class="btn btn-success">Yes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+ function validateForm() {
+    const foodname = document.getElementById('foodname');
+    const varientname = document.getElementById('varientname');
+    const fooderror = document.getElementById('hiddenfoodname');
+    const varienterror = document.getElementById('hiddenvarientname');
+
+    fooderror.classList.add('d-none');
+    varienterror.classList.add('d-none');
+
+    let valid = true;
+
+    if (!foodname.value.trim()) {
+      fooderror.classList.remove('d-none');
+      valid = false;
+    }
+
+    if (!varientname.value.trim()) {
+      varienterror.classList.remove('d-none');
+      valid = false;
+    }
+
+    return valid;
+  }
+
+  let debounceTimer;
+
+function searchVarient(value) {
+   clearTimeout(debounceTimer);
+   debounceTimer = setTimeout(() => {
+      const currentPage = 1; // Reset to the first page for a new search
+      window.location.href = `/admin/varient?pagenumber=${currentPage}&varient=${encodeURIComponent(value)}`;
+   }, 700); // Adjust delay (in milliseconds) as needed
+}
+
+function loadPage(pageNumber) {
+   const searchValue = document.getElementById('searchInput').value || '';
+   window.location.href = `/admin/varient?pagenumber=${pageNumber}&varient=${encodeURIComponent(searchValue)}`;
+}
+
+
+function editfun(foodname,varientname,id){
+  document.getElementById("editid").value=id
+  document.getElementById("editfoodname").value=foodname
+  document.getElementById("editvarientname").value=varientname
+
+}
+
+function hidefun(id){
+  document.getElementById('hideid').value=id
+}
+
+function unhidefun(id){
+  document.getElementById('unhideid').value=id
+}
+
+function deletefun(id){
+  document.getElementById('deleteid').value=id
+}
+
+function editvalidateForm(){
+  const foodname = document.getElementById('editfoodname');
+    const varientname = document.getElementById('editvarientname');
+    const fooderror = document.getElementById('edithiddenfoodname');
+    const varienterror = document.getElementById('edithiddenvarientname');
+
+    fooderror.classList.add('d-none');
+    varienterror.classList.add('d-none');
+
+    let valid = true;
+
+    if (!foodname.value.trim()) {
+      fooderror.classList.remove('d-none');
+      valid = false;
+    }
+
+    if (!varientname.value.trim()) {
+      varienterror.classList.remove('d-none');
+      valid = false;
+    }
+
+    return valid;
+}
+
+document.querySelectorAll(".isblocked").forEach((statusElement, index) => {
+    if (statusElement.textContent.trim() === "true") {
+      document.querySelectorAll(".tabledata")[index].style.color = "#616362"
+      document.querySelectorAll(".tableindex")[index].style.color = "#616362"
+      document.querySelectorAll(".tablefood")[index].style.color = "#616362"
+
+    }
+  });
+
+
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<% if (existmessage && existmessage.length > 0) { %>
+<script>
+  Swal.fire({
+    text: "<%= existmessage %>",
+    icon: "info",
+    confirmButtonText: "OK",
+  }).then(() => {
+    // Re-open the modal after SweetAlert
+    const addcategoryModal = document.getElementById('addCategoryModal');
+    if (addCategoryModal) {
+      const modalInstance = new bootstrap.Modal(addcategoryModal);
+      modalInstance.show();
+    }
+  });
+</script>
+<% } %>
+
+
+<% if (successmessage && successmessage.length>0) { %>
+  <script>
+    Swal.fire({
+      text: "<%= successmessage %>",
+      icon: "success"
+    });
+  </script>
+  <% } %>
+  
+  <% if (editexistmessage && editexistmessage.length>0) { %>
+    <script>
+      Swal.fire({
+        text: "<%= editexistmessage %>",
+        icon: "info"
+      });
+    </script>
+    <% } %>
+  
+  <% if (errormessage && errormessage.length>0) { %>
+  <script>
+    Swal.fire({
+      text: "<%= errormessage %>",
+      icon: "error"
+    });
+  </script>
+  <% } %>

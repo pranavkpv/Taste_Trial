@@ -1,0 +1,969 @@
+<%- include('partials/admin') %>
+<link rel="stylesheet" href="/rate.css">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+<div class="content">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="">Rate Management</h3>
+    <button class=" addItem" onclick="addItem()" data-bs-toggle="modal" data-bs-target="#addRateModal"> + Add
+      Item</button>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="row search-bar">
+    <div class="col-md-6 ">
+      <div class="input-group">
+        <span class="input-group-text bg-secondary text-light"><i class="fas fa-search"></i></span>
+        <input type="text" id="searchInput" class="form-control" placeholder="Search by Hotel...">
+      </div>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="table-responsive custom-table-bg">
+    <table class="table table-hover text-center">
+      <thead>
+        <tr>
+          <th>Sl No</th>
+          <th>Hotelname</th>
+          <th>Foodname</th>
+          <th>VarientName</th>
+          <th>image</th>
+          <th>Price</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody class="tableBody">
+        <!-- loop of food data -->
+
+        <% ratecollections.forEach((element,index) => { %>
+        <tr>
+          <td><%= index+1 %></td>
+          <td><%= element.hotelDetails[0].hotelname %></td>
+          <td><%= element.foodDetails[0].foodname %></td>
+          <td><%= element.varientDetails[0].varientname %></td>
+          <td><img src="<%= element.images[0] %>" alt="" style="height:50px"></td>
+          <td><%= element.rate %></td>
+          <td class="action-icons">
+            <a class="text-dark" href="" data-bs-toggle="modal" data-bs-target="#editrateModal"
+              onclick="editFun('<%= element.hotelDetails[0].hotelname %>','<%= element.foodDetails[0].foodname %>','<%= element.varientDetails[0].varientname %>','<%= element.rate %>','<%= element.gst_per %>','<%= element.delivery_per %>','<%= element.packing_per %>','<%= element.delivery_time %>','<%= element.images[0] %>','<%= element.images[1] %>','<%= element.images[2] %>','<%= element._id %>','<%= element.stock %>','<%= element.files[0] %>','<%= element.files[1] %>','<%= element.files[2] %>')"><i
+                class="bi bi-pencil-square"></i></a>
+          </td>
+          <td class="d-none isblocked" id="isblocked">true</td>
+        </tr>
+
+        <% }) %>
+
+        <!-- /close the loop -->
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- Add Modal -->
+<div class="modal fade" id="addRateModal" tabindex="-1" aria-labelledby="addRateModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-xl ">
+    <div class="modal-content p-3">
+      <form action="/admin/addrate" id="addform" method="post" enctype="multipart/form-data"
+        onsubmit="return validateForm()">
+        <h3>Add Rate</h3>
+        <div class="row">
+          <!-- Left Column -->
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label for="addhotelinput" class="form-label">Hotel Name</label>
+              <select class="form-control" type="text" name="hotel_id" id="addhotel" placeholder="Enter Hotel name">
+                <option value="">select</option>
+                <% hotels.forEach(element => { %>
+                <option value="<%= element._id %>"><%= element.hotelname %></option>
+                <% }) %>
+
+              </select>
+              <p class="text-danger d-none" id="addhotelpop">Please Select Hotelname!</p>
+
+            </div>
+
+            <div class="mb-3">
+              <label for="addfoodinput" class="form-label">Food Name</label>
+              <select class="form-control" type="text" name="food_id" id="addfoodname" placeholder="Enter Food name">
+                <option value="">select</option>
+                <% foods.forEach(element => { %>
+                <option value="<%= element._id %>"><%= element.foodname %></option>
+                <% }) %>
+
+              </select>
+              <p class="text-danger d-none" id="addfoodnamepop">Please Select Foodname!</p>
+
+            </div>
+
+            <div class="mb-3">
+              <label for="addvarientinput" class="form-label">Varient Name</label>
+              <select class="form-control" type="text" name="varient_id" id="addvarientname"
+                placeholder="Enter Varient name">
+                <option value="">select</option>
+                <% varients.forEach(element => { %>
+                <option value="<%= element._id %>"><%= element.varientname%></option>
+                <% }) %>
+
+              </select>
+              <p class="text-danger d-none" id="addvarientnamepop">Please Select Varientname!</p>
+
+            </div>
+
+            <div class="mb-3">
+              <label for="addRateinput" class="form-label">Rate</label>
+              <input class="form-control" value="0" type="number" name="rate" id="addRateinput"
+                placeholder="Enter Rate">
+              <p class="text-danger d-none" id="addRateinputpop">Please Enter Rate!</p>
+
+            </div>
+
+            <div class="mb-3">
+              <label for="addgstperinput" class="form-label">Gst %</label>
+              <input class="form-control" value="0" type="number" name="gst_per" id="addgstperinput"
+                placeholder="Enter Gst%">
+              <p class="text-danger d-none" id="addgstperinputpop">Please Enter Gst%!</p>
+            </div>
+
+            <div class="mb-3">
+              <label for="addgstamntinput" class="form-label">Gst Amount</label>
+              <input class="form-control" value="0" type="number" name="Gstamnt" id="addgstamntinput" readonly>
+            </div>
+            <!-- Image 1 -->
+            <div class="mb-3">
+              <label for="firstImage" class="form-label">Upload First Image</label>
+              <input class="form-control" type="file" id="firstImage" accept="image/*"
+                onchange="initCropper(event, 'croppedImage1', 'cropContainer1','firstfilename')" name="images" >
+                <input type="hidden" id="firstfilename"></input>
+
+              <div id="cropContainer1" style="display: none; margin-top: 10px;">
+                <img id="croppedImage1" style="max-width: 100%; height: auto;" alt="Cropped Image">
+                <button type="button" class="btn btn-success"
+                  onclick="saveCroppedImage('croppedImage1', 'cropContainer1', 'previewImage1', 'previewContainer1', 'hiddenInput1')">Save</button>
+              </div>
+
+              <div id="previewContainer1" style="margin-top: 10px; display: none;">
+                <img id="previewImage1" class="preview mt-3" style="max-width: 100%; height: auto;" alt="Preview Image">
+                
+              </div>
+
+              <input type="hidden" id="hiddenInput1" name="croppedImageData1">
+            </div>
+
+
+            <!-- image 2 -->
+            <div class="mb-3">
+              <label for="secondImage" class="form-label">Upload Second Image</label>
+              <input class="form-control" type="file" id="secondImage" accept="image/*"
+                onchange="initCropper(event, 'croppedImage2', 'cropContainer2','secondfilename')" name="images">
+                <input type="hidden" id="secondfilename"></input>
+
+              <div id="cropContainer2" style="display: none; margin-top: 10px;">
+                <img id="croppedImage2" style="max-width: 100%; height: auto;" alt="Cropped Image">
+                <button type="button" class="btn btn-success"
+                  onclick="saveCroppedImage('croppedImage2', 'cropContainer2', 'previewImage2', 'previewContainer2', 'hiddenInput2')">Save</button>
+              </div>
+
+              <div id="previewContainer2" style="margin-top: 10px; display: none;">
+                <img id="previewImage2" class="preview mt-3" style="max-width: 100%; height: auto;" alt="Preview Image">
+                
+              </div>
+
+              <input type="hidden" id="hiddenInput2" name="croppedImageData2">
+            </div>
+          </div>
+
+
+          <!-- Right Column -->
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label for="deliveryper" class="form-label">Delivery Percentage</label>
+              <input class="form-control" value="0" type="number" name="delivery_per" id="deliveryper"
+                placeholder="Enter delivery charge %">
+              <p class="text-danger d-none" id="deliveryperpop">Please Enter Delivery%!</p>
+
+            </div>
+
+            <div class="mb-3">
+              <label for="deliverycharge" class="form-label">Delivery Charge</label>
+              <input class="form-control" value="0" type="number" name="deliverycharge" id="deliverycharge" readonly>
+            </div>
+
+            <div class="mb-3">
+              <label for="packingper" class="form-label">Packing Charge %</label>
+              <input class="form-control" value="0" type="number" name="packing_per" id="packingper"
+                placeholder="Enter packing charge %">
+              <p class="text-danger d-none" id="packingperpop">Please Enter Packing%!</p>
+
+            </div>
+
+            <div class="mb-3">
+              <label for="packingcharge" class="form-label">Packing Charge</label>
+              <input class="form-control" value="0" type="number" name="packingcharge" id="packingcharge" readonly>
+            </div>
+
+            <div class="mb-3">
+              <label for="totalRate" class="form-label">Total Rate</label>
+              <input class="form-control" value="0" type="number" name="totalRate" id="totalRate" readonly>
+            </div>
+
+            <div class="mb-3">
+              <label for="deliverytime" class="form-label">Delivery Time (minutes)</label>
+              <input class="form-control" value="0" type="text" name="delivery_time" id="deliverytime"
+                placeholder="Enter delivery time">
+              <p class="text-danger d-none" id="deliverytimepop">Please Enter Delivery Time!</p>
+            </div>
+
+            <div class="mb-3">
+              <label for="stock" class="form-label">Stock</label>
+              <input class="form-control" value="0" type="number" name="stock" id="addstock"
+                placeholder="Enter stock">
+              <p class="text-danger d-none" id="deliverytimepop">Please Enter valid stock</p>
+            </div>
+
+            <!-- third image -->
+            <div class="mb-3">
+              <label for="thirdImage" class="form-label">Upload Third Image</label>
+              <input class="form-control" type="file" id="thirdImage" accept="image/*"
+                onchange="initCropper(event, 'croppedImage3', 'cropContainer3','thirdfilename')" name="images">
+                <input type="hidden" id="thirdfilename"></input>
+
+              <div id="cropContainer3" style="display: none; margin-top: 10px;">
+                <img id="croppedImage3" style="max-width: 100%; height: auto;" alt="Cropped Image">
+                <button type="button" class="btn btn-success"
+                  onclick="saveCroppedImage('croppedImage3', 'cropContainer3', 'previewImage3', 'previewContainer3', 'hiddenInput3')">Save</button>
+              </div>
+
+              <div id="previewContainer3" style="margin-top: 10px; display: none;">
+                <img id="previewImage3" class="preview mt-3" style="max-width: 100%; height: auto;" alt="Preview Image">
+                
+              </div>
+
+              <input type="hidden" id="hiddenInput3" name="croppedImageData3">
+            </div>
+
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-center gap-3 mt-3">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-success">Save</button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+
+<!-- Edit Rate -->
+<div class="modal fade" id="editrateModal" tabindex="-1" aria-labelledby="editfoodModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-xl">
+    <div class="modal-content p-3">
+      <form action="/admin/editRate" method="post" enctype="multipart/form-data" onsubmit="return editsubmit()">
+        <h3>Edit Rate</h3>
+        <div class="row">
+          <!-- Left Column -->
+          <div class="col-md-6">
+            <input type="hidden" id="editid" name="editid">
+            <div class="mb-3">
+              <label for="addhotelinput" class="form-label">Hotel Name</label>
+              <select name="" id="edithotel" class="form-control">
+                <% hotels.forEach(element => { %>
+                <option value="<%= element.hotelname %>"><%= element.hotelname %></option>
+                <% }) %>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="addfoodinput" class="form-label">Food Name</label>
+              <select name="" id="editfoodname" class="form-control">
+                <% foods.forEach(element => { %>
+                <option value="<%= element.foodname %>"><%= element.foodname %></option>
+                <% }) %>
+              </select>
+
+            </div>
+
+            <div class="mb-3">
+              <label for="addvarientinput" class="form-label">Varient Name</label>
+              <select name="" id="editvarientname" class="form-control">
+                 <% varients.forEach(element => { %>
+                  <option value="<%= element.varientname %>"><%= element.varientname %></option>
+                 <% }) %>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="addRateinput" class="form-label">Rate</label>
+              <input class="form-control" value="0" type="number" name="rate" id="editRateinput"
+                placeholder="Enter Rate">
+              <p class="text-danger d-none" id="editratepop">Please Enter Rate!</p>
+
+
+            </div>
+
+            <div class="mb-3">
+              <label for="addgstperinput" class="form-label">Gst %</label>
+              <input class="form-control" value="0" type="number" name="gst_per" id="editgstperinput"
+                placeholder="Enter Gst%">
+              <p class="text-danger d-none" id="editgstperinputpop">Please Enter Gst%!</p>
+
+            </div>
+
+            <div class="mb-3">
+              <label for="editgstamount" class="form-label">Gst Amount</label>
+              <input class="form-control" value="0" type="number" name="Gstamnt" id="editgstamount" readonly>
+            </div>
+            <!-- image1 -->
+            <div class="mb-3">
+              <label for="editfirstImage" class="form-label">Upload First Image</label>
+              <input class="form-control" type="file" id="editfirstImage" accept="image/*"
+                onchange="initCropper(event, 'editcroppedImage1', 'editcropContainer1','editfirstfilename')" name="images" >
+              <input type="hidden" id="editfirstfilename" name="editfirstfilename">
+         
+
+              <div id="editcropContainer1" style="display: none; margin-top: 10px;">
+                <img id="editcroppedImage1" style="max-width: 100%; height: auto;" alt="Cropped Image">
+                <button type="button" class="btn btn-success"
+                  onclick="saveCroppedImage('editcroppedImage1', 'editcropContainer1', 'editpreviewImage1', 'editpreviewContainer1', 'edithiddenInput1')">Save</button>
+              </div>
+
+              <div id="editpreviewContainer1" style="margin-top: 10px; ">
+                <img id="editpreviewImage1" class="preview mt-3" style="max-width: 100%; height: auto;"
+                  alt="Preview Image">
+                
+              </div>
+
+              <input type="hidden" id="edithiddenInput1" name="editcroppedImageData1">
+            </div>
+            <!-- secondimage -->
+            <div class="mb-3">
+              <label for="editsecondImage" class="form-label">Upload Second Image</label>
+              <input class="form-control" type="file" id="editsecondImage" accept="image/*"
+                onchange="initCropper(event, 'editcroppedImage2', 'editcropContainer2','editsecondfilename')" name="images">
+                <input type="hidden" id="editsecondfilename" name="editsecondfilename"></input>
+               
+
+
+              <div id="editcropContainer2" style="display: none; margin-top: 10px;">
+                <img id="editcroppedImage2" style="max-width: 100%; height: auto;" alt="Cropped Image">
+                <button type="button" class="btn btn-success"
+                  onclick="saveCroppedImage('editcroppedImage2', 'editcropContainer2', 'editpreviewImage2', 'editpreviewContainer2', 'edithiddenInput2')">Save</button>
+              </div>
+
+              <div id="editpreviewContainer2" style="margin-top: 10px; ">
+                <img id="editpreviewImage2" class="preview mt-3" style="max-width: 100%; height: auto;"
+                  alt="Preview Image">
+                
+              </div>
+
+              <input type="hidden" id="edithiddenInput2" name="editcroppedImageData2">
+            </div>
+
+          </div>
+
+          <!-- Right Column -->
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label for="deliveryper" class="form-label">Delivery Percentage</label>
+              <input class="form-control" value="0" type="number" name="delivery_per" id="editdeliveryper"
+                placeholder="Enter delivery charge %">
+              <p class="text-danger d-none" id="editdeliveryperpop">Please Enter Delivery%!</p>
+
+            </div>
+
+            <div class="mb-3">
+              <label for="deliverycharge" class="form-label">Delivery Charge</label>
+              <input class="form-control" value="0" type="number" name="deliverycharge" id="editdeliveryamount"
+                readonly>
+            </div>
+
+            <div class="mb-3">
+              <label for="packingper" class="form-label">Packing Charge %</label>
+              <input class="form-control" value="0" type="number" name="packing_per" id="editpackingper"
+                placeholder="Enter packing charge %">
+              <p class="text-danger d-none" id="editpackingperpop">Please Enter Packiing Charge%!</p>
+            </div>
+
+            <div class="mb-3">
+              <label for="packingcharge" class="form-label">Packing Charge</label>
+              <input class="form-control" value="0" type="number" name="packingcharge" id="editpackingamount" readonly>
+            </div>
+
+            <div class="mb-3">
+              <label for="totalRate" class="form-label">Total Rate</label>
+              <input class="form-control" value="0" type="number" name="totalRate" id="edittotalrate" readonly>
+            </div>
+
+            <div class="mb-3">
+              <label for="deliverytime" class="form-label">Delivery Time (minutes)</label>
+              <input class="form-control" value="0" type="text" name="delivery_time" id="editdeliverytime"
+                placeholder="Enter delivery time">
+              <p class="text-danger d-none" id="editdeliverytimepop">Please Enter Delivery Time!</p>
+            </div>
+
+
+            <div class="mb-3">
+              <label for="deliverytime" class="form-label">Stock</label>
+              <input class="form-control" value="0" type="number" name="stock" id="editstock"
+                placeholder="Enter stock number">
+              <p class="text-danger d-none" id="editdeliverytimepop">Please Enter valid stock number</p>
+            </div>
+
+
+            <div class="mb-3">
+              <label for="editthirdImage" class="form-label">Upload Third Image</label>
+              <input class="form-control" type="file" id="editthirdImage" accept="image/*"
+                onchange="initCropper(event, 'editcroppedImage3', 'editcropContainer3','editthirdfilename')" name="images">
+                <input type="hidden" id="editthirdfilename" name="editthirdfilename"></input>
+
+              <div id="editcropContainer3" style="display: none; margin-top: 10px;">
+                <img id="editcroppedImage3" style="max-width: 100%; height: auto;" alt="Cropped Image">
+                <button type="button" class="btn btn-success"
+                  onclick="saveCroppedImage('editcroppedImage3', 'editcropContainer3', 'editpreviewImage3', 'editpreviewContainer3', 'edithiddenInput3')">Save</button>
+              </div>
+
+              <div id="editpreviewContainer3" style="margin-top: 10px; ">
+                <img id="editpreviewImage3" class="preview mt-3" style="max-width: 100%; height: auto;"
+                  alt="Preview Image">
+                
+              </div>
+
+              <input type="hidden" id="edithiddenInput3" name="editcroppedImageData3">
+            </div>
+
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-center mt-3 gap-3">
+          <button type="" class="btn btn-secondary">Cancel</button>
+          <button type="submit" class="btn btn-success">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- block rate -->
+<div class="modal fade" id="blockrateModal" tabindex="-1" aria-labelledby="blockfoodModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered custom-modal-width">
+    <div class="modal-content">
+      <form action="/admin/hiderate" method="post">
+        <input type="hidden" id="hideid" name="hideid">
+        <div class="modal-body">
+          <p>Do you want to hide the rate?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+          <button type="submit" class="btn btn-success">Yes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- unblock Rate -->
+<div class="modal fade" id="unblockrateModal" tabindex="-1" aria-labelledby="unblockHotelModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered custom-modal-width">
+    <div class="modal-content">
+      <form action="/admin/unhiderate" method="post">
+        <input type="hidden" id="unhideid" name="unhideid">
+        <div class="modal-body">
+          <p>Do you want to unhide the rate?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+          <button type="submit" class="btn btn-success">Yes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- delete rate -->
+<div class="modal fade" id="deleterateModal" tabindex="-1" aria-labelledby="deleteHotelModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered custom-modal-width">
+    <div class="modal-content">
+      <form action="/admin/deleterate" method="post">
+        <input type="hidden" id="deleteid" name="deleteid">
+        <div class="modal-body">
+          <p>Do you want to delete the rate?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+          <button type="submit" class="btn btn-success">Yes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+  function validateForm() {
+    const addhotel = document.getElementById('addhotel').value;
+    const addhotelpop = document.getElementById('addhotelpop');
+
+    const addfoodname = document.getElementById('addfoodname').value;
+    const addfoodnamepop = document.getElementById('addfoodnamepop');
+
+    const addvarientname = document.getElementById('addvarientname').value;
+    const addvarientnamepop = document.getElementById('addvarientnamepop');
+
+    const addRateinput = document.getElementById('addRateinput').value;
+    const addRateinputpop = document.getElementById('addRateinputpop');
+
+    const addgstperinput = document.getElementById('addgstperinput').value;
+    const addgstperinputpop = document.getElementById('addgstperinputpop');
+
+    const deliveryper = document.getElementById('deliveryper').value;
+    const deliveryperpop = document.getElementById('deliveryperpop');
+
+    const packingper = document.getElementById('packingper').value;
+    const packingperpop = document.getElementById('packingperpop');
+
+    const deliverytime = document.getElementById('deliverytime').value;
+    const deliverytimepop = document.getElementById('deliverytimepop');
+
+    let isValid = true;
+
+    // Validate Hotel Name
+    if (!addhotel || addhotel === "select") {
+      addhotelpop.classList.remove('d-none');
+      isValid = false;
+    } else {
+      addhotelpop.classList.add('d-none');
+    }
+
+    // Validate Food Name
+    if (!addfoodname || addfoodname === "select") {
+      addfoodnamepop.classList.remove('d-none');
+      isValid = false;
+    } else {
+      addfoodnamepop.classList.add('d-none');
+    }
+
+    // Validate Varient Name
+    if (!addvarientname || addvarientname === "select") {
+      addvarientnamepop.classList.remove('d-none');
+      isValid = false;
+    } else {
+      addvarientnamepop.classList.add('d-none');
+    }
+
+    // Validate Rate
+    if (!addRateinput || addRateinput < 0) {
+      addRateinputpop.classList.remove('d-none');
+      isValid = false;
+    } else {
+      addRateinputpop.classList.add('d-none');
+    }
+
+    // Validate GST Percentage
+    if (!addgstperinput || addgstperinput < 0) {
+      addgstperinputpop.classList.remove('d-none');
+      isValid = false;
+    } else {
+      addgstperinputpop.classList.add('d-none');
+    }
+
+    // Validate Delivery Percentage
+    if (!deliveryper || deliveryper < 0) {
+      deliveryperpop.classList.remove('d-none');
+      isValid = false;
+    } else {
+      deliveryperpop.classList.add('d-none');
+    }
+
+    // Validate Packing Percentage
+    if (!packingper || packingper < 0) {
+      packingperpop.classList.remove('d-none');
+      isValid = false;
+    } else {
+      packingperpop.classList.add('d-none');
+    }
+
+    // Validate Delivery Time
+    if (!deliverytime || deliverytime < 0) {
+      deliverytimepop.classList.remove('d-none');
+      isValid = false;
+    } else {
+      deliverytimepop.classList.add('d-none');
+    }
+
+    return isValid;
+  }
+
+
+  function editsubmit() {
+    const fields = [
+      { id: 'edithotel', popId: 'edithotelpop', message: 'Please Select Hotel Name!' },
+      { id: 'editfoodname', popId: 'editfoodinputpop', message: 'Please Select Food Name!' },
+      { id: 'editvarientname', popId: 'editvarientnamepop', message: 'Please Select Varient Name!' },
+      { id: 'editRateinput', popId: 'editratepop', message: 'Please Enter a Valid Rate!', validate: (value) => value !== "" },
+      { id: 'editgstperinput', popId: 'editgstperinputpop', message: 'Please Enter a Valid GST Percentage!', validate: (value) => value !== "" },
+      { id: 'editdeliveryper', popId: 'editdeliveryperpop', message: 'Please Enter a Valid Delivery Percentage!', validate: (value) => value !== "" },
+      { id: 'editpackingper', popId: 'editpackingperpop', message: 'Please Enter a Valid Packing Charge Percentage!', validate: (value) => value !== "" },
+      { id: 'editdeliverytime', popId: 'editdeliverytimepop', message: 'Please Enter a Valid Delivery Time!', validate: (value) => value.trim() !== '' },
+    ];
+
+    let isValid = true;
+
+    fields.forEach(({ id, popId, message, validate = (value) => value.trim() !== '' }) => {
+      const field = document.getElementById(id);
+      const popElement = document.getElementById(popId);
+
+      if (!field || !popElement) {
+        console.error(`Missing element with ID "${ id }" or "${ popId }".`);
+        return;
+      }
+
+      const value = field.value;
+      if (!validate(value)) {
+        popElement.classList.remove('d-none');
+        popElement.textContent = message;
+        isValid = false;
+      } else {
+        popElement.classList.add('d-none');
+      }
+    });
+
+    return isValid;
+  }
+
+
+  
+
+  function editFun(hotelname, foodname, varientname, rate, gst, delivery, packing, time, firstimage, secondimage, thirdimage,id,stock,file1,file2,file3) {
+    document.getElementById('edithotel').value = hotelname
+    document.getElementById('editfoodname').value = foodname
+    document.getElementById('editvarientname').value = varientname
+    document.getElementById('editRateinput').value = rate
+    document.getElementById('editgstperinput').value = gst
+    document.getElementById('editdeliveryper').value = delivery
+    document.getElementById('editpackingper').value = packing
+    document.getElementById('editdeliverytime').value = time
+    document.getElementById('editstock').value=stock
+    gstamount = rate * gst / 100
+    document.getElementById('editgstamount').value = gstamount
+    deliveryamount = rate * delivery / 100
+    packingamount = rate * packing / 100
+    totalrate = parseFloat(rate) + parseFloat(gstamount) + parseFloat(deliveryamount) + parseFloat(packingamount)
+    document.getElementById('editdeliveryamount').value = deliveryamount
+    document.getElementById('editpackingamount').value = packingamount
+    document.getElementById('edittotalrate').value = totalrate
+    document.getElementById('editpreviewImage1').src = firstimage
+    document.getElementById('editpreviewImage2').src = secondimage
+    document.getElementById('editpreviewImage3').src = thirdimage
+    document.getElementById('editid').value=id
+    document.getElementById('editfirstfilename').value=file1
+    document.getElementById('editsecondfilename').value=file2
+    document.getElementById('editthirdfilename').value=file3
+
+
+
+  }
+
+
+  document.getElementById('editgstperinput').addEventListener('change', function () {
+    const rateInput = parseFloat(document.getElementById("editRateinput").value)
+    const gstPercentage = parseFloat(this.value)
+    document.getElementById("editgstamount").value = (rateInput * gstPercentage / 100)
+  })
+
+  document.getElementById("editdeliveryper").addEventListener('change', function () {
+    const rateInput = parseFloat(document.getElementById("editRateinput").value)
+    const deliveryper = parseFloat(this.value)
+    document.getElementById("editdeliveryamount").value = (rateInput * deliveryper / 100)
+  })
+  document.getElementById("editpackingper").addEventListener('change', function () {
+    const rateInput = parseFloat(document.getElementById("editRateinput").value)
+    const packingper = parseFloat(this.value)
+    document.getElementById("editpackingamount").value = (rateInput * packingper / 100)
+  })
+  document.getElementById("editRateinput").addEventListener('change', function () {
+    const rateInput = parseFloat(this.value)
+    const gstamount = parseFloat(document.getElementById("editgstamount").value)
+    const deliveryamount = parseFloat(document.getElementById("editdeliveryamount").value)
+    const packingamount = parseFloat(document.getElementById("editpackingamount").value)
+    document.getElementById("edittotalrate").value = rateInput + gstamount + deliveryamount + packingamount
+  })
+  document.getElementById("editgstperinput").addEventListener('change', function () {
+    const rateInput = parseFloat(document.getElementById("editRateinput").value)
+    const gstamount = rateInput * parseFloat(this.value) / 100
+    const deliveryamount = parseFloat(document.getElementById("editdeliveryamount").value)
+    const packingamount = parseFloat(document.getElementById("editpackingamount").value)
+    document.getElementById("edittotalrate").value = rateInput + gstamount + deliveryamount + packingamount
+  })
+  document.getElementById("editdeliveryper").addEventListener('change', function () {
+    const rateInput = parseFloat(document.getElementById("editRateinput").value)
+    const gstamount = parseFloat(document.getElementById("editgstamount").value)
+    const deliveryamount = rateInput * parseFloat(this.value) / 100
+    const packingamount = parseFloat(document.getElementById("editpackingamount").value)
+    document.getElementById("edittotalrate").value = rateInput + gstamount + deliveryamount + packingamount
+  })
+  document.getElementById("editpackingper").addEventListener('change', function () {
+    const rateInput = parseFloat(document.getElementById("editRateinput").value)
+    const gstamount = parseFloat(document.getElementById("editgstamount").value)
+    const deliveryamount = parseFloat(document.getElementById("editdeliveryamount").value)
+    const packingamount = rateInput * parseFloat(this.value) / 100
+    document.getElementById("edittotalrate").value = rateInput + gstamount + deliveryamount + packingamount
+  })
+  document.getElementById("editRateinput").addEventListener('change', function () {
+    const rateInput = parseFloat(this.value)
+    const gstPercentage = parseFloat(document.getElementById('editgstperinput').value)
+    const deliveryper = parseFloat(document.getElementById("editdeliveryper").value)
+    const packingper = parseFloat(document.getElementById("editpackingper").value)
+    document.getElementById("editgstamount").value = rateInput * gstPercentage / 100
+    document.getElementById("editdeliveryamount").value = rateInput * deliveryper / 100
+    document.getElementById("editpackingamount").value = rateInput * packingper / 100
+    document.getElementById('edittotalrate').value = rateInput + (rateInput * gstPercentage / 100) + (rateInput * deliveryper / 100) + (rateInput * packingper / 100)
+
+  })
+
+
+
+
+  // document.getElementById('addform').addEventListener('submit', function(event) {
+  //   event.preventDefault(); // Prevent default form submission
+  //   validateForm();
+  // });
+
+
+  let croppers = {}; // Object to hold multiple cropper instances
+
+  function initCropper(event, imageId, cropContainerId, filenameId) {
+    const file = event.target.files[0]; // Get the selected file
+    if (file) {
+        // Update the filename in the <p> tag
+        document.getElementById(filenameId).value = file.name;
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            const image = document.getElementById(imageId);
+            image.src = e.target.result; // Set the image source to the file's data URL
+
+            // Show the crop container
+            document.getElementById(cropContainerId).style.display = 'block';
+
+            // Destroy the previous cropper instance for this imageId if it exists
+            if (croppers[imageId]) {
+                croppers[imageId].destroy();
+            }
+
+            // Initialize a new cropper instance for this image
+            croppers[imageId] = new Cropper(image, {
+                aspectRatio: 1, // Adjust as per your requirement
+                viewMode: 1,
+            });
+        };
+        reader.readAsDataURL(file);
+    } else {
+        // If no file is selected, reset the filename display
+        document.getElementById(filenameId).textContent = "No file chosen";
+    }
+}
+
+  function saveCroppedImage(imageId, cropContainerId, previewImageId, previewContainerId, hiddenInputId) {
+    if (croppers[imageId]) {
+      const canvas = croppers[imageId].getCroppedCanvas();
+
+      // Set the preview image
+      const previewImage = document.getElementById(previewImageId);
+      previewImage.src = canvas.toDataURL('image/png');
+
+      // Store cropped image data in the hidden input
+      const hiddenInput = document.getElementById(hiddenInputId);
+      hiddenInput.value = canvas.toDataURL('image/png');
+
+      // Show the preview container and hide the crop container
+      document.getElementById(previewContainerId).style.display = 'block';
+      document.getElementById(cropContainerId).style.display = 'none';
+
+      // Destroy the cropper instance
+      croppers[imageId].destroy();
+      delete croppers[imageId];
+    }
+  }
+
+
+
+  document.getElementById('addgstperinput').addEventListener('input', function () {
+    const rateInput = parseFloat(document.getElementById("addRateinput").value)
+    const gstPercentage = parseFloat(this.value)
+    document.getElementById("addgstamntinput").value = (rateInput * gstPercentage / 100)
+  })
+  document.getElementById("deliveryper").addEventListener('input', function () {
+    const rateInput = parseFloat(document.getElementById("addRateinput").value)
+    const deliveryper = parseFloat(this.value)
+    document.getElementById("deliverycharge").value = (rateInput * deliveryper / 100)
+  })
+  document.getElementById("packingper").addEventListener('input', function () {
+    const rateInput = parseFloat(document.getElementById("addRateinput").value)
+    const packingper = parseFloat(this.value)
+    document.getElementById("packingcharge").value = (rateInput * packingper / 100)
+  })
+  document.getElementById("addRateinput").addEventListener('input', function () {
+    const rateInput = parseFloat(this.value)
+    const gstamount = parseFloat(document.getElementById("addgstamntinput").value)
+    const deliveryamount = parseFloat(document.getElementById("deliverycharge").value)
+    const packingamount = parseFloat(document.getElementById("packingcharge").value)
+    document.getElementById("totalRate").value = rateInput + gstamount + deliveryamount + packingamount
+  })
+  document.getElementById("addgstperinput").addEventListener('input', function () {
+    const rateInput = parseFloat(document.getElementById("addRateinput").value)
+    const gstamount = rateInput * parseFloat(this.value) / 100
+    const deliveryamount = parseFloat(document.getElementById("deliverycharge").value)
+    const packingamount = parseFloat(document.getElementById("packingcharge").value)
+    document.getElementById("totalRate").value = rateInput + gstamount + deliveryamount + packingamount
+  })
+  document.getElementById("deliveryper").addEventListener('input', function () {
+    const rateInput = parseFloat(document.getElementById("addRateinput").value)
+    const gstamount = parseFloat(document.getElementById("addgstamntinput").value)
+    const deliveryamount = rateInput * parseFloat(this.value) / 100
+    const packingamount = parseFloat(document.getElementById("packingcharge").value)
+    document.getElementById("totalRate").value = rateInput + gstamount + deliveryamount + packingamount
+  })
+  document.getElementById("packingper").addEventListener('input', function () {
+    const rateInput = parseFloat(document.getElementById("addRateinput").value)
+    const gstamount = parseFloat(document.getElementById("addgstamntinput").value)
+    const deliveryamount = parseFloat(document.getElementById("deliverycharge").value)
+    const packingamount = rateInput * parseFloat(this.value) / 100
+    document.getElementById("totalRate").value = rateInput + gstamount + deliveryamount + packingamount
+  })
+  document.getElementById("addRateinput").addEventListener('input', function () {
+    const rateInput = parseFloat(this.value)
+    const gstPercentage = parseFloat(document.getElementById('addgstperinput').value)
+    const deliveryper = parseFloat(document.getElementById("deliveryper").value)
+    const packingper = parseFloat(document.getElementById("packingper").value)
+    document.getElementById("addgstamntinput").value = rateInput * gstPercentage / 100
+    document.getElementById("deliverycharge").value = rateInput * deliveryper / 100
+    document.getElementById("packingcharge").value = rateInput * packingper / 100
+    document.getElementById('totalRate').value = rateInput + (rateInput * gstPercentage / 100) + (rateInput * deliveryper / 100) + (rateInput * packingper / 100)
+  })
+
+
+
+
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<% if (successmessage && successmessage.length>0) { %>
+<script>
+  Swal.fire({
+    text: "<%= successmessage %>",
+    icon: "success"
+  });
+</script>
+<% } %>
+
+<% if (errormessage && errormessage.length>0) { %>
+<script>
+  Swal.fire({
+    text: "<%= errormessage %>",
+    icon: "error"
+  });
+</script>
+<% } %>
+
+
+<% if (questionmessage && questionmessage.length > 0) { %>
+<script>
+  Swal.fire({
+    text: "<%= questionmessage %>",
+    icon: "question",
+    confirmButtonText: "OK",
+  }).then(() => {
+    // Re-open the modal after SweetAlert
+    const addrateModal = document.getElementById('addRateModal');
+    if (addrateModal) {
+      const modalInstance = new bootstrap.Modal(addrateModal);
+      modalInstance.show();
+    }
+  });
+</script>
+<% } %>
+
+
+<% if (existmessage && existmessage.length > 0) { %>
+<script>
+  Swal.fire({
+    text: "<%= existmessage %>",
+    icon: "info",
+    confirmButtonText: "OK",
+  }).then(() => {
+    // Re-open the modal after SweetAlert
+    const addrateModal = document.getElementById('addRateModal');
+    if (addrateModal) {
+      const modalInstance = new bootstrap.Modal(addrateModal);
+      modalInstance.show();
+    }
+  });
+</script>
+<% } %>
+
+
+
+
+<!-- function editvalidateForm() {
+  const editcategoryname = document.getElementById('editcategoryname').value;
+  const edithiddencategoryname = document.getElementById('edithiddencategoryname');
+  const editfoodname = document.getElementById('editfoodname').value;
+  const edithiddenfoodname = document.getElementById('edithiddenfoodname');
+  const editfoodImage = document.getElementById('editfoodImage');
+  const editimagehidden = document.getElementById('editimagehidden');
+ 
+
+
+  let isValid = true;
+  // Validate category name
+  if (!editcategoryname) {
+    edithiddencategoryname.classList.remove('d-none'); // Show the error message
+    isValid = false;
+  } else {
+    edithiddencategoryname.classList.add('d-none'); // Hide the error message
+  }
+
+  //validate foodname
+  if (!editfoodname) {
+    edithiddenfoodname.classList.remove('d-none'); // Show the error message
+    isValid = false;
+  } else {
+    edithiddenfoodname.classList.add('d-none'); // Hide the error message
+  }
+
+  return isValid; // Return true only if both fields are valid
+
+}
+
+function editfun(categoryname,foodname,image,id,isveg){
+  document.getElementById('editcategoryname').value=categoryname
+  document.getElementById('editfoodname').value=foodname
+  document.getElementById('editimagePreview').src=image
+  document.getElementById('editid').value=id
+  document.getElementById('editisveg').value=isveg
+
+}
+function deletefun(id){
+  document.getElementById('deleteid').value=id
+}
+
+function hidefun(id){
+  document.getElementById('hideid').value=id
+}
+
+function unhidefun(id){
+  document.getElementById('unhideid').value=id
+}
+
+
+document.querySelectorAll(".isblocked").forEach((statusElement, index) => {
+    if (statusElement.textContent.trim() === "true") {
+      document.querySelectorAll(".tabledata")[index].style.color = "#616362"
+      document.querySelectorAll(".tableindex")[index].style.color = "#616362"
+      document.querySelectorAll(".tablecategory")[index].style.color = "#616362"
+
+    }
+  }); -->
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> 

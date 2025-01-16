@@ -1,258 +1,551 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bootstrap Sidebar</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-  <link rel="stylesheet" href="/dashboard.css">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-</head>
-<body>
-  <nav class="sidebar">
-    <ul class="nav">
-      <li class="nav-item">
-        <a class="nav-link " href="/admin/dashboard">
-          <i class="fas fa-gauge fs-5 p-2"></i>
-          <span class="menu-title fs-4">Dashboard</span>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/admin/banner">
-          <i class="fas fa-gauge fs-5 p-2"></i>
-          <span class="menu-title fs-4">Banner Updation</span>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link " href="/admin/usermanagement">
-          <i class="fas fa-user fs-5 p-2"></i>
-          <span class="menu-title fs-5">User Management</span>
-        </a>
-      </li>
-      <li class="nav-item ">
-        <a class="nav-link " href="/admin/category">
-          <i class="fas fa-tag fs-5 p-2 "></i>
-          <span class="menu-title fs-5 ">Category Registration</span>
-        </a>
-      </li>
-      <li class="nav-item category">
-        <a class="category px-2" href="/admin/hotel">
-          <i class="fas fa-building fs-5 p-2"></i>
-          <span class="menu-title fs-5">Hotel Registration</span>
-        </a>
-      </li>
-      <li class="nav-item ">
-        <a class="nav-link" href="/admin/food">
-          <i class="fas fa-drumstick-bite fs-5 p-2"></i>
-          <span class="menu-title fs-5">Food Registration</span>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link  text-danger" href="">
-          <i class="fas fa-right-from-bracket fs-5 p-2 text-danger"></i>
-          <span class="menu-title fs-5">Logout</span>
-        </a>
-      </li>
-    </ul>
-  </nav>
-  <div class="d-flex searchkey">
-    <input type="text" id="searchCategory" class="form-control w-50" placeholder="Search Hotel" onkeyup="searchCategories()">
+<%- include('partials/admin') %>
+<link rel="stylesheet" href="/hotel.css">
+<div class="content">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="">Hotel Management</h3>
+    <button class=" addItem" onclick="addItem()" data-bs-toggle="modal" data-bs-target="#addHotelModal"> + Add
+      Item</button>
   </div>
-  <button class="additem" data-bs-toggle="modal" data-bs-target="#addHotel">Add item +</button>
-  <table class="atable">
-    <thead>
-      <tr>
-        <th>Sl No</th>
-        <th>Hotel Name</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody id="categoryTableBody">
-      <% if (hotels && hotels.length > 0) { %>
-        <% hotels.forEach(function(hotel, index) { %>
-            <tr>
-                <td class="isblockedindex"><%= index + 1 %></td>
-                <td class="isblockedhotelname"><%= hotel.hotelname %></td>
-                <td class="d-flex gap-5">
-                    <a href="#" data-bs-toggle="modal" data-bs-target="#editHotel" onclick="editFun('<%= hotel.hotelname %>','<%= hotel._id %>','<%= hotel.hoteladdress %>','<%= hotel.photo %>','<%= hotel.contact_no %>','<%= hotel.alternative_no %>')">
-                        <i class="fa-solid fa-pen-to-square"></i>
-                    </a>
-                    <a href="#" data-bs-toggle="modal" data-bs-target="#blockHotel" onclick="blockFun('<%= hotel._id %>')">
-                      <i class="bi bi-ban"></i>
-                    </a>   
-                    <a href="#" data-bs-toggle="modal" data-bs-target="#unblockHotel" onclick="unblockFun('<%= hotel._id %>')">
-                      <i class="bi bi-unlock"></i>
-                    </a>               
-                </td>
-                <td class="isblockedstatus" style="color:white"><%= hotel.is_blocked %></td>
-            </tr>
-        <% }) %>
-    <% } else { %>
+
+<!-- Search Bar -->
+<div class="row search-bar">
+  <div class="col-md-6 ">
+    <div class="input-group">
+      <span class="input-group-text bg-secondary text-light"><i class="fas fa-search"></i></span>
+      <input type="text" 
+     id="searchInput" 
+     oninput="searchHotel(this.value)" 
+     class="form-control" 
+     placeholder="Search by Category..." 
+     value="<%= searchedhotelname || '' %>">
+
+   </div>
+   
+  </div>
+</div>
+
+  <!-- Table -->
+  <div class="table-responsive custom-table-bg">
+    <table class="table table-hover text-center">
+      <thead>
         <tr>
-            <td colspan="3">No hotel found.</td>
+          <th>Sl No</th>
+          <th>Title</th>
+          <th>Image</th>
+          <th>Action</th>
         </tr>
-    <% } %>
-    
-    
-    </tbody>
-  </table>
+      </thead>
+      <tbody class="tableBody">
+        <!-- loop of hotel data -->
+        <% hotels.forEach((element, index) => { %>
+        <tr>
+          <td class="tableindex"><%= startIndex+index %></td>
+          <td class="tabledata"><%= element.hotelname %></td>
+          <td><img src="<%= element.image %>" alt="Hotel Image" style="height:50px"></td>
+          <td class="action-icons">
+            <a class="text-dark" href="" data-bs-toggle="modal" data-bs-target="#editHotelModal"
+              onclick="editfun('<%= element.hotelname %>','<%= element.hoteladdress %>','<%= element.contact_no %>','<%= element.alternative_no %>','<%= element.image %>','<%= element._id %>','<%= element.food_items %>')"><i
+                class="bi bi-pencil-square"></i></a>
+            <a class="text-dark" href="" data-bs-toggle="modal" data-bs-target="#deleteHotelModal"
+              onclick="deletefun('<%= element._id %>')"><i class="bi bi-trash3-fill"></i></a>
+            <a class="text-dark" href="" data-bs-toggle="modal" data-bs-target="#blockHotelModal"
+              onclick="hidefun('<%= element._id %>')"><i class="bi bi-eye-slash"></i></a>
+            <a class="text-dark" href="" data-bs-toggle="modal" data-bs-target="#unblockHotelModal"
+              onclick="unhidefun('<%= element._id %>')"><i class="bi bi-eye"></i></a>
+          </td>
+          <td class="d-none isblocked" id="isblocked"><%= element.is_blocked %></td>
+        </tr>
+        <% }) %>
+        <!-- /close the loop -->
+      </tbody>
+    </table>
+    <div id="pagination" style="text-align: center; margin-bottom: 20px;">
+      <% for (let i = 1; i <= page; i++) { %>
+         <button onclick="loadPage('<%= i %>')" class="btn btn-success">
+            <%= i %>
+         </button>
+      <% } %>
+   </div>
+  </div>
 
-<!-- Add hodel Modal -->
-<div class="modal fade" id="addHotel" tabindex="-1" aria-labelledby="addHotelLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-body">
-        <form action="/admin/addHotel" method="post" enctype="multipart/form-data">
-          <h3>Add Hotel</h3>
-          <label for="addHotelInput" class="form-label">Hotel Name</label>
-          <input class="form-control" type="text" name="hotelname" id="addHotelInput" placeholder="Enter hotel name" required>
+</div>
 
-          <label for="address" class="form-label">Address</label>
-          <input class="form-control" type="text" name="hoteladdress" id="address" placeholder="Enter hotel address" required>
-          
-          <label for="imageInput" class="form-label">Upload Image</label>
-          <input class="form-control" type="file" name="photo" id="imageInput" accept="image/*" required>
+<!-- Add Modal -->
+<div class="modal fade" id="addHotelModal" tabindex="-1" aria-labelledby="addHotelModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-xl">
+    <div class="modal-content p-2">
+      <form action="/admin/addhotel" method="post" onsubmit="return validateForm()" enctype="multipart/form-data"
+        id="foodSelectionForm">
+        <h2>Add Hotel</h2>
+        <div class="modal-body d-flex" style="gap:200px">
+          <div class="left" style="width:40%">
+            <div class="mb-3">
+              <label for="hotelTitle" class="form-label">Enter Hotel Name</label>
+              <input type="text" class="form-control" id="hotelname" placeholder="Enter Hotel Name" name="hotelname">
+              <p class="text-danger d-none error-message" id="hotelhidden">Please Enter Hotel!</p>
+            </div>
 
-          <label for="contactnumber" class="form-label">Contact Number</label>
-          <input class="form-control" type="text" name="contact_no" id="contactnumber" placeholder="Enter contact number" required>
+            <div class="mb-3">
+              <label for="hotelAddress" class="form-label">Enter Hotel Address</label>
+              <input type="text" class="form-control" id="hoteladdress" placeholder="Enter Hotel Address"
+                name="hoteladdress">
+              <p class="text-danger d-none error-message" id="addresshidden">Please Enter Hotel!</p>
+            </div>
 
-          <label for="alternativenumber" class="form-label">Alternative Number</label>
-          <input class="form-control" type="text" name="alternative_no" id="alternativenumber" placeholder="Enter alternative number" required>
-          
-          
-          <div class="d-flex justify-content-end mt-3">
-            <button type="submit" class="btn btn-primary">Add Hotel</button>
+
+            <div class="mb-3">
+              <label for="contactnumber" class="form-label">Enter Contact Number</label>
+              <input type="text" class="form-control" id="contactnumber" placeholder="Enter Contact Number"
+                name="contactnumber">
+              <p class="text-danger d-none error-message" id="contacthidden">Please Enter Contact Number!</p>
+            </div>
           </div>
-        </form>
-        
-      </div>
+          <div class="right" style="width:40%">
+            <div class="mb-3">
+              <label for="alternativenumber" class="form-label">Enter Alternative Number</label>
+              <input type="text" class="form-control" id="alternativenumber" placeholder="Enter Alternative Number"
+                name="alternativenumber">
+              <p class="text-danger d-none error-message" id="alternativehidden">Please Enter Alternative Number !</p>
+            </div>
+
+            <div class="mb-3">
+              <label for="hotelImage" class="form-label">Upload Image</label>
+              <input type="file" class="form-control" id="hotelImage" accept="image/*" onchange="previewImage(event)"
+                name="image">
+              <p class="text-danger d-none error-message" id="imagehidden">Please Upload Image!</p>
+            </div>
+
+            <div class="mb-3 text-center">
+              <img id="imagePreview" src="#" alt="Image Preview" class="img-thumbnail d-none" style="max-width: 200px;">
+            </div>
+            <div class="mb-3">
+              <div class="dropdown">
+                <button class="btn dropdown-toggle btn-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Select Foodname
+                </button>
+                <ul class="dropdown-menu p-3">
+                  <li>
+                    <div class="form-check">
+                      <input class="form-check-input select-all" type="checkbox" id="selectAll"
+                        onchange="selectAllCheckboxes(this)">
+                      <label class="form-check-label" for="selectAll">Select All</label>
+                    </div>
+                  </li>
+                  <li>
+                    <% foods.forEach(element => { %>
+                    <div class="form-check">
+                      <input class="form-check-input option-checkbox food-checkbox" type="checkbox" id="option1"
+                        name="foodname" value="<%= element.foodname %>">
+                      <label class="form-check-label" for="option1"><%= element.foodname %></label>
+                    </div>
+                    <% }) %>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        <input type="hidden" name="selectedFoods" id="selectedFoods">
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-success">Save</button>
+        </div>
+      </form>
+
     </div>
   </div>
 </div>
 
-<!-- Edit Hotel Modal -->
-<div class="modal fade" id="editHotel" tabindex="-1" aria-labelledby="editHotelLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-body">
-        <form action="/admin/editHotel" method="post" enctype="multipart/form-data">
-          <h3>Edit Hotel</h3>
-          <input type="hidden" id="hoteleditid" name="id">
-          <label for="editHotelInput" class="form-label">Hotel Name</label>
-          <input class="form-control" type="text" name="hotelname" id="editHotelInput" placeholder="Enter hotel name" required>
+<!-- Edit Hotel -->
+<div class="modal fade" id="editHotelModal" tabindex="-1" aria-labelledby="editHotelModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-xl">
+    <div class="modal-content p-2">
+      <form action="/admin/edithotel" id="foodSelectionForm" method="post" onsubmit="return editvalidateForm()"
+        enctype="multipart/form-data">
+        <h2>Edit Hotel</h2>
+        <div class="modal-body d-flex" style="gap:200px">
+          <div class="left" style="width:40%">
+            <div class="mb-3">
+              <input type="hidden" id="editid" name="editid">
+              <label for="edithotelTitle" class="form-label">Enter Hotel Name</label>
+              <input type="text" class="form-control" id="edithotelname" placeholder="Enter Hotel" name="hotelname">
+              <p class="text-danger d-none error-message" id="edithotelhidden">Please Enter Hotel!</p>
+            </div>
 
-          <label for="address" class="form-label">Address</label>
-          <input class="form-control" type="text" name="hotelAddress" id="editaddress" placeholder="Enter hotel address" required>
-          
-          <label for="imageInput" class="form-label">Upload Image</label>
-          <img id="editImagePreview" src=""  class="img-thumbnail mb-3" width="150">
-          <input class="form-control" type="file" name="photo" id="editimageInput" accept="image/*">
-          
+            <div class="mb-3">
+              <label for="edithoteladdress" class="form-label">Enter Hotel Address</label>
+              <input type="text" class="form-control" id="edithoteladdress" placeholder="Enter Hotel Address"
+                name="hoteladdress">
+              <p class="text-danger d-none error-message" id="editaddresshidden">Please Enter Hotel Address!</p>
+            </div>
 
-          <label for="contactnumber" class="form-label">Contact Number</label>
-          <input class="form-control" type="text" name="contact_no" id="editcontactnumber" placeholder="Enter contact number" required>
 
-          <label for="alternativenumber" class="form-label">Alternative Number</label>
-          <input class="form-control" type="text" name="alternative_no" id="editalternativenumber" placeholder="Enter alternative number" required>
-          
-          
-          <div class="d-flex justify-content-end mt-3">
-            <button type="submit" class="btn btn-primary">Edit Hotel</button>
+            <div class="mb-3">
+              <label for="contactnumber" class="form-label">Enter Contact Number</label>
+              <input type="text" class="form-control" id="editcontactnumber" placeholder="Enter Contact Number"
+                name="contactnumber">
+              <p class="text-danger d-none error-message" id="editcontacthidden">Please Enter Contact Number!</p>
+            </div>
           </div>
-        </form>
-        
-      </div>
+          <div class="right" style="width:40%">
+            <div class="mb-3">
+              <label for="alternativenumber" class="form-label">Enter Alternative Number</label>
+              <input type="text" class="form-control" id="editalternativenumber" placeholder="Enter Alternative Number"
+                name="alternativenumber">
+              <p class="text-danger d-none error-message" id="editalternativehidden">Please Enter Alternative Number !
+              </p>
+            </div>
+
+            <div class="mb-3">
+              <label for="edithotelImage" class="form-label">Upload Image</label>
+              <input type="file" class="form-control" id="edithotelImage" accept="image/*"
+                onchange="previewImage(event)" name="image">
+
+            </div>
+
+            <div class="mb-3 text-center">
+              <img id="editimagePreview" src="#" alt="Image Preview" class="img-thumbnail" style="max-width: 200px;">
+            </div>
+            <div class="mb-3">
+              <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Select Foodname
+                </button>
+                <ul class="dropdown-menu p-3">
+                  <li>
+                    <div class="form-check">
+                      <input class="form-check-input select-all" type="checkbox" id="selectAll"
+                        onchange="selectAllCheckboxes(this)">
+                      <label class="form-check-label" for="selectAll">Select All</label>
+                    </div>
+                  </li>
+                    <% foods.forEach(element => { %>
+                      <li class="editlist">
+                          <input class="form-check-input option-checkbox editfood-checkbox" type="checkbox" id="editoptions"
+                            name="foodname" value="<%= element._id %>">
+                          <label class="editform-check-label" for="option1"><%= element.foodname%></label>
+                      </li>  
+                    <% }) %>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        <input type="hidden" name="selectedFoods" id="editselectedFoods">
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-success">Save</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
 
-<!-- block Hotel modal -->
-<div class="modal fade" id="blockHotel" tabindex="-1" aria-labelledby="editCategoryLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
+<!-- block Hotel -->
+<div class="modal fade" id="blockHotelModal" tabindex="-1" aria-labelledby="blockHotelModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered custom-modal-width">
     <div class="modal-content">
-      <div class="modal-body">
-           <form action="/admin/blockHotel" method="post">
-            <input type="hidden" id="blockid" name="blockid">
-            <h2>Are you sure</h2>
-           <p>Do you want to block the hotel!</p>
-           <div class="d-flex justify-content-end">
-            <button type="button" class="btn btn-primary me-2" data-bs-dismiss="modal">Cancel</button>
-            <button class="btn btn-danger" type="submit">Block</button>
-          </div>
-           </form>
-      </div>
+      <form action="/admin/hideHotel" method="post">
+        <input type="hidden" id="hideid" name="hideid">
+        <div class="modal-body">
+          <p>Do you want to hide the hotel?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+          <button type="submit" class="btn btn-success">Yes</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
 
-<!-- unblock hotel -->
-
-<div class="modal fade" id="unblockHotel" tabindex="-1" aria-labelledby="editCategoryLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
+<!-- unblock Hotel -->
+<div class="modal fade" id="unblockHotelModal" tabindex="-1" aria-labelledby="unblockHotelModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered custom-modal-width">
     <div class="modal-content">
-      <div class="modal-body">
-           <form action="/admin/unblockHotel" method="post">
-            <input type="hidden" id="unblockid" name="unblockid">
-            <h2>Are you sure</h2>
-           <p>Do you want to unblock the hotel!</p>
-           <div class="d-flex justify-content-end">
-            <button type="button" class="btn btn-primary me-2" data-bs-dismiss="modal">Cancel</button>
-            <button class="btn btn-danger" type="submit">Unblock</button>
-          </div>
-           </form>
-      </div>
+      <form action="/admin/unHidehotel" method="post">
+        <input type="hidden" id="unhideid" name="unhideid">
+        <div class="modal-body">
+          <p>Do you want to unhide the hotel?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+          <button type="submit" class="btn btn-success">Yes</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-  <script>
-   function editFun(hotelname, id, hotelAddress, photo, contact_no, alternative_no) {
-  document.getElementById("hoteleditid").value = id;
-  document.getElementById("editHotelInput").value = hotelname;
-  document.getElementById("editaddress").value = hotelAddress;
-  document.getElementById("editcontactnumber").value = contact_no;
-  document.getElementById("editalternativenumber").value = alternative_no;
-  document.getElementById("editImagePreview").src = ``; // Adjust the path as necessary
+
+<!-- delete Hotel -->
+<div class="modal fade" id="deleteHotelModal" tabindex="-1" aria-labelledby="deleteHotelModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered custom-modal-width">
+    <div class="modal-content">
+      <form action="/admin/deleteHotel" method="post">
+        <input type="hidden" id="deleteid" name="deleteid">
+        <div class="modal-body">
+          <p>Do you want to delete the hotel?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+          <button type="submit" class="btn btn-success">Yes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+
+let debounceTimer;
+
+function searchHotel(value) {
+   clearTimeout(debounceTimer);
+   debounceTimer = setTimeout(() => {
+      const currentPage = 1; // Reset to the first page for a new search
+      window.location.href = `/admin/hotel?pagenumber=${currentPage}&hotel=${encodeURIComponent(value)}`;
+   }, 700); // Adjust delay (in milliseconds) as needed
 }
-function deleteFun(hotelname){
-  document.getElementById("deletehotel").value=hotelname
-}
-function searchCategories(){
-  const input = document.getElementById("searchCategory").value.toLowerCase();
-    const rows = document.querySelectorAll("#categoryTableBody tr");
-    let serialNumber = 1;
 
-    rows.forEach(row => {
-        const category = row.children[1].textContent.toLowerCase(); 
-        if (category.includes(input)) {
-            row.style.display = ""; 
-            row.children[0].textContent = serialNumber++; 
-        } else {
-            row.style.display = "none";
-        }
+function loadPage(pageNumber) {
+   const searchValue = document.getElementById('searchInput').value || '';
+   window.location.href = `/admin/hotel?pagenumber=${pageNumber}&hotel=${encodeURIComponent(searchValue)}`;
+}
+
+
+  function previewImage(event) {
+    const imageInput = event.target;
+    const preview = document.getElementById('imagePreview');
+    const editpreview = document.getElementById('editimagePreview');
+
+    if (imageInput.files && imageInput.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        preview.src = e.target.result;
+        preview.classList.remove('d-none'); // Show the preview
+        editpreview.src = e.target.result;
+        editpreview.classList.remove('d-none');
+      };
+      reader.readAsDataURL(imageInput.files[0]);
+      reader.readAsDataURL(editpreview.files[0]);
+    } else {
+      preview.src = '#';
+      preview.classList.add('d-none'); // Hide the preview
+      editpreview.src = '#';
+    }
+  }
+
+  function validateForm() {
+    const hotelTitle = document.getElementById('hotelname').value.trim();
+    const hotelImage = document.getElementById('hotelImage');
+    const hotelhidden = document.getElementById('hotelhidden');
+    const imagehidden = document.getElementById('imagehidden');
+    const hoteladdress = document.getElementById('hoteladdress').value;
+    const addresshidden = document.getElementById('addresshidden');
+    const contactnumber = document.getElementById('contactnumber').value;
+    const contacthidden = document.getElementById('contacthidden');
+    const alternativenumber = document.getElementById('alternativenumber').value;
+    const alternativehidden = document.getElementById('alternativehidden')
+
+
+    let isValid = true;
+    // Validate Title
+    if (!hotelTitle) {
+      hotelhidden.classList.remove('d-none'); // Show the error message
+      isValid = false;
+    } else {
+      hotelhidden.classList.add('d-none'); // Hide the error message
+    }
+
+    //validate hotel Address
+    if (!hoteladdress) {
+      addresshidden.classList.remove('d-none'); // Show the error message
+      isValid = false;
+    } else {
+      addresshidden.classList.add('d-none'); // Hide the error message
+    }
+    //validate contactnumber
+    if (!contactnumber) {
+      contacthidden.classList.remove('d-none'); // Show the error message
+      isValid = false;
+    } else {
+      contacthidden.classList.add('d-none'); // Hide the error message
+    }
+    //validate alternativenumber
+    if (!alternativenumber) {
+      alternativehidden.classList.remove('d-none'); // Show the error message
+      isValid = false;
+    } else {
+      alternativehidden.classList.add('d-none'); // Hide the error message
+    }
+
+    // Validate Image
+    if (hotelImage.files.length === 0) {
+      imagehidden.classList.remove('d-none'); // Show the error message
+      isValid = false;
+    } else {
+      imagehidden.classList.add('d-none'); // Hide the error message
+    }
+
+    return isValid; // Return true only if both fields are valid
+  }
+
+  function editvalidateForm() {
+    const edithotelTitle = document.getElementById('edithotelname').value.trim();
+    const edithotelImage = document.getElementById('edithotelImage');
+    const edithotelhidden = document.getElementById('edithotelhidden');
+    const editimagehidden = document.getElementById('editimagehidden');
+    const edithoteladdress = document.getElementById('edithoteladdress').value;
+    const editaddresshidden = document.getElementById('editaddresshidden');
+    const editcontactnumber = document.getElementById('editcontactnumber').value;
+    const editcontacthidden = document.getElementById('editcontacthidden');
+    const editalternativenumber = document.getElementById('editalternativenumber').value;
+    const editalternativehidden = document.getElementById('editalternativehidden')
+
+
+    let isValid = true;
+    // Validate Title
+    if (!edithotelTitle) {
+      edithotelhidden.classList.remove('d-none'); // Show the error message
+      isValid = false;
+    } else {
+      edithotelhidden.classList.add('d-none'); // Hide the error message
+    }
+
+    //validate hotel Address
+    if (!edithoteladdress) {
+      editaddresshidden.classList.remove('d-none'); // Show the error message
+      isValid = false;
+    } else {
+      editaddresshidden.classList.add('d-none'); // Hide the error message
+    }
+    //validate contactnumber
+    if (!editcontactnumber) {
+      editcontacthidden.classList.remove('d-none'); // Show the error message
+      isValid = false;
+    } else {
+      editcontacthidden.classList.add('d-none'); // Hide the error message
+    }
+    //validate alternativenumber
+    if (!editalternativenumber) {
+      editalternativehidden.classList.remove('d-none'); // Show the error message
+      isValid = false;
+    } else {
+      editalternativehidden.classList.add('d-none'); // Hide the error message
+    }
+
+    return isValid; // Return true only if both fields are valid
+  }
+
+  function editfun(hotelname, hoteladdress, contactnumber, alternativenumber, image, id, fooditems) {
+    document.getElementById('edithotelname').value = hotelname;
+    document.getElementById('edithoteladdress').value = hoteladdress;
+    document.getElementById('editcontactnumber').value = contactnumber;
+    document.getElementById('editalternativenumber').value = alternativenumber;
+    document.getElementById('editimagePreview').src = image;
+    document.getElementById('editid').value = id;
+    document.getElementById('editselectedFoods').value = fooditems;
+
+    const foodItemsArray = Array.isArray(fooditems) ? fooditems : fooditems.split(',');
+    const checkboxes = document.querySelectorAll('.editfood-checkbox');
+
+    // Iterate over all checkboxes and set their checked state
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = foodItemsArray.includes(checkbox.value);
     });
 }
-function blockFun(id){
-  document.getElementById("blockid").value=id
-}
-function unblockFun(id){
-  document.getElementById("unblockid").value=id
-}
-document.querySelectorAll(".isblockedstatus").forEach((statusElement, index) => {
-    if (statusElement.textContent.trim() === "true") {
-        // Apply color to the corresponding category name
-        document.querySelectorAll(".isblockedhotelname")[index].style.color = "red";
-    }
-});
-document.querySelectorAll(".isblockedstatus").forEach((statusElement, index) => {
-    if (statusElement.textContent.trim() === "true") {
-        // Apply color to the corresponding category name
-        document.querySelectorAll(".isblockedindex")[index].style.color = "red";
-    }
-});
 
-  </script>
-</body>
-</html>
+  function deletefun(id) {
+    document.getElementById('deleteid').value = id
+  }
+
+  function hidefun(id) {
+    document.getElementById('hideid').value = id
+  }
+
+  function unhidefun(id) {
+    document.getElementById('unhideid').value = id
+  }
+
+
+  document.querySelectorAll(".isblocked").forEach((statusElement, index) => {
+    if (statusElement.textContent.trim() === "true") {
+      document.querySelectorAll(".tabledata")[index].style.color = "#616362"
+      document.querySelectorAll(".tableindex")[index].style.color = "#616362"
+    }
+  });
+
+  function selectAllCheckboxes(selectAllCheckbox) {
+    const checkboxes = document.querySelectorAll('.option-checkbox');
+    checkboxes.forEach((checkbox) => {
+      checkbox.checked = selectAllCheckbox.checked;
+    });
+  }
+  //remove selectall tick
+  document.querySelectorAll('.option-checkbox').forEach((checkbox) => {
+    checkbox.addEventListener('change', () => {
+      const selectAll = document.getElementById('selectAll');
+      const allChecked = Array.from(document.querySelectorAll('.option-checkbox')).every((cb) => cb.checked);
+      selectAll.checked = allChecked;
+    });
+  });
+
+  document.getElementById("foodSelectionForm").addEventListener("submit", function (e) {
+    const selectedFoods = [];
+    const checkboxes = document.querySelectorAll(".food-checkbox:checked");
+    checkboxes.forEach((checkbox) => {
+      selectedFoods.push(checkbox.value);
+    });
+    document.getElementById("selectedFoods").value = JSON.stringify(selectedFoods);
+  });
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<% if (existdatamessage && existdatamessage.length > 0) { %>
+<script>
+  Swal.fire({
+    text: "<%= existdatamessage %>",
+    icon: "info",
+    confirmButtonText: "OK",
+  }).then(() => {
+    // Re-open the modal after SweetAlert
+    const addhotelModal = document.getElementById('addHotelModal');
+    if (addhotelModal) {
+      const modalInstance = new bootstrap.Modal(addhotelModal);
+      modalInstance.show();
+    }
+  });
+</script>
+<% } %>
+
+
+
+<% if (saveddatamessage && saveddatamessage.length>0) { %>
+<script>
+  Swal.fire({
+    text: "<%= saveddatamessage %>",
+    icon: "success"
+  });
+</script>
+<% } %>
+
+
+
+<% if (errormessage && errormessage.length>0) { %>
+<script>
+  Swal.fire({
+    text: "<%= errormessage %>",
+    icon: "error"
+  });
+</script>
+<% } %>
+
+<% if (editexistmessage && editexistmessage.length>0) { %>
+<script>
+  Swal.fire({
+    text: "<%= editexistmessage %>",
+    icon: "info"
+  });
+</script>
+<% } %>

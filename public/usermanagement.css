@@ -1,0 +1,95 @@
+.usermanagement{
+   background-color: #39532D;
+}
+
+
+thead{
+  height: 60px;
+  font-size: larger;
+}
+
+ .search-bar {
+   margin-bottom: 20px;
+ }
+ .table img {
+   width: 50px;
+   height: 50px;
+   object-fit: cover;
+ }
+ .action-icons i {
+   cursor: pointer;
+   margin-right: 10px;
+ }
+ .action-icons i:hover {
+   color: #00d1b2;
+ }
+
+ .content{
+   width:70%;
+   left:25%;
+   position: absolute;
+   top: 20%;
+ 
+ }
+
+.error-message{
+  font-size: 0.9rem; 
+  margin-top: 5px;
+}
+
+
+/* Table styles */
+.table-hover {
+  background-color: transparent; /* Keep table transparent */
+  color: white; /* Set text color to white for visibility */
+}
+
+.table-hover thead th {
+  color: white; /* Header text color */
+  background-color: #3a4a39; /* Slightly darker header background */
+}
+
+.table-hover tbody tr {
+  background-color: #283325; /* Match table row background with container */
+  color: white; /* Body text color */
+}
+
+.table-hover tbody tr:hover {
+  background-color: #3a4a39; /* Hover effect for table rows */
+}
+
+.table-hover tbody td {
+  border-color: #283325; /* Match cell border with the background */
+}
+
+/* Image styles for better alignment */
+.table-hover tbody td img {
+  width: 50px; /* Resize image */
+  height: auto;
+  border-radius: 5px; /* Optional: add rounded corners to images */
+}
+
+.addItem{
+  background-color: #39532D;
+  padding: 5px;
+  border: none;
+  border-radius: 5px;
+  color: white;
+}
+
+.modal-body p {
+  font-size: 16px;
+  font-weight: 500;
+  color: #555;
+  margin: 20px 0;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.modal-footer .btn {
+  width: 100px;
+}

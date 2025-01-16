@@ -10,8 +10,103 @@ const categoryschema=require("./model/categoryschema")
 const hotelSchema=require("./model/hotelschema")
 const foodSchema=require("./model/foodschema")
 const bannerschema=require('./model/bannerschema')
+const varientSchema=require('./model/varientschema')
+const session = require('express-session');
+const flash = require('connect-flash');
+const cookieParser = require('cookie-parser');
+const passport = require('passport')
+const foodschema = require('./model/foodschema')
+const rateSchema = require('./model/rateschema')
+const addressSchema=require('./model/addressschema')
+const GoogleStrategy = require('passport-google-oauth20').Strategy
+const orderSchema=require('./model/orderschema')
 
 
+app.use(flash());
+app.use(session({
+   secret: 'your_secret_key', // Replace with a secure secret key
+   resave: false, // Do not force save the session if it was not modified
+   saveUninitialized: true, // Save a session that is uninitialized
+   cookie: { 
+    maxAge: 24 * 60 * 60 * 1000, // Optional: Set session expiration time to 1 minute
+     secure: false // Make this true if using HTTPS
+   }
+}));
+
+app.use((req, res, next) => {
+   req.session.save(next);  // Force the session to be saved
+ });
+
+ app.use(passport.initialize());
+ app.use(passport.session());
+ passport.use(new GoogleStrategy({
+  clientID : process.env.GOOGLE_CLIENT_ID,
+  clientSecret : process.env.GOOGLE_CLIENT_SECRET,
+  callbackURL : "http://localhost:3000/auth/google/callback"
+ },
+
+ async (accessToken, refreshToken, profile, done) => {
+  try {
+    // Check if the user exists in the database based on their Google email
+    let user = await userschema.findOne({ email: profile.emails[0].value });
+    
+    if (!user) {
+      // If the user does not exist, create a new user
+      user = new userschema({
+        firstname: profile.name.givenName,
+        lastname: profile.name.familyName,
+        email: profile.emails[0].value,
+        password: 'googleOAuthPassword', // You could generate a random password, or leave it empty
+        phonenumber: "000000000", // Set a default value or leave null
+      });
+
+      // Save the new user to the database
+      await user.save();
+    }
+    
+    // Pass the user profile to the done function (which will be used for session management)
+    return done(null, user);
+  } catch (err) {
+    return done(err, false);
+  }
+}));
+
+// Serialize user into session
+passport.serializeUser((user, done) => {
+  done(null, user.id); // store user ID in session
+});
+
+// Deserialize user from session
+passport.deserializeUser(async (id, done) => {
+  try {
+    const user = await userschema.findById(id);
+    done(null, user); // Add user details to the session
+  } catch (err) {
+    done(err, false);
+  }
+});
+
+app.get('/auth/google/callback', passport.authenticate('google', {
+  failureRedirect: '/user/login', // Redirect to login if authentication fails
+}), async (req, res) => {
+  const users = await userschema.findById(req.user._id)
+  const banners = await bannerschema.find({})
+  const categories = await categoryschema.find({})
+  const foods = await foodschema.find({})
+  req.flash('success',"User Login SuccessFully")
+  const successmessage=req.flash('success')
+  req.session.user=users._id
+  console.log(req.session.user)
+  // Render a template on successful authentication
+  // You can pass user data to the template as needed
+  res.render('user/home', { users,banners,categories,foods,successmessage }); // Assuming 'home.ejs' is your template
+});
+
+
+
+
+
+app.use(cookieParser());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

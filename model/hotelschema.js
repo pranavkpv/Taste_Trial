@@ -9,7 +9,7 @@ const hotelSchema=new mongoose.Schema({
     type:String,
     require:true
   },
-  photo:{
+  image:{
     type:String,
     require:true
   },
@@ -21,14 +21,16 @@ const hotelSchema=new mongoose.Schema({
     type:Number,
     require:true
   },
-  created_at:{
-    type:Date,
-    default:Date.now()
-  },
+  food_items: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Food'
+    },
+  ],
   is_blocked:{
     type:Boolean,
     requred:true,
     default:false
   } 
-})
+},{ timestamps: true })
 module.exports=mongoose.model("hotel",hotelSchema)

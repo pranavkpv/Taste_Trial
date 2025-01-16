@@ -1,0 +1,28 @@
+ /* Card Animation */
+ .animated-card {
+   transition: transform 0.3s ease, box-shadow 0.3s ease;
+   overflow: hidden;
+   border-radius: 10px;
+}
+
+.animated-card:hover {
+   transform: translateY(-10px);
+   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.card-img {
+   transition: transform 0.3s ease;
+}
+
+.animated-card:hover .card-img {
+   transform: scale(1.1);
+}
+
+.card-title {
+   font-size: 1.5rem;
+   font-weight: bold;
+}
+
+.card-text {
+   color: #666;
+}

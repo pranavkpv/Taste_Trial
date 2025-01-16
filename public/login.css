@@ -8194,7 +8194,7 @@
    .login-wrap .icon {
      width: 80px;
      height: 80px;
-     background: #8d448b;
+     background: #8D448B;
      border-radius: 50%;
      font-size: 30px;
      margin: 0 auto;
@@ -8305,20 +8305,20 @@
    .btn:hover, .btn:active, .btn:focus {
      outline: none; }
    .btn.btn-primary {
-     background: #8d448b !important;
-     border: 1px solid #8d448b !important;
+     background: #8D448B!important;
+     border: 1px solid #8D448B !important;
      color: #fff !important; }
      .btn.btn-primary:hover {
-       border: 1px solid #8d448b;
+       border: 1px solid black;
        background: transparent;
        color: #8d448b; }
      .btn.btn-primary.btn-outline-primary {
-       border: 1px solid #8d448b;
+       border: 1px solid black;
        background: transparent;
        color: #8d448b; }
        .btn.btn-primary.btn-outline-primary:hover {
          border: 1px solid transparent;
-         background: #8d448b;
+         background: black;
          color: #fff; }
  
  .form-group {
@@ -8332,4 +8332,15 @@
      @media (max-width: 767.98px) {
        .form-group .submit {
          top: 0; } }
- 
+         .eye-icon {
+          position: absolute;
+          top: 50%;
+          right: 10px;
+          transform: translateY(-50%);
+          cursor: pointer;
+          color: #888;
+       }
+       
+       .eye-icon:hover {
+          color: #000;
+       }

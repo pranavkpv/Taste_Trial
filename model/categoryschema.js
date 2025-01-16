@@ -14,7 +14,5 @@ const categoryschema=new mongoose.Schema({
     required: true,
     default: false, // Optional: You can set a default value
   }
-  
-  
 })
 module.exports=mongoose.model("category",categoryschema)

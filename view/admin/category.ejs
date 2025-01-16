@@ -1,245 +1,363 @@
-
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-  <link rel="stylesheet" href="/dashboard.css">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-  <nav class="sidebar">
-    <ul class="nav">
-      <li class="nav-item">
-        <a class="nav-link " href="/admin/dashboard">
-          <i class="fas fa-gauge fs-5 p-2"></i>
-          <span class="menu-title fs-4">Dashboard</span>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/admin/banner">
-          <i class="fas fa-gauge fs-5 p-2"></i>
-          <span class="menu-title fs-4">Banner Updation</span>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link " href="/admin/usermanagement">
-          <i class="fas fa-user fs-5 p-2"></i>
-          <span class="menu-title fs-5">User Management</span>
-        </a>
-      </li>
-      <li class="nav-item category d-flex">
-        <a class="category px-2" href="/admin/category">
-          <i class="fas fa-tag fs-5 p-2 "></i>
-          <span class="menu-title fs-5 ">Category Registration</span>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/admin/hotel">
-          <i class="fas fa-building fs-5 p-2"></i>
-          <span class="menu-title fs-5">Hotel Registration</span>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/admin/food">
-          <i class="fas fa-drumstick-bite fs-5 p-2"></i>
-          <span class="menu-title fs-5">Food Registration</span>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link  text-danger" href="index.html">
-          <i class="fas fa-right-from-bracket fs-5 p-2 text-danger"></i>
-          <span class="menu-title fs-5">Logout</span>
-        </a>
-      </li>
-    </ul>
-  </nav>
-  <div class="d-flex searchkey">
-    <input type="text" id="searchCategory" class="form-control w-50" placeholder="Search Category" onkeyup="searchCategories()">
+<%- include('partials/admin') %>
+<link rel="stylesheet" href="/category.css">
+<div class="content">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="">Category Management</h3>
+    <button class=" addItem" onclick="addItem()" data-bs-toggle="modal" data-bs-target="#addCategoryModal"> + Add
+      Item</button>
   </div>
-  <button class="additem" data-bs-toggle="modal" data-bs-target="#addCategory">Add item +</button>
-  <table class="atable">
-    <thead>
-      <tr>
-        <th>Sl No</th>
-        <th>Category</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody id="categoryTableBody">
-      <% if (categories && categories.length > 0) { %>
-        <% categories.forEach(function(category, index) { %>
-            <tr>
-                <td class="isblockedindex"><%= index + 1 %></td>
-                <td class="isblockedcategoryname"><%= category.categoryname %></td>
-                <td class="d-flex gap-5">
-                    <a href="#" data-bs-toggle="modal" data-bs-target="#editCategory" onclick="editFun('<%= category.categoryname %>','<%= category._id %>','<%= category.image %>')">
-                        <i class="fa-solid fa-pen-to-square"></i>
-                    </a>
-                    <a href="#" data-bs-toggle="modal" data-bs-target="#deleteCategory" onclick="deleteFun('<%= category.categoryname %>')">
-                      <i class="bi bi-ban"></i>
-                    </a>   
-                    <a href="#" data-bs-toggle="modal" data-bs-target="#unblockcategory" onclick="deleteFun('<%= category.categoryname %>')">
-                      <i class="bi bi-unlock"></i>
-                    </a>            
-                </td>
-                <td style="color:white" class="isdeletedstatus"><%= category.isdeleted %></td>
-            </tr>
-        <% }) %>
-    <% } else { %>
+
+  <!-- Search Bar -->
+  <div class="row search-bar">
+    <div class="col-md-6 ">
+      <div class="input-group">
+        <span class="input-group-text bg-secondary text-light"><i class="fas fa-search"></i></span>
+        <input type="text" 
+       id="searchInput" 
+       oninput="searchCategory(this.value)" 
+       class="form-control" 
+       placeholder="Search by Category..." 
+       value="<%= searchedcategoryname || '' %>">
+
+     </div>
+     
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="table-responsive custom-table-bg">
+    <table class="table table-hover text-center" id="categorylist">
+      <thead>
         <tr>
-            <td colspan="3">No categories found.</td>
+          <th>Sl No</th>
+          <th>Title</th>
+          <th>Image</th>
+          <th>Action</th>
         </tr>
-    <% } %>
-    
-    
-    </tbody>
-  </table>
-  <!-- add category -->
-  <!-- Sidebar and Navbar Content (No changes) -->
+      </thead>
+      <tbody class="tableBody">
+        <!-- loop of category data -->
+        <% categories.forEach((element, index) => { %>
+        <tr>
+          <td class="tableindex"><%= startIndex+index %></td>
+          <td class="tabledata"><%= element.categoryname %></td>
+          <td><img src="<%= element.image %>" alt="Category Image" style="height:50px"></td>
+          <td class="action-icons">
+            <a class="text-dark" href="" data-bs-toggle="modal" data-bs-target="#editCategoryModal"
+              onclick="editfun('<%= element.categoryname %>','<%= element.image %>','<%= element._id %>')"><i
+                class="bi bi-pencil-square"></i></a>
+            <a class="text-dark" href="" data-bs-toggle="modal" data-bs-target="#deleteCategoryModal"
+              onclick="deletefun('<%= element._id %>')"><i class="bi bi-trash3-fill"></i></a>
+            <a class="text-dark" href="" data-bs-toggle="modal" data-bs-target="#blockCategoryModal"
+              onclick="hidefun('<%= element._id %>')"><i class="bi bi-eye-slash"></i></a>
+            <a class="text-dark" href="" data-bs-toggle="modal" data-bs-target="#unblockCategoryModal"
+              onclick="unhidefun('<%= element._id %>')"><i class="bi bi-eye"></i></a>
+          </td>
+          <td class="d-none isblocked" id="isblocked"><%= element.isdeleted %></td>
+        </tr>
+        <% }) %>
+        <!-- /close the loop -->
+      </tbody>
+    </table>
+    <div id="pagination" style="text-align: center; margin-bottom: 20px;">
+      <% for (let i = 1; i <= page; i++) { %>
+         <button onclick="loadPage('<%= i %>')" class="btn btn-success">
+            <%= i %>
+         </button>
+      <% } %>
+   </div>
+      
+  </div>
 
-<!-- Add Category Modal -->
-<div class="modal fade" id="addCategory" tabindex="-1" aria-labelledby="addCategoryLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
+</div>
+
+<!-- Add Modal -->
+<div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered custom-modal-width">
     <div class="modal-content">
-      <div class="modal-body">
-        <form action="/admin/addcategory" method="post" enctype="multipart/form-data">
-          <h3>Add Category</h3>
-          <label for="addCategoryInput" class="form-label">Category Name</label>
-          <input class="form-control" type="text" name="categoryname" id="addCategoryInput" placeholder="Enter category name" required>
-          
-          <label for="imageInput" class="form-label">Upload Image</label>
-          <input class="form-control" type="file" name="image" id="imageInput" accept="image/*" >
-          <img src="" alt="" id="categoryImage">
-          <div class="d-flex justify-content-end mt-3">
-            <button type="submit" class="btn btn-primary">Add Category</button>
+      <form action="/admin/addcategory" method="post" onsubmit="return validateForm()" enctype="multipart/form-data">
+        <div class="modal-body">
+          <div class="mb-3">
+            <h2>Add Category</h2>
+            <label for="categoryTitle" class="form-label">Enter Category Name</label>
+            <input type="text" class="form-control" id="categoryTitle" placeholder="Enter title" name="categoryname">
+            <p class="text-danger d-none error-message" id="categoryhidden">Please Enter Category!</p>
           </div>
-        </form>
-        
-      </div>
+
+          <div class="mb-3">
+            <label for="categoryImage" class="form-label">Upload Image</label>
+            <input type="file" class="form-control" id="categoryImage" accept="image/*" onchange="previewImage(event)"
+              name="image">
+            <p class="text-danger d-none error-message" id="imagehidden">Please Upload Image!</p>
+          </div>
+
+          <div class="mb-3 text-center">
+            <img id="imagePreview" src="" alt="Image Preview" class="img-thumbnail d-none" style="max-width: 200px;">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-success">Save</button>
+        </div>
+      </form>
+
     </div>
   </div>
 </div>
 
-<!-- Edit Category Modal -->
-<div class="modal fade" id="editCategory" tabindex="-1" aria-labelledby="editCategoryLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
+<!-- Edit Category -->
+<div class="modal fade" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered custom-modal-width">
     <div class="modal-content">
-      <div class="modal-body">
-        <form action="/admin/editcategory" method="post" enctype="multipart/form-data">
-          <h3>Edit Category</h3>
-          <input type="hidden" id="editId" name="id">
-          <label for="addCategoryInput" class="form-label">categoryname</label>
-          <input class="form-control" type="text" name="categoryname" id="editCategoryInput" placeholder="Enter category name" required>
-          
-          <label for="imageInput" class="form-label">Upload Image</label>
-          <input class="form-control" type="file" name="image" id="editimageInput" accept="image/*" required>
-          <img src="" alt="">
-          
-          <div class="d-flex justify-content-end mt-3">
-            <button type="submit" class="btn btn-primary">Edit Category</button>
+      <form action="/admin/editcategory" method="post" onsubmit="return editvalidateForm()"
+        enctype="multipart/form-data">
+        <div class="modal-body">
+          <div class="mb-3">
+            <h2>Edit Category</h2>
+            <input type="hidden" id="editid" name="editid">
+            <label for="editcategoryTitle" class="form-label">Enter Category Name</label>
+            <input type="text" class="form-control" id="editcategoryTitle" placeholder="Enter Category"
+              name="categoryname">
+            <p class="text-danger d-none error-message" id="editcategoryhidden">Please Enter Category!</p>
           </div>
-        </form>
-      </div>
+
+          <div class="mb-3">
+            <label for="editcategoryImage" class="form-label">Upload Image</label>
+            <input type="file" class="form-control" id="editcategoryImage" accept="image/*"
+              onchange="previewImage(event)" name="image">
+
+          </div>
+
+          <div class="mb-3 text-center">
+            <img id="editimagePreview" src="" alt="Image Preview" class="img-thumbnail" style="max-width: 200px;">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-success">Save</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
 
-<!-- block category modal -->
-<div class="modal fade" id="deleteCategory" tabindex="-1" aria-labelledby="editCategoryLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
+<!-- block Category -->
+<div class="modal fade" id="blockCategoryModal" tabindex="-1" aria-labelledby="blockCategoryModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered custom-modal-width">
     <div class="modal-content">
-      <div class="modal-body">
-           <form action="/admin/deletecategory" method="post">
-            <input type="hidden" id="deletecategory" name="categoryname">
-            <h2>Are you sure</h2>
-           <p>Do you want to block the category!</p>
-           <div class="d-flex justify-content-end">
-            <button type="button" class="btn btn-primary me-2" data-bs-dismiss="modal">cancel</button>
-            <button class="btn btn-danger" type="submit">Block</button>
-          </div>
-           </form>
-      </div>
-    </div>
-  </div>
-</div>
-<!-- unblockcategory -->
-<div class="modal fade" id="unblockcategory" tabindex="-1" aria-labelledby="editCategoryLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-body">
-           <form action="/admin/unblockcategory" method="post">
-            <input type="hidden" id="unblockcategoryinput" name="categoryname">
-            <h2>Are you sure</h2>
-           <p>Do you want to unblock the category!</p>
-           <div class="d-flex justify-content-end">
-            <button type="button" class="btn btn-primary me-2" data-bs-dismiss="modal">cancel</button>
-            <button class="btn btn-danger" type="submit">Unblock</button>
-          </div>
-           </form>
-      </div>
+      <form action="/admin/hidecategory" method="post">
+        <input type="hidden" id="hideid" name="hideid">
+        <div class="modal-body">
+          <p>Do you want to hide the category?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+          <button type="submit" class="btn btn-success">Yes</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
 
+<!-- unblock Category -->
+<div class="modal fade" id="unblockCategoryModal" tabindex="-1" aria-labelledby="unblockCategoryModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered custom-modal-width">
+    <div class="modal-content">
+      <form action="/admin/unhidecategory" method="post">
+        <input type="hidden" id="unhideid" name="unhideid">
+        <div class="modal-body">
+          <p>Do you want to unhide the category?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+          <button type="submit" class="btn btn-success">Yes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+<!-- delete Category -->
+<div class="modal fade" id="deleteCategoryModal" tabindex="-1" aria-labelledby="deleteCategoryModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered custom-modal-width">
+    <div class="modal-content">
+      <form action="/admin/deletecategory" method="post">
+        <input type="hidden" id="deleteid" name="deleteid">
+        <div class="modal-body">
+          <p>Do you want to delete the category?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+          <button type="submit" class="btn btn-success">Yes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 
 <script>
-function validateadd(){
-  const addCategory=document.getElementById("addCategoryInput").value
-  if(addCategory===""){
-    Swal.fire("please enter category");
-    return false
-  }
-  return true
-}
-function validateedit(){
-  const editCategory=document.getElementById("editCategoryInput").value
-  if(editCategory===""){
-    Swal.fire("please enter category");
-    return false
-  }
-  return true
-}
-function editFun(categoryName,id,image){
-  console.log(image)
-  document.getElementById("editCategoryInput").value=categoryName
-  document.getElementById("editId").value=id
-  document.getElementById("editimageInput").value=`/uploads/${file.filename}`
-}
-function deleteFun(categoryName){
-  document.getElementById("deletecategory").value=categoryName
-  document.getElementById("unblockcategoryinput").value=categoryName
-}
 
 
-function searchCategories() {
-    const input = document.getElementById("searchCategory").value.toLowerCase();
-    const rows = document.querySelectorAll("#categoryTableBody tr");
-    let serialNumber = 1;
+  function validateForm() {
+    const categoryTitle = document.getElementById('categoryTitle');
+    const categoryImage = document.getElementById('categoryImage');
+    const titleError = document.getElementById('categoryhidden');
+    const imageError = document.getElementById('imagehidden');
 
-    rows.forEach(row => {
-        const category = row.children[1].textContent.toLowerCase(); 
-        if (category.includes(input)) {
-            row.style.display = ""; 
-            row.children[0].textContent = serialNumber++; 
-        } else {
-            row.style.display = "none";
-        }
-    });
-}
-document.querySelectorAll(".isdeletedstatus").forEach((statusElement, index) => {
-    if (statusElement.textContent.trim() === "true") {
-        // Apply color to the corresponding category name
-        document.querySelectorAll(".isblockedcategoryname")[index].style.color = "red";
+    titleError.classList.add('d-none');
+    imageError.classList.add('d-none');
+
+    let valid = true;
+
+    if (!categoryTitle.value.trim()) {
+      titleError.classList.remove('d-none');
+      valid = false;
     }
-});
-document.querySelectorAll(".isdeletedstatus").forEach((statusElement, index) => {
-    if (statusElement.textContent.trim() === "true") {
-        // Apply color to the corresponding category name
-        document.querySelectorAll(".isblockedindex")[index].style.color = "red";
+
+    if (!categoryImage.value.trim()) {
+      imageError.classList.remove('d-none');
+      valid = false;
     }
-});
+
+    return valid;
+  }
+
+  function editvalidateForm() {
+    const categoryTitle = document.getElementById('editcategoryTitle');
+    const titleError = document.getElementById('editcategoryhidden');
+
+
+    titleError.classList.add('d-none');
+
+    let valid = true;
+
+    if (!categoryTitle.value.trim()) {
+      titleError.classList.remove('d-none');
+      valid = false;
+    }
+
+
+    return valid;
+  }
+
+  function previewImage(event) {
+    const input = event.target;
+    const preview = input.id === 'categoryImage' ? document.getElementById('imagePreview') : document.getElementById('editimagePreview');
+    const file = input.files[0];
+    const reader = new FileReader();
+
+    if (file) {
+      reader.onload = function (e) {
+        preview.src = e.target.result;
+        preview.classList.remove('d-none');
+      };
+      reader.readAsDataURL(file);
+    } else {
+      preview.src = '';
+      preview.classList.add('d-none');
+    }
+  }
+
+  function editfun(title, image, id) {
+    document.getElementById('editcategoryTitle').value = title;
+    document.getElementById('editimagePreview').src = image;
+    document.getElementById('editid').value = id;
+  }
+
+  function hidefun(id) {
+    document.getElementById('hideid').value = id;
+  }
+
+  function unhidefun(id) {
+    document.getElementById('unhideid').value = id;
+  }
+
+  function deletefun(id) {
+    document.getElementById('deleteid').value = id;
+  }
+
+  document.querySelectorAll(".isblocked").forEach((statusElement, index) => {
+    if (statusElement.textContent.trim() === "true") {
+      document.querySelectorAll(".tabledata")[index].style.color = "#616362"
+      document.querySelectorAll(".tableindex")[index].style.color = "#616362"
+    }
+  });
 
 
 
+  let debounceTimer;
+
+function searchCategory(value) {
+   clearTimeout(debounceTimer);
+   debounceTimer = setTimeout(() => {
+      const currentPage = 1; // Reset to the first page for a new search
+      window.location.href = `/admin/category?pagenumber=${currentPage}&category=${encodeURIComponent(value)}`;
+   }, 700); // Adjust delay (in milliseconds) as needed
+}
+
+function loadPage(pageNumber) {
+   const searchValue = document.getElementById('searchInput').value || '';
+   window.location.href = `/admin/category?pagenumber=${pageNumber}&category=${encodeURIComponent(searchValue)}`;
+}
+
+
+
+
+
+
+
+  
 
 </script>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<% if (existmessage && existmessage.length > 0) { %>
+<script>
+  Swal.fire({
+    text: "<%= existmessage %>",
+    icon: "info",
+    confirmButtonText: "OK",
+  }).then(() => {
+    // Re-open the modal after SweetAlert
+    const addcategoryModal = document.getElementById('addCategoryModal');
+    if (addCategoryModal) {
+      const modalInstance = new bootstrap.Modal(addcategoryModal);
+      modalInstance.show();
+    }
+  });
+</script>
+<% } %>
+
+
+<% if (successmessage && successmessage.length>0) { %>
+<script>
+  Swal.fire({
+    text: "<%= successmessage %>",
+    icon: "success"
+  });
+</script>
+<% } %>
+
+
+<% if (errormessage && errormessage.length>0) { %>
+<script>
+  Swal.fire({
+    text: "<%= errormessage %>",
+    icon: "error"
+  });
+</script>
+<% } %>
+
+<% if (editexistmessage && editexistmessage.length>0) { %>
+<script>
+  Swal.fire({
+    text: "<%= editexistmessage %>",
+    icon: "info",
+    confirmButtonText: "Try Again"
+  });
+</script>
+<% } %>

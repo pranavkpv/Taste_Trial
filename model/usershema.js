@@ -19,7 +19,7 @@ const userschema=new mongoose.Schema({
     },
     phonenumber:{
       type:String,
-      required:true
+      default:null
     },
     is_blocked:{
       type:Boolean,

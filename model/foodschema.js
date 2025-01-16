@@ -12,48 +12,20 @@ const foodSchema = new Schema({
     ref: 'Category',
     required: true,
   },
-  hotel_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Hotel',
-    required: true,
-  },
-  rate: {
-    type: Number,
-    required: true,
-  },
-  gst_per: {
-    type: Number,
-    required: true,
-  },
-  delivery_charge: {
-    type: Number,
-    required: true,
-  },
-  packing_charge: {
-    type: Number,
-    required: true,
-  },
-  duration_time: {
-    type: Number,
-    required: true,
-  },
-  offer_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Offer',
-  },
   is_blocked: {
     type: Boolean,
     required:true,
     default: false
   },
-  is_veg: {
-    type: Boolean,
+  image:{
+    type: String,
     required:true
   },
-  rating_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Rating',
-  },
+  is_veg: {
+    type: String,
+    enum:['veg','non-veg'],
+    default:'veg'
+  }
 }, { timestamps: true });
 
 module.exports= mongoose.model('Food', foodSchema);

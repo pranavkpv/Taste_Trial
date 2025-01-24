@@ -9,6 +9,19 @@ const categoryschema=new mongoose.Schema({
     type:String,
     required:true
   },
+  offer:{
+    type:Number,
+    required:true
+  },
+  expiry_date:{
+    type:Date,
+    validate: {
+      validator: function (value) {
+        return value > new Date(); // Ensures expiry_date is a future date
+      },
+      message: 'Expiry date must be in the future',
+    },
+  },
   isdeleted: {
     type: Boolean,
     required: true,

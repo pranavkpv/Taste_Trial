@@ -9,6 +9,8 @@ const foodschema = require('../../model/foodschema')
 const cartschema = require('../../model/cartschema')
 const mongoose = require('mongoose');
 const orderschema = require('../../model/orderschema')
+const categoryschema = require('../../model/categoryschema')
+const couponschema = require('../../model/couponschema')
 const ObjectId = mongoose.Types.ObjectId;
 
 const dashboard = async (req, res) => {
@@ -23,11 +25,11 @@ const dashboard = async (req, res) => {
 const address = async (req, res) => {
    try {
       const successmessage = req.flash('success')
-      const userid = req.params.id
+      const userid=req.session.user
       const addressess = await addressSchema.find({ user_id: userid })
-      res.render('user/address', { userid, successmessage, addressess })
+      res.render('user/address', { userid, successmessage, addressess ,searchmessage :"",searcheditemname:""})
    } catch (error) {
-
+     console.log(error)
    }
 }
 
@@ -48,7 +50,7 @@ const addAddress = async (req, res) => {
 
       await newaddress.save()
       req.flash('success', "Address Added Successfully")
-      res.redirect(`/user/address/${ userid }`)
+      res.redirect(`/user/address`)
 
    } catch (error) {
       console.log(error)
@@ -69,7 +71,7 @@ const editAddress = async (req, res) => {
          addresstype
       })
       req.flash('success', 'Address Edited Successfully')
-      res.redirect(`/user/address/${ userid }`)
+      res.redirect(`/user/address/`)
    } catch (error) {
       console.log(error)
    }
@@ -80,7 +82,7 @@ const deleteAddress = async (req, res) => {
       const { deleteid, userid } = req.body
       await addressSchema.findByIdAndDelete({ _id: deleteid })
       req.flash('success', 'Address Deleted Successfully')
-      res.redirect(`/user/address/${ userid }`)
+      res.redirect(`/user/address`)
    } catch (error) {
       console.log(console.error)
    }
@@ -91,56 +93,51 @@ const deleteAddress = async (req, res) => {
 const changeAccount = async (req, res) => {
    try {
       const successmessage = req.flash("success")
-      const userid = req.params.id
+      const userid = req.session.user
       const users = await userschema.findOne({ _id: userid })
-      res.render('user/changeAccount', { userid, users, successmessage })
+      res.render('user/changeAccount', {userid, users, successmessage ,searchmessage:"",searcheditemname :""})
    } catch (error) {
       console.log(error)
    }
 }
 
+const updateAction = async (req, res) => {
+   try {
+      const { fname, lname, phone, email, userid } = req.body
+      await userschema.updateOne({ email: email }, {
+         firstname: fname,
+         lastname: lname,
+         phonenumber: phone,
+         email: email
+      })
+      req.flash('success', "Updated Successfully")
+      res.redirect(`/user/changeAccount`)
+   } catch (error) {
+      console.log(error)
+   }
+}
+
+
 const order = async (req, res) => {
    try {
-      const userid = req.params.id;
-      console.log(userid)
-
+      const userid = req.session.user;
       const successmessage = req.flash('success')
-
       // Fetch orders for the user, including populated items.rate_id and food_id
-      const orders = await orderschema
-         .find({ user_id: new mongoose.Types.ObjectId(userid) })
-         .populate({
-            path: 'items.rate_id',
-            populate: {
-               path: 'food_id',
-               model: 'Food', // Ensure this is populated correctly with the Food model
-            },
-         })
-         .lean(); // .lean() returns plain JavaScript objects, which is fine for rendering
-
-      // Log the orders to check if the data is being populated properly
-      console.log(orders);
-
-      // Add necessary details for rendering
-      orders.forEach(order => {
-         order.items.forEach(item => {
-            // Check if rate_id and food_id exist before trying to access their properties
-            if (item.rate_id && item.rate_id.food_id) {
-               item.food_image = item.rate_id.food_id.image || "default_image_url"; // Fallback if image doesn't exist
-               item.food_name = item.rate_id.food_id.foodname || "Unknown Food"; // Fallback if food name doesn't exist
-               item.rate = item.rate_id.rate || 0; // Fallback if rate doesn't exist
-               item.quantity = item.quantity || 0; // Fallback if quantity is missing
-               item.total = item.total_amount || 0; // Fallback if total_amount is missing
-            } else {
-               // If rate_id or food_id is missing, provide fallback data
-               item.food_image = "default_image_url";
-               item.food_name = "Unknown Food";
-               item.rate = 0;
-               item.quantity = 0;
-               item.total = 0;
-            }
-         });
-      });
+      const orders = await orderschema.aggregate([{$match:{user_id:new ObjectId(userid)}},{$unwind:"$items"}
+         ,{$lookup:{
+            from:"rates",
+            localField:"items.rate_id",
+            foreignField:"_id",
+            as:"rateDetails"
+         }},
+         {$lookup:{
+            from:"foods",
+            localField:'rateDetails.food_id',
+            foreignField:"_id",
+            as:"foodDetails"
+         }}
+      ])
+      
 
       orders.forEach(order => {
          order.createdAtFormatted = order.createdAt
@@ -148,9 +145,10 @@ const order = async (req, res) => {
             : null;
 
       })
+  
 
       // Render the orders page
-      res.render('user/order', { userid, orders, successmessage });
+      res.render('user/order', { userid, orders, successmessage,searchmessage :"",searcheditemname:"" });
    } catch (error) {
       console.error('Error in fetching orders:', error);
       res.status(500).send("An error occurred while fetching orders.");
@@ -160,16 +158,19 @@ const order = async (req, res) => {
 
 const orderCancel = async (req, res) => {
    try {
-      const { rateId, qty, userid, orderid,status } = req.body;
-      const numQty = parseInt(qty);
-      // Update the stock for the given rateId
-      const rateIdObject = new mongoose.Types.ObjectId(rateId);
-      await rateschema.updateOne({ _id: rateIdObject }, { $inc: { stock: numQty } })
+   
+      console.log(req.body)
+      const numQty = parseInt(req.body.qty);
+      const rates=await  rateschema.findOne({_id:req.body.rateId})
+     const orders=await orderschema.findOne({_id:req.body.orderid})
+      await rateschema.findByIdAndUpdate({ _id: req.body.rateId }, { $inc: { stock: numQty } });
+
+      // Update the order status
       await orderschema.updateOne(
          {
-            _id: orderid,
-            "items.rate_id": rateIdObject,  // Search for the matching rate_id inside the items array
-            "items.status":{$in:["processing","packing","onTheWay"]}
+            _id: req.body. orderid,
+            "items.rate_id": req.body.rateId,  // Search for the matching rate_id inside the items array
+            "items.status": { $in: ["processing", "packing", "onTheWay"] }
          },
          {
             $set: {
@@ -177,28 +178,68 @@ const orderCancel = async (req, res) => {
             }
          }
       );
-      req.flash('success', "The Order cancelled SuccessFully")
-      // Redirect to the user's order page
-      res.redirect(`/user/order/${ userid }`);
+
+      req.flash('success', "The order was cancelled successfully.");
+      res.redirect('/user/order');
    } catch (error) {
-      console.log(error);
-      res.status(500).send("An error occurred while canceling the order.");
+      console.error(error);
+
+      if (error instanceof mongoose.Error || error.name === "BSONError") {
+         req.flash('error', "An error occurred due to invalid input data.");
+      } else {
+         req.flash('error', "An error occurred while canceling the order.");
+      }
+
+      res.status(500).redirect('/user/order'); // Redirect with a status message
    }
 };
 
-// update profile
-const updateAction = async (req, res) => {
+
+const orderDetails= async(req,res)=>{
    try {
-      const { fname, lname, phone, email, password, userid } = req.body
-      await userschema.updateOne({ email: email }, {
-         firstname: fname,
-         lastname: lname,
-         phonenumber: phone,
-         email: email,
-         password: password
-      })
-      req.flash('success', "Updated Successfully")
-      res.redirect(`/user/changeAccount/${ userid }`)
+      const userid=req.session.user
+      const orderid=req.query.orderId
+      const rateid=req.query.rateid
+      const rates=await rateschema.findOne({_id:rateid})
+      const foods= await foodschema.findOne({_id:rates.food_id})
+      const categories= await categoryschema.findOne({_id:foods.category_id})
+      const varients = await varientschema.findOne({_id:rates.varient_id})
+      const users = await userschema.findOne({_id:userid})
+      const orders=await orderschema.findOne({_id:orderid})
+      const addresses = await addressSchema.findOne({_id:orders.address_id})
+      const date = orders.createdAt
+      const formattedDate = date.toISOString().split('T')[0];
+      let Quantity=0
+      for(let i=0;i<orders.items.length;i++){
+         if(orders.items[i].rate_id.toString()==new ObjectId(req.query.rateid)){
+              Quantity=orders.items[i].quantity
+         }
+      }
+      res.render('user/orderDetails',{userid,searchmessage :"",formattedDate,searcheditemname :"",rates,foods,varients,users,addresses,orders,Quantity,categories})
+   } catch (error) {
+      console.log(error)
+   }
+}
+
+
+const orderReturn = async(req,res)=>{
+   try {
+      const {orderId,rateId}=req.body
+      await orderschema.findByIdAndUpdate({_id:orderId},{})
+      await orderschema.updateOne(
+         {
+            _id:  orderId,
+            "items.rate_id": rateId,  // Search for the matching rate_id inside the items array
+            "items.status": { $in: ["delivered"] }
+         },
+         {
+            $set: {
+               "items.$.status": "waiting for approval"  // Use $ to target the matching element
+            }
+         }
+      );
+      req.flash('success',"waiting for approval")
+      res.redirect('/user/order')
    } catch (error) {
       console.log(error)
    }
@@ -207,7 +248,9 @@ const updateAction = async (req, res) => {
 
 
 
+
 module.exports = {
    dashboard, address, addAddress, editAddress, deleteAddress,
-   changeAccount, order, orderCancel, updateAction
+   changeAccount, order, orderCancel, updateAction,orderDetails,
+   orderReturn
 }

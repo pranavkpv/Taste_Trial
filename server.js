@@ -20,6 +20,19 @@ const rateSchema = require('./model/rateschema')
 const addressSchema=require('./model/addressschema')
 const GoogleStrategy = require('passport-google-oauth20').Strategy
 const orderSchema=require('./model/orderschema')
+const wishlistSchema=require('./model/wishlistschema')
+const couponSchema=require('./model/couponschema')
+const paymentRoute=require('./routes/payment')
+require('dotenv').config(); // Load environment variables
+
+const Razorpay = require('razorpay');
+
+const razorpayInstance = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID, // Load from .env
+  key_secret: process.env.RAZORPAY_KEY_SECRET, // Load from .env
+});
+
+
 
 
 app.use(flash());
@@ -28,7 +41,7 @@ app.use(session({
    resave: false, // Do not force save the session if it was not modified
    saveUninitialized: true, // Save a session that is uninitialized
    cookie: { 
-    maxAge: 24 * 60 * 60 * 1000, // Optional: Set session expiration time to 1 minute
+    maxAge: 24 * 60 * 60 * 1000 * 1400000, 
      secure: false // Make this true if using HTTPS
    }
 }));
@@ -94,12 +107,9 @@ app.get('/auth/google/callback', passport.authenticate('google', {
   const categories = await categoryschema.find({})
   const foods = await foodschema.find({})
   req.flash('success',"User Login SuccessFully")
-  const successmessage=req.flash('success')
   req.session.user=users._id
   console.log(req.session.user)
-  // Render a template on successful authentication
-  // You can pass user data to the template as needed
-  res.render('user/home', { users,banners,categories,foods,successmessage }); // Assuming 'home.ejs' is your template
+  res.redirect('/user/home'); 
 });
 
 
@@ -121,4 +131,5 @@ connectDB()
 
 app.use("/admin",adminRouter)
 app.use("/user",userRouter)
+app.use("/pay",paymentRoute)
 app.listen(3000)

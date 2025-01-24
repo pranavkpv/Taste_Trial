@@ -10,6 +10,9 @@ const foodcontroller=require("../controller/admin/foodcontroller")
 const varientcontroller=require("../controller/admin/varientcontroller")
 const ratecontroller=require("../controller/admin/ratecontroller")
 const ordercontroller=require("../controller/admin/ordercontroller")
+const returncontroller=require("../controller/admin/returncontroller")
+const couponcontroller=require("../controller/admin/couponcontroller")
+const reportController=require("../controller/admin/reportController")
 
 
 router.get("/login",admincontroller.login)
@@ -75,12 +78,20 @@ router.post("/editRate",upload.array('images',3),ratecontroller.editrate)
 
 router.get("/order",ordercontroller.order)
 router.post("/updateStatus",ordercontroller.updateStatus)
+router.get("/orderDetails",ordercontroller.orderDetails)
+
+router.get("/returndata",returncontroller.returndata)
+router.post("/approveReturn",returncontroller.approveReturn)
+router.post("/rejectReturn",returncontroller.rejectReturn)
 
 
+router.get("/coupon",couponcontroller.coupon)
+router.post("/addcoupon",couponcontroller.addcoupon)
+router.post("/editCoupon",couponcontroller.editCoupon)
+router.post('/deleteCoupon',couponcontroller.deleteCoupon)
 
 
-
-
+router.get("/salesReport",reportController.salesReport)
 
 
 

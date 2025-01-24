@@ -4,9 +4,56 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
 <style>
-   .rateDetails p{
+   .rateDetails p {
       line-height: 10px;
+   }
+
+   .coupon-box {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      width: 300px;
+      text-align: center;
+   }
+
+   .coupon-box h2 {
+      margin-bottom: 20px;
+      font-size: 20px;
+   }
+
+   .coupon-box input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+   }
+
+   .coupon-box button {
+      background-color: #007bff;
+      color: #fff;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      width: 100%;
+   }
+
+   .coupon-box button:hover {
+      background-color: #0056b3;
+   }
+
+   .net-amount {
+      margin-top: 20px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
    }
 </style>
 <%- include('partials/profileheadr') %>
@@ -19,20 +66,20 @@
          <h5>Select Delivery Address</h5>
       </div>
       <div class="card-body">
-         <form> 
+         <form>
             <% addressess.forEach((element, index) => { %>
                <div class="form-check">
-                  <input type="hidden" value="<%= element._id %>" id="addressId<%= index %>">
-                  <input class="form-check-input" type="radio" name="address" id="address<%= index %>" <%= index === 0 ? 'checked' : '' %>>
+                  <input class="form-check-input" type="radio" name="address" onchange="setAddress('<%= element._id %>')">
                   <label class="form-check-label" for="address<%= index %>">
-                     <b><%= element.addresstype.toUpperCase() %> Address</b>, <%= element.landmark %>, <%= element.city %>, 
-                     <%= element.state %>, PIN :<%= element.pin_code %>, MOB:<%= element.mobile_no %>, 
+                     <b><%= element.addresstype.toUpperCase() %> Address</b>, <%= element.landmark %>, <%= element.city %>,
+                     <%= element.state %>, PIN :<%= element.pin_code %>, MOB:<%= element.mobile_no %>,
                      <span><%= element.alternative_no %></span>
                   </label>
                </div>
-            <% }) %>
-            
-            
+               <% }) %>
+               
+
+
          </form>
       </div>
    </div>
@@ -40,145 +87,264 @@
    <!-- Order Summary Table -->
    <div class="card shadow-sm mb-5">
       <div class="card-header bg-primary text-white">
-        <h5>Order Summary</h5>
+         <h5>Order Summary</h5>
       </div>
       <div class="card-body">
          <% datas.forEach(element => { %>
-            <div class="d-flex mb-3 " style="gap:200px">
-               <div class="me-3">
-                 <img src="<%= element.rateDetails.images[0] %>" alt="Product" class="img-fluid rounded" style="width: 180px; height: 220px;">
-               </div>
-               <div>
-                 <h6 class="fw-bold fs-5"><%= element.foodDetails[0].foodname %></h6>
-                 <p class="mb-1"><strong>Hotel Name : </strong><%= element.hotelDetails[0].hotelname %></p>
-                 <p class="mb-1"><strong>Variant : </strong><%= element.varientDetails[0].varientname %></p>
-                 <p class="mb-1"><strong>Quantity : </strong><%= element.number %></p>
-               </div>
-               <div class="rateDetails">
-                 <h3 class="text-success">Rate Details</h3>
-                 <p><strong>Base Rate : </strong><%= element.number*element.rateDetails.rate %></p>
-                 <p><strong>Gst Amount : </strong><%= element.number*(element.rateDetails.rate*element.rateDetails.gst_per/100) %></p>
-                 <p><strong>Packing Charge : </strong><%= element.number*(element.rateDetails.rate*element.rateDetails.packing_per/100) %></p>
-                 <p><strong>Delivery Charge : </strong><%= element.number*(element.rateDetails.rate*element.rateDetails.delivery_per/100) %></p>
-                 <p class="fs-5">Final Amount    :<%= element.number*(element.rateDetails.rate+element.rateDetails.rate*element.rateDetails.gst_per/100+
-                 element.rateDetails.rate*element.rateDetails.packing_per/100+element.rateDetails.rate*element.rateDetails.delivery_per/100) %></p>
-               </div>
-             </div>    
-           <hr>         
+         <div class="d-flex mb-3 " style="gap:200px">
+            <div class="me-3">
+               <img src="<%= element.rateDetails.images[0] %>" alt="Product" class="img-fluid rounded"
+                  style="width: 180px; height: 220px;">
+            </div>
+            <div>
+               <h6 class="fw-bold fs-5"><%= element.foodDetails[0].foodname %></h6>
+               <p class="mb-1"><strong>Hotel Name : </strong><%= element.hotelDetails[0].hotelname %></p>
+               <p class="mb-1"><strong>Variant : </strong><%= element.varientDetails[0].varientname %></p>
+               <p class="mb-1"><strong>Quantity : </strong><%= element.number %></p>
+            </div>
+            <div class="rateDetails">
+               <h3 class="text-success">Rate Details</h3>
+               <p><strong>Base Rate : </strong><%= element.number*element.rateDetails.rate %></p>
+               <p><strong>Gst Amount :
+                  </strong><%= element.number*(element.rateDetails.rate*element.rateDetails.gst_per/100) %></p>
+               <p><strong>Packing Charge :
+                  </strong><%= element.number*(element.rateDetails.rate*element.rateDetails.packing_per/100) %></p>
+               <p><strong>Delivery Charge :
+                  </strong><%= element.number*(element.rateDetails.rate*element.rateDetails.delivery_per/100) %></p>
+               <% if (element.foodDetails[0].offer > 0 || element.categoryDetails[0].offer > 0) { %>
+               <% if (element.foodDetails[0].offer > element.categoryDetails[0].offer){ %>
+               <p><strong> Offer Amount :
+                  </strong><%=element.number *element.rateDetails.rate*element.foodDetails[0].offer/100 %></p>
+               <p class="fs-5">Final Amount
+                  :<%= element.number*(element.rateDetails.rate+element.rateDetails.rate*element.rateDetails.gst_per/100+
+                 element.rateDetails.rate*element.rateDetails.packing_per/100+element.rateDetails.rate*element.rateDetails.delivery_per/100
+                 -  element.rateDetails.rate*element.foodDetails[0].offer/100) %>
+               </p>
+               <% } else { %>
+               <p><strong> Offer Amount :
+                  </strong><%= element.number*element.rateDetails.rate*element.categoryDetails[0].offer/100 %></p>
+               <p class="fs-5">Final Amount
+                  :<%= element.number*(element.rateDetails.rate+element.rateDetails.rate*element.rateDetails.gst_per/100+
+                    element.rateDetails.rate*element.rateDetails.packing_per/100+element.rateDetails.rate*element.rateDetails.delivery_per/100
+                    - element.rateDetails.rate*element.categoryDetails[0].offer/100) %>
+                  <% } %>
+                  <% } else { %>
+               <p class="fs-5">Final Amount
+                  :<%= element.number*(element.rateDetails.rate+element.rateDetails.rate*element.rateDetails.gst_per/100+
+                 element.rateDetails.rate*element.rateDetails.packing_per/100+element.rateDetails.rate*element.rateDetails.delivery_per/100) %>
+               </p>
+               <% } %>
+            </div>
+         </div>
+         <hr>
          <% }) %>
       </div>
-    </div>
-    <% 
-let totalSum = 0; // Initialize the total sum
+   </div>
+   <% 
+let totalSum = 0; 
 datas.forEach(element => { 
-  // Calculate the final amount for the current element
-  const finalAmount = element.number * (
+ if(element.foodDetails[0].offer > element.categoryDetails[0].offer){
+   var finalAmount = element.number * (
     element.rateDetails.rate +
     element.rateDetails.rate * element.rateDetails.gst_per / 100 +
     element.rateDetails.rate * element.rateDetails.packing_per / 100 +
-    element.rateDetails.rate * element.rateDetails.delivery_per / 100
+    element.rateDetails.rate * element.rateDetails.delivery_per / 100 -
+    element.rateDetails.rate * element.foodDetails[0].offer / 100
   );
+ }else{
+   var finalAmount = element.number * (
+    element.rateDetails.rate +
+    element.rateDetails.rate * element.rateDetails.gst_per / 100 +
+    element.rateDetails.rate * element.rateDetails.packing_per / 100 +
+    element.rateDetails.rate * element.rateDetails.delivery_per / 100 -
+    element.rateDetails.rate * element.categoryDetails[0].offer / 100
+   )
+ }
 
   totalSum += finalAmount; // Add the final amount to the total sum
 })
 %>
-<h3 class="text-danger" style="text-align: right;">Net Amount : ₹  <%= totalSum %></h3>
 
-    
 
-   <!-- Payment Methods -->
- 
+
+
+
    <div class="card shadow-sm mb-5">
       <div class="card-header bg-primary text-white">
-         <h5>Choose Payment Method</h5>
+         <h5>Choose Payment Method/ Apply Coupon</h5>
       </div>
       <div class="card-body">
-         <form action="/user/orderSuccess" method="POST">
-            <input type="hidden" id="addressId" name="addressId">
-            <% datas.forEach(element => { %>
-               <input type="hidden" value="<%= element._id %>" name="cartId">
-               <input type="hidden" value="<%= element.number %>" name="numberofproduct">
-            <% }) %>
-            <input type="hidden" id="userid" value="<%= userid %>" name="userid">
-            <!-- Hidden field to store the selected payment method -->
-            <input type="hidden" id="selectedPaymentMethod" name="selectedPaymentMethod" value="COD">
-         
-            <div class="form-check">
-               <input class="form-check-input" type="radio" name="paymentMethod" value="COD" id="cod" checked>
-               <label class="form-check-label" for="cod">Cash on Delivery</label>
+         <form action="/user/applyCoupon" method="post">
+            <input type="hidden" value="<%= userid %>">
+            <div class="coupon-box">
+               <h2>Apply Coupon Code</h2>
+               <% datas.forEach(element => { %>
+               <input type="text" value="<%= element._id %>" name="cartIDS">
+               <input type="text" value="<%= element.number %>" name="purchaseQty">
+               <% }) %>
+               <input type="text" id="couponCode" placeholder="Enter Coupon Code" name="couponCode">
+               <button onclick="" type="sumbit">Apply</button>
             </div>
-            <div class="form-check">
-               <input class="form-check-input" type="radio" name="paymentMethod" value="UPI" id="upi">
-               <label class="form-check-label" for="upi">UPI</label>
-               <div class="mt-2" id="upiInput" style="display: none;">
-                  <input type="text" class="form-control" name="upiId" placeholder="Enter your UPI ID">
-               </div>
-            </div>
-            <div class="form-check">
-               <input class="form-check-input" type="radio" name="paymentMethod" value="Other" id="other">
-               <label class="form-check-label" for="other">Other Payment Options</label>
-            </div>
-            <div class="mt-4 text-center">
-               <button type="submit" class="btn btn-success">Confirm Order</button>
-            </div>
+            <% if (couponsuccessmessage && couponsuccessmessage.length>0) { %>
+            <div class="net-amount text-danger fs-5 ms-5" id="netAmount">Net Amount: $ <span
+                  id="withcoupon"><%= Math.round(totalSum - totalSum*coupons.discount_per/100) %></span></div>
+            <% } else { %>
+            <div class="net-amount  text-danger fs-5 ms-5" id="netAmount">Net Amount: $ <span
+                  id="withoutCoupon"><%= Math.round(totalSum)  %></span></div>
+            <% } %>
+
          </form>
-         
+         <form action="/user/orderSuccess" method="POST" id="checkout_form">
+            <input type="text" id="addressId" name="addressId">
+            <% datas.forEach(element => { %>
+            <input type="text" value="<%= element._id %>" name="cartId">
+            <input type="text" value="<%= element.number %>" name="numberofproduct">
+            <% }) %>
+            <!-- Hidden field to store the selected payment method -->
+            <input type="text" id="selectedPaymentMethod" name="selectedPaymentMethod" value="COD">
+            <% if (couponsuccessmessage && couponsuccessmessage.length>0) { %>
+            <input type="text" value="<%= coupons._id %>" name="couponId">
+            <% } %>
+
+            <div class="form-check">
+               <input class="form-check-input" type="radio" name="paymentMethod" value="COD" id="cod"
+                      onchange="updateButton()" checked>
+               <label class="form-check-label" for="cod">Cash on Delivery</label>
+           </div>
+           <div class="form-check">
+               <input class="form-check-input" type="radio" name="paymentMethod" value="razorpay" id="razorpay"
+                      onchange="updateButton()">
+               <label class="form-check-label" for="razorpay">Razorpay</label>
+           </div>
+           <div class="form-check">
+               <input class="form-check-input" type="radio" name="paymentMethod" value="wallet" id="wallet"
+                      onchange="updateButton()">
+               <label class="form-check-label" for="wallet">From Wallet</label>
+           </div>
+           <div class="mt-4 text-center">
+               <button type="submit" class="btn btn-success" id="submitButton">Place Order</button>
+           </div>       
+         </form>
+
       </div>
    </div>
 </div>
 
+
+
+
 <%- include('partials/userfooter') %>
 <script>
-   // Toggle UPI ID input field
-   document.getElementById('upi').addEventListener('change', function () {
-      document.getElementById('upiInput').style.display = 'block';
-   });
+   function setAddress(id){
+      document.getElementById('addressId').value = id;
+   }
+ 
 
-   document.getElementById('cod').addEventListener('change', function () {
-      document.getElementById('upiInput').style.display = 'none';
-   });
+   function updateButton() {
+    const selectedMethod = document.querySelector('input[name="paymentMethod"]:checked');
+    const submitButton = document.getElementById('submitButton');
+    const selectedInput = document.getElementById('selectedPaymentMethod');
 
-   document.getElementById('other').addEventListener('change', function () {
-      document.getElementById('upiInput').style.display = 'none';
-   });
-   
-// Function to update the addressId field based on the selected radio button
-function updateAddressId() {
-   const selectedRadio = document.querySelector('input[name="address"]:checked'); // Get the selected radio button
-   if (!selectedRadio) return; // Exit if no radio button is selected
+    if (selectedMethod) {
+        // Update the text input field
+        selectedInput.value = selectedMethod.value;
 
-   const addressIndex = selectedRadio.id.replace('address', ''); // Extract the index from the radio button's id
-   const addressValue = document.getElementById(`addressId${addressIndex}`).value; // Get the corresponding address value
-   const addressIdField = document.getElementById('addressId'); // Get the hidden input field for address ID
-   addressIdField.value = addressValue; // Update the hidden input field with the address ID
+        // Update the button text based on the selected payment method
+        if (selectedMethod.value === 'COD') {
+            submitButton.innerText = 'Place Order';
+        } else if (selectedMethod.value === 'razorpay') {
+            submitButton.innerText = 'Pay with Razorpay';
+        } else if (selectedMethod.value === 'wallet') {
+            submitButton.innerText = 'Pay from Wallet';
+        }
+    } else {
+        console.error("No payment method selected.");
+    }
 }
 
-// Add an event listener to update the address ID whenever a radio button is selected
-document.querySelectorAll('input[name="address"]').forEach(radio => {
-   radio.addEventListener('change', updateAddressId);
-});
 
-// Set the initial value of the addressId field on page load
-document.addEventListener('DOMContentLoaded', updateAddressId);
+   //-----------------------------------------------
 
- // Get all radio buttons for payment methods
- const paymentMethods = document.querySelectorAll('input[name="paymentMethod"]');
-   const selectedPaymentMethodField = document.getElementById('selectedPaymentMethod');
-   const upiInputField = document.getElementById('upiInput');
+   document.querySelector('#checkout_form').addEventListener('submit', async function (e) {
 
-   // Add event listeners to update the hidden input field
-   paymentMethods.forEach(paymentMethod => {
-      paymentMethod.addEventListener('change', () => {
-         selectedPaymentMethodField.value = paymentMethod.value;
+      e.preventDefault();
+      try {
+         const selectedPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+         if (selectedPaymentMethod === 'COD' || selectedPaymentMethod === 'wallet') {
+            this.submit();
+            return;
+         }else{
+            let netAmountElement = document.querySelector('#withCoupon') || document.querySelector('#withoutCoupon');
+            let amount = netAmountElement ? parseInt(netAmountElement.innerText.trim()) : 0;
+         const response = await fetch('/pay/create-order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ amount })
+         });
 
-         // Show or hide UPI input field based on the selected payment method
-         if (paymentMethod.value === 'UPI') {
-            upiInputField.style.display = 'block';
-         } else {
-            upiInputField.style.display = 'none';
+         const data = await response.json();
+         if (!data.success) {
+            Swal.fire({
+               title: "Error!",
+               text: "Failed to create order. Please try again.",
+               icon: "error",
+               showConfirmButton: false,
+               timer: 2000
+            });
+            return;
          }
-      });
+
+         const options = {
+            key: '<%= process.env.RAZORPAY_KEY_ID %>',
+            amount: data.amount,
+            currency: data.currency,
+            name: 'Taste Trial',
+            description: 'Test Transaction',
+            image: '',
+            order_id: data.order_id,
+            handler: function (response) {
+               Swal.fire({
+                  title: "Success!",
+                  text: "Payment successful!",
+                  icon: "success",
+                  showConfirmButton: false,
+                  timer: 2000
+               }).then(() => {
+                  // Submit the form after successful payment
+                  const form = document.querySelector('#checkout_form');
+                  document.getElementById('payment_id').value = response.razorpay_payment_id;
+                  form.submit();
+               });
+            },
+            prefill: {
+               name: '',
+               email: '',
+               contact: ''
+            },
+            theme: { color: '#3399cc' }
+         };
+
+         const rzp1 = new Razorpay(options);
+         rzp1.open();
+         }
+      } catch (error) {
+         console.log("Hai")
+         Swal.fire({
+            title: "Error!",
+            text: "An error occurred. Please try again.",
+            icon: "error",
+            showConfirmButton: false,
+            timer: 2000
+         });
+      }
    });
+
+   //----------------------------------------------- 
+
+
+
+
+
 
 
 
@@ -186,10 +352,29 @@ document.addEventListener('DOMContentLoaded', updateAddressId);
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <% if (successmessage && successmessage.length>0) { %>
-   <script>
-     Swal.fire({
-       text: "<%= successmessage %>",
-       icon: "success"
-     });
-   </script>
- <% } %>
+<script>
+   Swal.fire({
+      text: "<%= successmessage %>",
+      icon: "success"
+   });
+</script>
+<% } %>
+
+
+<% if (errormessage && errormessage.length>0) { %>
+<script>
+   Swal.fire({
+      text: "<%= errormessage %>",
+      icon: "error"
+   });
+</script>
+<% } %>
+
+<% if (couponsuccessmessage && couponsuccessmessage.length>0) { %>
+<script>
+   Swal.fire({
+      text: "<%= couponsuccessmessage %>",
+      icon: "success"
+   });
+</script>
+<% } %>

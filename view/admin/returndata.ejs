@@ -1,0 +1,174 @@
+<%- include('partials/admin') %>
+<link rel="stylesheet" href="/return.css">
+<div class="content">
+   <div class="d-flex justify-content-between align-items-center mb-4">
+      <h3 class="">Order Management</h3>
+   </div>
+
+
+
+   <!-- Table -->
+   <div class="row search-bar">
+      <div class="col-md-6 ">
+         <div class="input-group">
+            <span class="input-group-text bg-secondary text-light"><i class="fas fa-search"></i></span>
+            <input type="text" id="searchInput" oninput="searchInvoice(this.value)" class="form-control"
+               placeholder="Search by Invoice Number..." value="">
+
+         </div>
+
+      </div>
+   </div>
+   <div class="table-responsive">
+      <table class="table table-bordered text-center">
+         <thead class="table-dark">
+            <tr>
+               <th scope="col">Date</th>
+               <th scope="col">Invoice Number</th>
+               <th scope="col">Client Name</th>
+               <th scope="col">Product Name</th>
+               <th scope="col">Rate</th>
+               <th scope="col">View</th>
+               <th scope="col">Status</th>
+            </tr>
+         </thead>
+         <tbody>
+            <% orders.forEach(element => { %>
+            <tr style="text-align: center;">
+               <td><p class="mt-4"><%= element.createdAtFormatted %></p></td>
+               <td><p class="mt-4">INV-<%= element._id %></p></td>
+               <td><p class="mt-4"><%= element.userDetails[0].firstname %> <%= element.userDetails[0].lastname %></p></td>
+               <td><img src="<%= element.rateDetails[0].images[0] %>" alt=""><br>
+                  <p><%= element.foodDetails[0].foodname %></p>
+               </td>
+               <td>
+                  <ul class="list-unstyled text-start m-auto mt-4" style="max-width: 200px;">
+                     <% if (element.foodDetails[0].offer > element.categoryDetails[0].offer) { %>
+                     <li><%= element.items.quantity*(element.rateDetails[0].rate + element.rateDetails[0].rate*element.rateDetails[0].gst_per/100 +
+                      element.rateDetails[0].rate * element.rateDetails[0].packing_per/100 +
+                      element.rateDetails[0].rate * element.rateDetails[0].delivery_per/100 -
+                      element.rateDetails[0].rate * element.foodDetails[0].offer/100) %></li>
+                     <% } else { %>
+                     <li><%= element.items.quantity*(element.rateDetails[0].rate + element.rateDetails[0].rate*element.rateDetails[0].gst_per/100 +
+                           element.rateDetails[0].rate * element.rateDetails[0].packing_per/100 +
+                           element.rateDetails[0].rate * element.rateDetails[0].delivery_per/100 -
+                           element.rateDetails[0].rate * element.categoryDetails[0].offer/100) %></li>
+                     <% } %>
+                  </ul>
+               </td>
+          
+               <td>
+                  <form action="/admin/orderDetails" class="mt-4">
+                     <input type="hidden" value="<%= element._id %>" name="orderid">
+                     <input type="hidden" value="<%= element.items.rate_id %>" name="rateid">
+                     <input type="hidden" value="<%= element.userDetails[0]._id %>" name="userid">
+                     <button type="submit" class="btn btn-primary">View</button>
+                  </form>
+               </td>
+               <td>
+                  <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#approveModal" onclick="approve('<%= element._id %>','<%= element.items.rate_id %>','<%= element.items.quantity %>')">approve</button><br>
+                  <button class="btn btn-danger mt-2" data-bs-toggle="modal" data-bs-target="#rejectModal" style=" width:82px" onclick="reject('<%= element._id %>','<%= element.items.rate_id %>','<%= element.items.quantity %>')">Reject</button>
+               </td>
+            </tr>
+            <% }) %>
+         </tbody>
+      </table>
+      <div id="pagination" style="text-align: center; margin-bottom: 20px;">
+         <% for (let i = 1; i <= page; i++) { %>
+         <button onclick="loadPage('<%= i %>')" class="btn btn-success">
+            <%= i %>
+         </button>
+         <% } %>
+      </div>
+   </div>
+</div>
+<!-- approved modal -->
+<div class="modal fade" id="approveModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+   <div class="modal-dialog modal-dialog-centered">
+     <div class="modal-content">
+       <div class="modal-header">
+         <h1 class="modal-title fs-4" id="exampleModalLabel">Are You Sure ?</h1>
+         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+       </div>
+       <form action="/admin/approveReturn" method="post">
+         <div class="modal-body">
+            <p>Do You Want To Approve </p>
+          </div>
+          <input type="hidden" id="approvequantity" name="quantity">
+          <input type="hidden" id="approveorderId" name="orderId">
+          <input type="hidden" id="approverateId" name="rateId">
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-success">Approve</button>
+          </div>
+       </form>
+     </div>
+   </div>
+ </div>
+
+ <!-- rejected -->
+
+ <div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
+   <div class="modal-dialog modal-dialog-centered">
+     <div class="modal-content">
+       <div class="modal-header">
+         <h1 class="modal-title fs-4" id="exampleModalLabel">Are You Sure ?</h1>
+         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+       </div>
+       <form action="/admin/rejectReturn" method="post">
+         <div class="modal-body">
+            <p>Do You Want To Reject </p>
+          </div>
+          <input type="hidden" id="rejectquantity" name="quantity">
+          <input type="hidden" id="rejectorderId" name="orderId">
+          <input type="hidden" id="rejectrateId" name="rateId">
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-danger">Reject</button>
+          </div>
+       </form>
+     </div>
+   </div>
+ </div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<% if (successmessage && successmessage.length>0) { %>
+   <script>
+     Swal.fire({
+       text: "<%= successmessage %>",
+       icon: "success"
+     });
+   </script>
+ <% } %>
+
+<script>
+
+   let debounceTimer;
+
+   function searchInvoice(value) {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+         const currentPage = 1; // Reset to the first page for a new search
+         window.location.href = `/admin/returndata?pagenumber=${ currentPage }&invoice=${ encodeURIComponent(value) }`;
+      }, 700); // Adjust delay (in milliseconds) as needed
+   }
+
+   function loadPage(pageNumber) {
+      const searchValue = document.getElementById('searchInput').value || '';
+      window.location.href = `/admin/returndata?pagenumber=${ pageNumber }&invoice=${ encodeURIComponent(searchValue) }`;
+   }
+
+   function approve(orderId,rateId,quantity){
+      document.getElementById('approveorderId').value=orderId
+      document.getElementById('approverateId').value=rateId
+      document.getElementById('approvequantity').value=quantity
+   }
+   function reject(orderId,rateId,quantity){
+      document.getElementById('rejectorderId').value=orderId
+      document.getElementById('rejectrateId').value=rateId
+      document.getElementById('rejectquantity').value=quantity
+   }
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

@@ -63,11 +63,19 @@ const cart = async (req, res) => {
                    foreignField: "_id",
                    as: "varientDetails",
                },
+           },{
+            $lookup:{
+                from:"categories",
+                localField:"foodDetails.category_id",
+                foreignField:"_id",
+                as:"categoryDetails"
+            }
            },
            { $match: searchFilter },
            { $skip: skip },
            { $limit: limit },
        ]);
+       
 
        // Aggregate total amount across all items in the cart
        const totalAmountData = await cartSchema.aggregate([
@@ -161,6 +169,7 @@ const cart = async (req, res) => {
        const successmessage = req.flash('success');
        const totaldata = totalDocuments.length > 0 ? totalDocuments[0].total : 0;
        const totalPages = Math.ceil(totaldata / limit);
+    
 
        // Render response
        res.render('user/cart', {

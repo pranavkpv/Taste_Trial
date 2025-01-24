@@ -1,1 +1,53 @@
+
+
 <%- include('partials/admin') %>
+<!-- Main Content -->
+<div class="content flex-grow-1 " style="width:70%;margin-left:300px">
+   <div class="container-fluid ">
+
+     <!-- Cards Section -->
+     <div class="row">
+      <div class="col-md-4" style="margin-top: 100px;">
+        <button style="border: none;;width:100%" onclick="window.location.href='/admin/salesReport'">
+          <div class="card text-white bg-primary mb-3">
+            <div class="card-body">
+              <h5 class="card-title">Sales Report Summary</h5>
+              <p class="card-text">
+                <strong>Total Sales Count:</strong> <%= orderNumber %><br>
+                <strong>Total Order Amount:</strong> ₹ <%= totalOrderAmount %><br>
+                <strong>Overall Discount:</strong> ₹ <%= totalOfferAmount+couponSum %>
+              </p>
+            </div>
+          </div>
+        </button>
+      </div>
+      <div class="col-md-4" style="margin-top: 100px;">
+        <button style="border: none;;width:100%" onclick="window.location.href='/admin/usermanagement'">
+          <div class="card text-white bg-success mb-3">
+            <div class="card-body">
+              <h5 class="card-title">User Report</h5>
+              <p class="card-text">
+                <strong>Total Users:</strong> <%= usersCount %><br>
+                <strong>Blocked Users:</strong><%= blockUserCount %><br>
+                <strong>Unblocked Users:</strong><%= unblockUserCount %>
+              </p>
+            </div>
+          </div>
+        </button>
+      </div>
+       <div class="col-md-4" style="margin-top: 100px;">
+         <div class="card text-white bg-warning mb-3">
+           <div class="card-body" style="height:136px">
+             <h5 class="card-title">Pending Orders</h5>
+             <p class="card-text">25</p>
+           </div>
+         </div>
+       </div>
+     </div>
+
+     <!-- Table Section -->
+     
+     </div>
+   </div>
+ </div>
+</div>

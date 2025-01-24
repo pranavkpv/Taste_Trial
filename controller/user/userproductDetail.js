@@ -4,6 +4,7 @@ const hotelschema=require('../../model/hotelschema')
 const foodschema=require('../../model/foodschema')
 const rateschema=require('../../model/rateschema')
 const cartSchema=require('../../model/cartschema')
+const categoryschema=require('../../model/categoryschema')
 
 
 const productDetail = async (req, res) => {
@@ -14,6 +15,7 @@ const productDetail = async (req, res) => {
       const hotels = await hotelschema.findOne({ _id: hotelid });
       const foods = await foodschema.findOne({ _id: foodid });
       const rates = await rateschema.findOne({ _id: rateid });
+      const categories = await categoryschema.findOne({_id:foods.category_id})
 
       const successmessage = req.flash('success'); // Read success flash message
       const errormessage = req.flash('error'); // Read error flash message
@@ -28,6 +30,7 @@ const productDetail = async (req, res) => {
          searcheditemname: "",
          searchmessage: "",
          userid,
+         categories
       });
    } catch (error) {
       console.error(error);

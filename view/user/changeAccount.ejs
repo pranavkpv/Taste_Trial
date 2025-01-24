@@ -16,45 +16,37 @@
         <h5 class="mb-0">Change Account Details</h5>
       </div>
       <div class="card-body">
-        <form action="/user/updateAction" method="post">
-          <input type="hidden"value="<%= users._id %>" name="userid">
+        <form action="/user/updateAction" method="post" onsubmit="validateForm()">
+          <input type="hidden"value="<%= userid %>" name="userid">
           <input type="text" name="email1" style="display: none;" autocomplete="username">
           <input type="password" name="password1" style="display: none;" autocomplete="current-password">
           <!-- First Name -->
           <div class="mb-3">
             <label for="firstName" class="form-label">First Name</label>
             <input type="text" name="fname" class="form-control" id="firstName" placeholder="Enter your first name" value="<%= users.firstname %>" >
+            <p class="text-danger d-none" id="hiddenFirstname">first name is required</p>
           </div>
 
           <!-- Last Name -->
           <div class="mb-3">
             <label for="lastName" class="form-label">Last Name</label>
             <input type="text" name="lname" class="form-control" id="lastName" placeholder="Enter your last name"  value="<%= users.lastname %>">
+            <p class="text-danger d-none" id="hiddenSecondname">second name is required</p>
+
           </div>
 
           <!-- Phone Number -->
           <div class="mb-3">
             <label for="phoneNumber" class="form-label">Phone Number</label>
             <input type="tel" name="phone" class="form-control" id="phoneNumber" placeholder="Enter your phone number" value="<%= users.phonenumber %>">
+            <p class="text-danger d-none" id="hiddenPhone">Phone number is required</p>
           </div>
 
           <!-- Email -->
           <div class="mb-3">
             <label for="email" class="form-label">Email</label>
             <input type="email" name="email" class="form-control" id="email" placeholder="Enter your email"  value="<%= users.email %>">
-          </div>
-
-          <!-- Password -->
-          <div class="mb-3">
-            <label for="password" class="form-label">Password</label>
-            <input type="text" name="password" class="form-control" id="password" placeholder="Enter your password" value="<%= users.password %>">
-          </div>
-
-          <!-- Confirm Password -->
-          <div class="mb-3">
-            <label for="confirmPassword" class="form-label">Confirm Password</label>
-            <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm your password"
-              required>
+            <p class="text-danger d-none" id="hiddenEmail">Email is required</p>
           </div>
 
           <!-- Submit Button -->
@@ -75,3 +67,69 @@
     });
   </script>
 <% } %>
+
+<script>
+   function validateForm(event) {
+    let isValid = true; // To track form validity
+
+    // Get the form fields
+    const firstname = document.getElementById('firstName').value.trim();
+    const lastname = document.getElementById('lastName').value.trim();
+    const phonenumber = document.getElementById('phoneNumber').value.trim();
+    const email = document.getElementById('email').value.trim();
+
+    // Get the error message elements
+    const hiddenFirstname = document.getElementById('hiddenFirstname');
+    const hiddenLastname = document.getElementById('hiddenSecondname');
+    const hiddenPhone = document.getElementById('hiddenPhone');
+    const hiddenEmail = document.getElementById('hiddenEmail');
+
+    // Validate first name
+    if (firstname === '') {
+      hiddenFirstname.classList.remove('d-none');
+      isValid = false;
+    } else {
+      hiddenFirstname.classList.add('d-none');
+    }
+
+    // Validate last name
+    if (lastname === '') {
+      hiddenLastname.classList.remove('d-none');
+      isValid = false;
+    } else {
+      hiddenLastname.classList.add('d-none');
+    }
+
+    // Validate phone number
+    const phoneRegex = /^[0-9]{10}$/; // Example: 10-digit phone number
+    if (phonenumber === '' || !phoneRegex.test(phonenumber)) {
+      hiddenPhone.textContent = phonenumber === '' 
+        ? 'Phone number is required' 
+        : 'Enter a valid 10-digit phone number';
+      hiddenPhone.classList.remove('d-none');
+      isValid = false;
+    } else {
+      hiddenPhone.classList.add('d-none');
+    }
+
+    // Validate email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Basic email regex
+    if (email === '' || !emailRegex.test(email)) {
+      hiddenEmail.textContent = email === '' 
+        ? 'Email is required' 
+        : 'Enter a valid email address';
+      hiddenEmail.classList.remove('d-none');
+      isValid = false;
+    } else {
+      hiddenEmail.classList.add('d-none');
+    }
+
+    // If the form is invalid, prevent submission
+    if (!isValid) {
+      event.preventDefault();
+    }
+  }
+
+  // Attach the validation function to the form's submit event
+  document.querySelector('form').addEventListener('submit', validateForm);
+</script>

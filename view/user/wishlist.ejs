@@ -1,0 +1,211 @@
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="/dashboard.css">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+  body {
+    font-family: auto;
+  }
+
+  .profile-header {
+    background-color: #f44336;
+    color: white;
+    padding: 20px;
+    text-align: center;
+    position: relative;
+  }
+
+  .profile-header .edit-profile {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+  }
+
+  .menu {
+    background-color: #fff;
+    border-right: 1px solid #ddd;
+    min-height: 100vh;
+    padding: 20px;
+  }
+
+  .menu a {
+    display: block;
+    padding: 10px;
+    color: #333;
+    text-decoration: none;
+  }
+
+  .menu a:hover {
+    background-color: #f8f9fa;
+    border-radius: 5px;
+  }
+
+  .address-card {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 15px;
+  }
+
+  footer {
+    background-color: black;
+    color: white;
+    padding: 20px 0;
+  }
+
+  footer a {
+    color: white;
+    text-decoration: none;
+  }
+
+  body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f5f6fa;
+  }
+
+  .menu {
+    height: 100vh;
+    background-color: #343a40;
+    padding-top: 20px;
+    padding-left: 15px;
+    border-right: 2px solid #dee2e6;
+  }
+
+  .menu a {
+    display: block;
+    padding: 10px 15px;
+    color: #ced4da;
+    text-decoration: none;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    transition: background 0.3s, color 0.3s;
+  }
+
+  .menu a.wishlist,
+  .menu a:hover {
+    background-color: #495057;
+    color: #f8f9fa;
+  }
+
+  .content-header {
+    background-color: #ffffff;
+    padding: 20px;
+    border-bottom: 2px solid #dee2e6;
+  }
+
+  .content-header h1 {
+    font-size: 1.8rem;
+    color: #495057;
+  }
+
+
+  .wishlist-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #333;
+  }
+
+  .wishlist-card {
+    border: none;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .wishlist-card:hover {
+    transform: translateY(-5px);
+  }
+
+  .card-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+  }
+
+  .price {
+    color: #28a745;
+    font-weight: bold;
+  }
+
+  .remove-btn {
+    font-size: 0.8rem;
+  }
+</style>
+<%- include('partials/profileheadr') %>
+
+<div class="row">
+  <div class="col-md-2 menu">
+    <%- include('partials/profileside') %>
+  </div>
+
+  <div class="col-md-10 mt-5 ">
+    <div class="text-center mb-4">
+      <h1 class="wishlist-title">My Wishlist</h1>
+      <p class="text-muted">All your favorite items in one place!</p>
+    </div>
+    <div class="row">
+      <!-- Wishlist Item 1 -->
+      <% wishlistData.forEach(element => { %>
+      <div class="col-md-4">
+        <div class="card wishlist-card shadow-sm ms-4">
+          <img src="<%= element.rateDetails[0].images[0] %>" class="card-img-top" alt="Item Image" style="width:300px">
+          <div class="card-body">
+            <h5 class="card-title"><%= element.foodDetails[0].foodname %></h5>
+            <p class="card-text text-muted">
+              The food item belongs to the <%= element.categoryDetails[0].categoryname %> category,
+              and a variant of <%= element.foodDetails[0].foodname %> (<%= element.varientDetails[0].varientname %>)
+              has been added under the hotel name "<%= element.hotelDetails[0].hotelname %>"</p>
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="price">$<%= element.rateDetails[0].rate %></span>
+              <button class="btn btn-danger btn-sm remove-btn" data-bs-toggle="modal" data-bs-target="#removewishlist"
+                onclick="removefun('<%= element._id %>')">Remove</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <% }) %>
+      <!-- Add more wishlist items as needed -->
+    </div>
+  </div>
+
+  <!-- remove Address -->
+  <div class="modal fade" id="removewishlist" tabindex="-1" aria-labelledby="removeWishlistModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered custom-modal-width">
+      <div class="modal-content">
+        <form action="/user/removeWishlist" method="post">
+          <input type="hidden" id="removeid" name="removeid">
+          <div class="modal-body">
+            <p>Do you want to Remove the Item from Cart?</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+            <button type="submit" class="btn btn-success">Yes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <%- include('partials/userfooter') %>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+    crossorigin="anonymous"></script>
+
+  <script>
+    function removefun(id) {
+      document.getElementById('removeid').value = id
+    }
+  </script>
+
+  <% if (successmessage && successmessage.length>0) { %>
+  <script>
+    Swal.fire({
+      text: "<%= successmessage %>",
+      icon: "success"
+    });
+  </script>
+  <% } %>

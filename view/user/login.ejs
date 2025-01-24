@@ -21,27 +21,30 @@
                      <input type="password" name="password1" style="display: none;" autocomplete="current-password">
 
                      <div class="form-group">
-                        <input type="text" class="form-control rounded-left" placeholder="User Email" name="email" autocomplete="off">
+                        <input type="text" class="form-control rounded-left" placeholder="User Email" name="email"
+                           autocomplete="off">
                      </div>
                      <div class="form-group d-flex">
-                        <input type="password" class="form-control rounded-left" placeholder="Password" name="password" autocomplete="off">
+                        <input type="password" class="form-control rounded-left" placeholder="Password" name="password"
+                           autocomplete="off">
                      </div>
                      <div class="form-group d-md-flex">
                         <div class="w-50">
-                           <a href="/user/forgotpassword">forgot password</a>
+                           <a href="/user/emailverification">forgot password</a>
                         </div>
                      </div>
                      <div class="form-group" style="height:57px">
                         <button type="submit" class="btn btn-primary rounded submit p-3 px-5">Login</button>
                      </div>
                      <p style="text-align: center;">Or</p>
-                     
+
                      <div class="form-group">
                         <p>Don't have an account <a href="/user/signup">Signup</a></p>
                      </div>
                   </form>
                   <div class="form-group" style="height:57px;margin-top:-32px">
-                     <button class="btn btn-primary rounded submit p-3 px-5" onclick="location.href='/user/auth/google'">Login With Google</button>
+                     <button class="btn btn-primary rounded submit p-3 px-5"
+                        onclick="location.href='/user/auth/google'">Login With Google</button>
                   </div>
                </div>
             </div>
@@ -59,36 +62,34 @@
    <% } %>
 
    <% if (nocontendmessage && nocontendmessage.length>0) { %>
-      <script>
-         Swal.fire({
-            icon: "info",
-            text: "<%= nocontendmessage %>"
-         });
-      </script>
-      <% } %>
+   <script>
+      Swal.fire({
+         icon: "info",
+         text: "<%= nocontendmessage %>"
+      });
+   </script>
+   <% } %>
 
-      <% if (successmessage && successmessage.length>0) { %>
-         <script>
-            Swal.fire({
-               icon: "success",
-               text: "<%= successmessage %>"
-            });
-         </script>
-         <% } %>
+   <% if (successmessage && successmessage.length>0) { %>
+   <script>
+      Swal.fire({
+         icon: "success",
+         text: "<%= successmessage %>"
+      });
+   </script>
+   <% } %>
 
-         <% if (errormessage && errormessage.length>0) { %>
-            <script>
-               Swal.fire({
-                  icon: "error",
-                  text: "<%= errormessage %>"
-               });
-            </script>
-            <% } %>
-      
+   <% if (errormessage && errormessage.length>0) { %>
+   <script>
+      Swal.fire({
+         icon: "error",
+         text: "<%= errormessage %>"
+      });
+   </script>
+   <% } %>
+
 
    <script src="js/jquery.min.js"></script>
    <script src="js/popper.js"></script>
    <script src="js/bootstrap.min.js"></script>
    <script src="js/main.js"></script>
-
-</body>

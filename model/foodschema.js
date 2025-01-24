@@ -12,6 +12,23 @@ const foodSchema = new Schema({
     ref: 'Category',
     required: true,
   },
+  duration_time:{
+    type:Number,
+    required:true
+  },
+  offer:{
+    type:Number,
+    required:true
+  },
+  expiry_date:{
+    type:Date,
+    validate: {
+      validator: function (value) {
+        return value > new Date(); // Ensures expiry_date is a future date
+      },
+      message: 'Expiry date must be in the future',
+    },
+  },
   is_blocked: {
     type: Boolean,
     required:true,

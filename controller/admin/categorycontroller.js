@@ -6,10 +6,10 @@ const category = async (req, res) => {
       const selectedpage = Number(req.query.pagenumber) || 1; // Get the page number
       const limit = 5; // Number of categories per page
       const skip = (selectedpage - 1) * limit; // Calculate the skip value
-      
+
       // Search filter
-      const searchFilter = searchedcategoryname 
-         ? { categoryname: { $regex: searchedcategoryname, $options: 'i' } } 
+      const searchFilter = searchedcategoryname
+         ? { categoryname: { $regex: searchedcategoryname, $options: 'i' } }
          : {};
 
       // Get filtered data count
@@ -17,20 +17,30 @@ const category = async (req, res) => {
       const page = Math.ceil(totaldata / limit);
 
       // Get filtered and paginated data
-      const categories = await categoryschema.find(searchFilter).skip(skip).limit(limit);
+      let categories = await categoryschema.find(searchFilter).skip(skip).limit(limit);
+       // Format expiryDate for each category
+       categories = categories.map(category => {
+         if (category.expiry_date) {
+            category.formattedExpiryDate = new Date(category.expiry_date)
+               .toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" })
+               .split("/")
+               .join("-");
+         }
+         return category;
+      });
 
       const existmessage = req.flash('exist');
       const successmessage = req.flash('success');
       const errormessage = req.flash('error');
       const editexistmessage = req.flash('editexist');
-      const startIndex=skip+1
+      const startIndex = skip + 1
 
-      res.render("admin/category", { 
-         categories, 
-         existmessage, 
-         successmessage, 
-         errormessage, 
-         editexistmessage, 
+      res.render("admin/category", {
+         categories,
+         existmessage,
+         successmessage,
+         errormessage,
+         editexistmessage,
          page,
          searchedcategoryname,
          startIndex
@@ -42,7 +52,8 @@ const category = async (req, res) => {
 
 const addcategory = async (req, res) => {
    try {
-      const { categoryname } = req.body;
+      const { categoryname, offer, expirydate } = req.body;
+     
       const file = req.file;
       const image = `/uploads/${ file.filename }`;
       const existcategory = await categoryschema.findOne({ categoryname });
@@ -52,6 +63,8 @@ const addcategory = async (req, res) => {
       } else {
          const newcategory = new categoryschema({
             categoryname,
+            offer,
+            expiry_date: expirydate,
             image
          });
          await newcategory.save();
@@ -65,7 +78,7 @@ const addcategory = async (req, res) => {
 };
 const editcategory = async (req, res) => {
    try {
-      const { categoryname, editid } = req.body;
+      const { categoryname, editid,Offer,expirydate } = req.body;
       const file = req.file
       const existTitle = await categoryschema.find({ _id: { $ne: editid } })
       const countDocument = await categoryschema.countDocuments() - 1
@@ -80,12 +93,12 @@ const editcategory = async (req, res) => {
          res.redirect('/admin/category')
       } else {
          if (!file) {
-            await categoryschema.findByIdAndUpdate({ _id: editid }, { categoryname })
+            await categoryschema.findByIdAndUpdate({ _id: editid }, { categoryname,offer:Offer,expiry_date:expirydate })
             req.flash('success', "Updated Successfully");
             res.redirect('/admin/category');
          } else {
             const image = `/uploads/${ file.filename }`
-            await categoryschema.findByIdAndUpdate({ _id: editid }, { categoryname, image })
+            await categoryschema.findByIdAndUpdate({ _id: editid }, { categoryname, image,offer:Offer,expiry_date:expirydate })
             req.flash('success', "Category Updated Successfully");
             return res.redirect('/admin/category');
          }

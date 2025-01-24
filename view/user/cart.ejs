@@ -208,7 +208,7 @@
   <!-- Main Content -->
   <div class="container cart-container col-md-10">
     <h2 class="cart-header">Your Shopping Cart</h2>
-    <p class=""><%= userid %></p>
+    <p class="d-none"><%= userid %></p>
 
     <table class="table table-bordered " style="margin-left: -119px;width: 1120px;">
       <thead>
@@ -219,6 +219,7 @@
           <th class="fs-5">Variant</th>
           <th class="fs-5">Hotel</th>
           <th class="fs-5">Rate</th>
+          <th class="fs-6" style="width:50px">Avail Stock</th>
           <th class="fs-5">Quantity</th>
           <th class="fs-5">Total</th>
           <th class="fs-5">Actions</th>
@@ -237,15 +238,34 @@
           <td class="fs-6"><%= element.foodDetails.foodname %></td>
           <td class="fs-6"><%= element.varientDetails[0].varientname %></td>
           <td class="fs-6"><%= element.hotelDetails[0].hotelname %></td>
-          <td class="fs-6 rateperunit">₹ <%= element.rateDetails.rate +
-              element.rateDetails.rate * element.rateDetails.gst_per / 100 +
-              element.rateDetails.rate * element.rateDetails.packing_per / 100 +
-              element.rateDetails.rate * element.rateDetails.delivery_per / 100 %>
-          </td>
+          <% if (element.categoryDetails[0].offer>0 || element.foodDetails.offer>0) { %>
+            <% if (element.categoryDetails[0].offer > element.foodDetails.offer) { %>
+              <td class="fs-6 rateperunit">₹ <%= element.rateDetails.rate +
+                element.rateDetails.rate * element.rateDetails.gst_per / 100 +
+                element.rateDetails.rate * element.rateDetails.packing_per / 100 +
+                element.rateDetails.rate * element.rateDetails.delivery_per / 100 -
+                element.rateDetails.rate * element.categoryDetails[0].offer /100 %>
+            </td>
+            <% } else { %>
+              <td class="fs-6 rateperunit">₹ <%= element.rateDetails.rate +
+                element.rateDetails.rate * element.rateDetails.gst_per / 100 +
+                element.rateDetails.rate * element.rateDetails.packing_per / 100 +
+                element.rateDetails.rate * element.rateDetails.delivery_per / 100 -
+                element.rateDetails.rate * element.foodDetails.offer /100 %>
+            </td>  
+            <% } %>
+            <% } else { %>
+              <td class="fs-6 rateperunit">₹ <%= element.rateDetails.rate +
+                  element.rateDetails.rate * element.rateDetails.gst_per / 100 +
+                  element.rateDetails.rate * element.rateDetails.packing_per / 100 +
+                  element.rateDetails.rate * element.rateDetails.delivery_per / 100 %>
+              </td>    
+          <% } %>
+          <td class="fs-6 text-danger availQty"><%= element.rateDetails.stock %></td>
           <td>
             <button class="decrease btn btn-secondary">-</button>
-            <span class="quantity"><%= element.number %></span>
-            <button class="increase btn btn-secondary">+</button>
+            <span class="quantity" name="cartstock"><%= element.number %></span>
+            <button class="increase btn btn-secondary" onclick="checkQtyfun()">+</button>
           </td>
           <td class="fs-6 totalRate">
           </td>
@@ -258,37 +278,34 @@
         <% if (carts.length == 0) { %>
         <h4 style="margin-top: 7rem;text-align: center;">No Data Found</h4>
         <% } else { %>
- 
-          <tr <% if (selectedpage!==totalPages) { %>
-            class="d-none"  
-          <% } %>>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>Total Amount:</td>
-            <td><span class="subtotal">₹ <span id="total-amount"></span></span></td>
-            <td>
-              <form action="">
-                <button id="proceed" class="btn btn-primary">Proceed with Selected</button>
-              </form>
-            </td>
-          </tr>   
-   
+
+        <tr <% if (selectedpage!==totalPages) { %> class="d-none" <% } %>>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td>Total Amount:</td>
+          <td><span class="subtotal">₹ <span id="total-amount"></span></span></td>
+          <td>
+            <button id="proceed" class="btn btn-primary">Proceed with Selected</button>
+          </td>
+        </tr>
+
         <% } %>
       </tbody>
     </table>
     <div style="margin-top: 600px;margin-left: 500px;">
       <% for (let i = 1; i <= totalPages; i++) { %>
-        <button  onclick="loadPage('<%= i %>')" class="btn <%= i === selectedpage ? 'btn-danger' : 'btn-success' %>">
-           <%= i %>
-        </button>
+      <button onclick="loadPage('<%= i %>')" class="btn <%= i === selectedpage ? 'btn-danger' : 'btn-success' %>">
+        <%= i %>
+      </button>
       <% } %>
 
     </div>
- 
+
   </div>
 </div>
 
@@ -297,7 +314,7 @@
   <div class="modal-dialog modal-dialog-centered custom-modal-width">
     <div class="modal-content">
       <form action="/user/removeCart" method="post">
-        <input type="text" id="removeid" name="cartid">
+        <input type="hidden" id="removeid" name="cartid">
         <div class="modal-body">
           <p>Do you want to Remove the product from cart?</p>
         </div>
@@ -317,94 +334,60 @@
 
 
 
-   let debounceTimer;
+  let debounceTimer;
 
-function searchItem(value) {
-   clearTimeout(debounceTimer);
-   debounceTimer = setTimeout(() => {
+  function searchItem(value) {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
       const currentPage = 1; // Reset to the first page for a new search
-      window.location.href = `/user/cart?pagenumber=${currentPage}&product=${encodeURIComponent(value)}`;
-   }, 700); // Adjust delay (in milliseconds) as needed
-}
-
-function loadPage(pageNumber) {
-   const searchValue = document.getElementById('searchInput').value || '';
-   window.location.href = `/user/cart?pagenumber=${pageNumber}&product=${encodeURIComponent(searchValue)}`;
-}
-
-
-
-
-
-
-  document.querySelector('table').addEventListener('click', function (e) {
-  const target = e.target;
-
-  // Check if the clicked element is an increase or decrease button
-  if (target.classList.contains('increase') || target.classList.contains('decrease')) {
-    const row = target.closest('tr'); // Find the closest table row
-    const quantitySpan = row.querySelector('.quantity'); // Get the quantity element
-    const ratePerUnit = parseFloat(row.querySelector('.rateperunit').textContent.replace('₹', '').trim()); // Get the rate per unit
-    const totalRateSpan = row.querySelector('.totalRate'); // Get the total rate element
-
-    let quantity = parseInt(quantitySpan.textContent); // Parse the quantity value
-
-    // Increment or decrement the quantity
-    if (target.classList.contains('increase')) {
-      quantity++;
-    } else if (target.classList.contains('decrease') && quantity > 1) {
-      quantity--;
-    }
-
-    // Update the quantity in the UI
-    quantitySpan.textContent = quantity;
-
-    // Calculate and update the total rate
-    const totalRate = ratePerUnit * quantity;
-    totalRateSpan.textContent = '₹ ' + totalRate.toFixed(2); // Format the total rate with ₹ symbol
+      window.location.href = `/user/cart?pagenumber=${ currentPage }&product=${ encodeURIComponent(value) }`;
+    }, 700); // Adjust delay (in milliseconds) as needed
   }
-});
+
+  function loadPage(pageNumber) {
+    const searchValue = document.getElementById('searchInput').value || '';
+    window.location.href = `/user/cart?pagenumber=${ pageNumber }&product=${ encodeURIComponent(searchValue) }`;
+  }
 
 
+  document.querySelectorAll('.increase, .decrease').forEach(button => {
+    button.addEventListener('click', function () {
+      const row = this.closest('tr');
+      const quantityEl = row.querySelector('.quantity');
+      let quantity = parseInt(quantityEl.textContent);
 
-document.querySelectorAll('.increase, .decrease').forEach(button => {
-  button.addEventListener('click', function () {
-    const row = this.closest('tr');
-    const quantityEl = row.querySelector('.quantity');
-    let quantity = parseInt(quantityEl.textContent);
+      if (this.classList.contains('increase')) {
+        quantity++;
+      } else if (this.classList.contains('decrease') && quantity > 1) {
+        quantity--;
+      }
 
-    if (this.classList.contains('increase')) {
-      quantity++;
-    } else if (this.classList.contains('decrease') && quantity > 1) {
-      quantity--;
-    }
+      quantityEl.textContent = quantity;
 
-    quantityEl.textContent = quantity;
+      // Calculate the total rate for the row
+      const ratePerUnit = parseFloat(row.querySelector('.rateperunit').innerText.replace('₹', '').trim());
+      const totalRate = (ratePerUnit * quantity).toFixed(2);
+      row.querySelector('.totalRate').innerText = `₹ ${ totalRate }`;
 
-    // Calculate the total rate for the row
-    const ratePerUnit = parseFloat(row.querySelector('.rateperunit').innerText.replace('₹', '').trim());
-    const totalRate = (ratePerUnit * quantity).toFixed(2);
-    row.querySelector('.totalRate').innerText = `₹ ${totalRate}`;
-
-    updateTotalAmount(); // Update the total amount
+      updateTotalAmount(); // Update the total amount
+    });
   });
-});
 
 
-// Initial calculation for all rows on page load
-document.addEventListener('DOMContentLoaded', function () {
-  const ratePerUnitElements = document.getElementsByClassName('rateperunit');
-  const quantityElements = document.getElementsByClassName('quantity');
-  const totalRateElements = document.getElementsByClassName('totalRate');
+  // Initial calculation for all rows on page load
+  document.addEventListener('DOMContentLoaded', function () {
+    const ratePerUnitElements = document.getElementsByClassName('rateperunit');
+    const quantityElements = document.getElementsByClassName('quantity');
+    const totalRateElements = document.getElementsByClassName('totalRate');
 
-  for (let i = 0; i < ratePerUnitElements.length; i++) {
-    const ratePerUnit = parseFloat(ratePerUnitElements[i].textContent.replace('₹', '').trim());
-    const quantity = parseInt(quantityElements[i].textContent);
-    const totalRate = ratePerUnit * quantity;
+    for (let i = 0; i < ratePerUnitElements.length; i++) {
+      const ratePerUnit = parseFloat(ratePerUnitElements[i].textContent.replace('₹', '').trim());
+      const quantity = parseInt(quantityElements[i].textContent);
+      const totalRate = ratePerUnit * quantity;
 
-    totalRateElements[i].textContent = '₹ ' + totalRate.toFixed(2); // Initialize total rate with ₹ symbol
-  }
-});
+      totalRateElements[i].textContent = '₹ ' + totalRate.toFixed(2); // Initialize total rate with ₹ symbol
+    }
+  });
 
 
 
@@ -414,10 +397,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const selectedItems = [];
     let cartIDS = []
+    let purchaseQty = []
     document.querySelectorAll('.check-cart').forEach((checkbox, index) => {
       if (checkbox.checked) {
         selectedItems.push(index); // Collect selected item indices (or any identifying data)
         cartIDS.push(checkbox.getAttribute('data-id'))
+        purchaseQty.push(document.querySelectorAll('.quantity')[index].textContent)
       }
     });
 
@@ -441,9 +426,8 @@ document.addEventListener('DOMContentLoaded', function () {
       cancelButtonText: 'Cancel',
     }).then((result) => {
       if (result.isConfirmed) {
-        const userid = "<%= userid %>"
         // Redirect or handle form submission here
-        window.location.href = `/user/confirmorder?userid=${ userid }&cartIDS=${ cartIDS }`;
+        window.location.href = `/user/confirmorder?&cartIDS=${ cartIDS }&purchaseQty=${purchaseQty}`;
       }
     });
   });
@@ -460,11 +444,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Initialize total rate for each item
     for (let i = 0; i < ratePerUnitElements.length; i++) {
-        const ratePerUnit = parseFloat(ratePerUnitElements[i].textContent.replace('₹', '').trim());
-        const quantity = parseInt(quantityElements[i].textContent);
-        const totalRate = ratePerUnit * quantity;
+      const ratePerUnit = parseFloat(ratePerUnitElements[i].textContent.replace('₹', '').trim());
+      const quantity = parseInt(quantityElements[i].textContent);
+      const totalRate = ratePerUnit * quantity;
 
-        totalRateElements[i].textContent = '₹ ' + totalRate.toFixed(2); // Initialize total rate with ₹ symbol
+      totalRateElements[i].textContent = '₹ ' + totalRate.toFixed(2); // Initialize total rate with ₹ symbol
     }
 
     // Update total amount based on selected items
@@ -480,203 +464,173 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Show/hide the total amount row based on the current page
     if (currentPage === totalPages) {
-        document.getElementById('total-row').style.display = 'table-row'; // Show total row on last page
+      document.getElementById('total-row').style.display = 'table-row'; // Show total row on last page
     } else {
-        document.getElementById('total-row').style.display = 'none'; // Hide total row on other pages
+      document.getElementById('total-row').style.display = 'none'; // Hide total row on other pages
     }
-});
+  });
 
-// Event listener for checking/unchecking items
-document.querySelector('table').addEventListener('click', function (e) {
+  // Event listener for checking/unchecking items
+  document.querySelector('table').addEventListener('click', function (e) {
     const target = e.target;
 
     // Check if the clicked element is a checkbox
     if (target.classList.contains('check-cart')) {
-        const index = target.getAttribute('data-index');
-        const cartID = target.getAttribute('data-id');
+      const index = target.getAttribute('data-index');
+      const cartID = target.getAttribute('data-id');
 
-        // Get current selections from local storage
-        let selectedItems = JSON.parse(localStorage.getItem('selectedItems')) || [];
+      // Get current selections from local storage
+      let selectedItems = JSON.parse(localStorage.getItem('selectedItems')) || [];
 
-        // Add or remove the selected item from the array
-        if (target.checked) {
-            selectedItems.push(cartID);
-        } else {
-            selectedItems = selectedItems.filter(item => item !== cartID);
-        }
+      // Add or remove the selected item from the array
+      if (target.checked) {
+        selectedItems.push(cartID);
+      } else {
+        selectedItems = selectedItems.filter(item => item !== cartID);
+      }
 
-        // Store updated selections in local storage
-        localStorage.setItem('selectedItems', JSON.stringify(selectedItems));
+      // Store updated selections in local storage
+      localStorage.setItem('selectedItems', JSON.stringify(selectedItems));
 
-        // Update total amount based on selected items
-        updateTotalAmount();
+      // Update total amount based on selected items
+      updateTotalAmount();
     }
-});
+  });
 
-// Function to load previously selected items from local storage
-function loadSelectedItems() {
+  // Function to load previously selected items from local storage
+  function loadSelectedItems() {
     const selectedItems = JSON.parse(localStorage.getItem('selectedItems')) || [];
 
     // Check each checkbox if it matches the stored selected items
     document.querySelectorAll('.check-cart').forEach((checkbox) => {
-        if (selectedItems.includes(checkbox.getAttribute('data-id'))) {
-            checkbox.checked = true;
-        }
-    });
-}
-
-// Function to calculate and update total amount for selected items
-function updateTotalAmount() {
-  const selectedItems = JSON.parse(localStorage.getItem('selectedItems')) || {};
-  let totalAmount = 0;
-
-  document.querySelectorAll('.check-cart').forEach(checkbox => {
-    if (checkbox.checked) {
-      const row = checkbox.closest('tr');
-      const itemTotal = parseFloat(row.querySelector('.totalRate').innerText.replace('₹', '').trim());
-      totalAmount += itemTotal;
-    }
-  });
-
-  document.getElementById('total-amount').innerText = totalAmount.toFixed(2); // Update UI
-}
-
-
-// Function to get the current page number (implement your own logic for pagination)
-function getCurrentPage() {
-    // For example, this can be fetched from the URL or page state
-    return parseInt(new URLSearchParams(window.location.search).get('page')) || 1; // Default to page 1 if not found
-}
-
-// Proceed with selected items (on button click)
-document.getElementById('proceed').addEventListener('click', function (event) {
-    event.preventDefault(); // Prevent form submission
-
-    const selectedItems = [];
-    document.querySelectorAll('.check-cart').forEach((checkbox) => {
-        if (checkbox.checked) {
-            selectedItems.push(checkbox.getAttribute('data-id'));
-        }
-    });
-
-    if (selectedItems.length === 0) {
-        Swal.fire('No items selected', 'Please select items to proceed', 'warning');
-    } else {
-        // Proceed with the selected items
-        console.log('Proceed with selected items:', selectedItems);
-        // You can send selectedItems to the server or perform the necessary actions
-    }
-});
-
-
-
-
-
-
-// Proceed with selected items (on button click)
-document.getElementById('proceed').addEventListener('click', function (event) {
-    event.preventDefault(); // Prevent form submission
-
-    const selectedItems = [];
-    document.querySelectorAll('.check-cart').forEach((checkbox) => {
-        if (checkbox.checked) {
-            selectedItems.push(checkbox.getAttribute('data-id'));
-        }
-    });
-
-    if (selectedItems.length === 0) {
-        Swal.fire('No items selected', 'Please select items to proceed', 'warning');
-    } else {
-        // Proceed with the selected items
-        console.log('Proceed with selected items:', selectedItems);
-        // You can send selectedItems to the server or perform the necessary actions
-    }
-});
-
-
-document.querySelectorAll('.check-cart').forEach(checkbox => {
-  checkbox.addEventListener('change', function () {
-    const itemId = this.dataset.id;
-    let selectedItems = JSON.parse(localStorage.getItem('selectedItems')) || {};
-
-    if (this.checked) {
-      selectedItems[itemId] = true; // Mark item as selected
-    } else {
-      delete selectedItems[itemId]; // Remove item from selected
-    }
-
-    localStorage.setItem('selectedItems', JSON.stringify(selectedItems));
-    updateTotalAmount(); // Update the total amount
-  });
-});
-
-
-
-
-document.addEventListener('DOMContentLoaded', () => {
-  // Initialize data structure to store row information
-  const rowData = [];
-
-  // Store initial data for all rows across all pages
-  document.querySelectorAll('tr').forEach((row, index) => {
-    const ratePerUnit = parseFloat(row.querySelector('.rateperunit').textContent.replace('₹', '').trim());
-    const quantity = parseInt(row.querySelector('.quantity').textContent);
-    rowData[index] = {
-      ratePerUnit,
-      quantity,
-    };
-  });
-
-  // Function to update the row data
-  function updateRowData(index, quantity) {
-    rowData[index].quantity = quantity;
-  }
-
-  // Function to calculate the grand total across all pages
-  function calculateGrandTotal() {
-    const grandTotal = rowData.reduce((sum, row) => {
-      return sum + row.ratePerUnit * row.quantity;
-    }, 0);
-    document.getElementById('total-amount').textContent = grandTotal.toFixed(2);
-  }
-
-  // Add event listeners to increase and decrease buttons
-  document.querySelectorAll('.increase').forEach((button, index) => {
-    button.addEventListener('click', () => {
-      const row = button.closest('tr');
-      const quantityElement = row.querySelector('.quantity');
-      let quantity = parseInt(quantityElement.textContent);
-      quantity += 1;
-      quantityElement.textContent = quantity;
-      updateRowData(index, quantity);
-      calculateGrandTotal();
-    });
-  });
-
-  document.querySelectorAll('.decrease').forEach((button, index) => {
-    button.addEventListener('click', () => {
-      const row = button.closest('tr');
-      const quantityElement = row.querySelector('.quantity');
-      let quantity = parseInt(quantityElement.textContent);
-      if (quantity > 1) {
-        quantity -= 1;
-        quantityElement.textContent = quantity;
-        updateRowData(index, quantity);
-        calculateGrandTotal();
+      if (selectedItems.includes(checkbox.getAttribute('data-id'))) {
+        checkbox.checked = true;
       }
     });
+  }
+
+  // Function to calculate and update total amount for selected items
+  function updateTotalAmount() {
+    const selectedItems = JSON.parse(localStorage.getItem('selectedItems')) || {};
+    let totalAmount = 0;
+
+    document.querySelectorAll('.check-cart').forEach(checkbox => {
+      if (checkbox.checked) {
+        const row = checkbox.closest('tr');
+        const itemTotal = parseFloat(row.querySelector('.totalRate').innerText.replace('₹', '').trim());
+        totalAmount += itemTotal;
+      }
+    });
+
+    document.getElementById('total-amount').innerText = totalAmount.toFixed(2); // Update UI
+  }
+
+
+  // Function to get the current page number (implement your own logic for pagination)
+  function getCurrentPage() {
+    // For example, this can be fetched from the URL or page state
+    return parseInt(new URLSearchParams(window.location.search).get('page')) || 1; // Default to page 1 if not found
+  }
+
+  // Proceed with selected items (on button click)
+  document.getElementById('proceed').addEventListener('click', function (event) {
+    event.preventDefault(); // Prevent form submission
+
+    const selectedItems = [];
+    document.querySelectorAll('.check-cart').forEach((checkbox) => {
+      if (checkbox.checked) {
+        selectedItems.push(checkbox.getAttribute('data-id'));
+      }
+    });
+
+    if (selectedItems.length === 0) {
+      Swal.fire('No items selected', 'Please select items to proceed', 'warning');
+    } else {
+      // Proceed with the selected items
+      console.log('Proceed with selected items:', selectedItems);
+      // You can send selectedItems to the server or perform the necessary actions
+    }
   });
 
-  // Initial calculation of the grand total
-  calculateGrandTotal();
+
+  document.querySelectorAll('.increase, .decrease').forEach(button => {
+  button.addEventListener('click', function () {
+    const row = this.closest('tr');
+    const quantityEl = row.querySelector('.quantity');
+    const availableQty = parseInt(row.querySelector('.availQty').textContent);
+    const rateEl = row.querySelector('.rateperunit');
+    const totalEl = row.querySelector('.totalRate');
+    const ratePerUnit = parseFloat(rateEl.textContent.replace('₹', '').trim());
+    let quantity = parseInt(quantityEl.textContent);
+
+    if (this.classList.contains('increase')) {
+      if (quantity < availableQty) {
+        quantity+1;
+      } else {
+        Swal.fire('Stock Limit Reached', '', 'info');
+      }
+    } else if (this.classList.contains('decrease')) {
+      if (quantity > 1) {
+        quantity-1;
+      } else {
+        Swal.fire('Minimum Quantity Reached', '', 'info');
+      }
+    }
+
+    // Update quantity in the UI
+    quantityEl.textContent = quantity;
+
+    // Update the total price
+    const total = quantity * ratePerUnit;
+    totalEl.textContent = `₹ ${total.toFixed(2)}`;
+  });
 });
 
+  function updateTotal(row, quantity) {
+    const ratePerUnit = parseFloat(row.querySelector('.rateperunit').textContent.replace('₹', '').trim());
+    const totalRateEl = row.querySelector('.totalRate');
+    const total = ratePerUnit * quantity;
+    totalRateEl.textContent = `₹ ${ total.toFixed(2) }`;
+  }
+
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // Initialize data structure to store row information
+    const rowData = [];
+
+    // Store initial data for all rows across all pages
+    document.querySelectorAll('tr').forEach((row, index) => {
+      const ratePerUnit = parseFloat(row.querySelector('.rateperunit').textContent.replace('₹', '').trim());
+      const quantity = parseInt(row.querySelector('.quantity').textContent);
+
+      rowData[index] = {
+        ratePerUnit,
+        quantity,
+      };
+    });
+
+    // Function to update the row data
+    function updateRowData(index, quantity) {
+      rowData[index].quantity = quantity;
+    }
+
+    // Function to calculate the grand total across all pages
+    function calculateGrandTotal() {
+      const grandTotal = rowData.reduce((sum, row) => {
+        return sum + row.ratePerUnit * row.quantity;
+      }, 0);
+      document.getElementById('total-amount').textContent = grandTotal.toFixed(2);
+    }
+
+  })
+  
 
 
 
-function removefromCart(id){
-  document.getElementById('removeid').value=id
-}
+
+  function removefromCart(id) {
+    document.getElementById('removeid').value = id
+  }
 
 
 

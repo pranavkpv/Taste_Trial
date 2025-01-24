@@ -1,0 +1,55 @@
+
+
+<%- include('partials/admin') %>
+<link rel="stylesheet" href="/order.css">
+<div style="height:150px">
+
+</div>
+<div class="order-details-container" style="margin-left:500px;">
+   <!-- Order Summary Section -->
+   <div class="order-summary" >
+      <h4 class="section-title" >Order Summary</h4>
+      <div class="d-flex align-items-center mb-4">
+         <img src="<%= rates.images[0] %>" alt="Product Image" class="product-image">
+         <div class="ms-4" style="line-height: 7px;">
+            <h5> <%= foods.foodname %>(<%= varients.varientname %>) </h5>
+            <p><strong>Base rate:</strong> <%= rates.rate %> </p>
+            <p><strong>Gst Amount:</strong> <%= rates.rate*rates.gst_per/100 %> </p>
+            <p><strong>Delivery Charge:</strong> <%=rates.rate*rates.delivery_per/100%> </p>
+            <p><strong>Packing Charge:</strong><%= rates.rate*rates.packing_per/100 %> </p>
+            <% if (foods.offer > categories.offer) { %>
+               <p><strong>Offer : </strong><%= rates.rate*foods.offer/100 %></p>
+               <p><strong>Number:</strong><%= Quantity %></p>
+               <p class="text-danger"><strong>Total Amount:</strong><%=Quantity *(rates.rate+(rates.rate*rates.delivery_per/100)+(rates.rate*rates.gst_per/100)+(rates.rate*rates.packing_per/100)-(rates.rate*foods.offer/100)) %></p>
+             <% } else { %>
+               <p><strong>Offer : </strong><%= rates.rate*categories.offer/100 %></p>
+               <p><strong>Number:</strong><%= Quantity %></p>
+               <p class="text-danger"><strong>Total Amount:</strong><%=Quantity *(rates.rate+(rates.rate*rates.delivery_per/100)+(rates.rate*rates.gst_per/100)+(rates.rate*rates.packing_per/100)-(rates.rate*categoriesoffer/100)) %></p>
+              
+            <% } %>
+         </div>
+      </div>
+   </div>
+
+   <!-- User Address Section -->
+   <div class="user-address" style="line-height: 10px;">
+      <h4 class="section-title">Shipping Address</h4>
+      <p><strong>Name:</strong><%= users.firstname  %></p>
+      <p><strong>Email:</strong><%= users.email %> </p>
+      <p><strong>Phone:</strong> <%= addresses.mobile_no %> </p>
+      <p><strong>Address:</strong> 
+          <%=addresses.addresstype %>, 
+          <%= addresses.landmark %> ,
+          <%= addresses.city %>  ,
+          <%= addresses.state %>  ,
+          <%= addresses.pin_code %> 
+      </p>
+   </div>
+
+   <!-- Order Details -->
+   <div class="order-details mt-4">
+      <h4 class="section-title">Order Details</h4>
+      <p><strong>Order ID:</strong> #INV  <%=orders._id%> </p>
+      <p><strong>Order Date:</strong>  <%= formattedDate %> </p>
+   </div>
+</div>

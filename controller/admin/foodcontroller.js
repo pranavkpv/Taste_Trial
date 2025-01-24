@@ -23,7 +23,7 @@ const food = async (req, res) => {
       const successmessage = req.flash('success')
       const existmessage = req.flash('exist')
       const editexistmessage = req.flash('editexist')
-      const foods = await foodschema.aggregate([
+      let foods = await foodschema.aggregate([
          {
             $lookup: {
                from: "categories",
@@ -36,7 +36,15 @@ const food = async (req, res) => {
          { $skip: skip }, // Skip the specified number of documents
          { $limit: limit } // Limit the number of documents returned
       ]);
-      console.log(foods)
+      foods = foods.map(food => {
+         if (food.expiry_date) {
+            food.formattedExpiryDate = new Date(food.expiry_date)
+               .toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" })
+               .split("/")
+               .join("-");
+         }
+         return food;
+      });
       const categories = await categoryschema.find()
       res.render('admin/food', { foods, categories, errormessage, successmessage, existmessage, editexistmessage,searchedfoodname ,startIndex,page})
    } catch (error) {
@@ -48,7 +56,7 @@ const food = async (req, res) => {
 
 const addFood = async (req, res) => {
    try {
-      const { foodname, category_id, isveg } = req.body;
+      const { foodname, category_id, isveg,duration_time,offer,expirydate } = req.body;
       const file = req.file;
       const existFood = await foodschema.findOne({ foodname })
       if (existFood) {
@@ -60,7 +68,10 @@ const addFood = async (req, res) => {
             foodname,
             category_id,
             is_veg: isveg,
-            image
+            image,
+            duration_time,
+            offer,
+            expiry_date:expirydate
          })
          await newFood.save()
          req.flash('success', "Food Is Saved SuccessFully");
@@ -81,7 +92,10 @@ const editFood = async (req, res) => {
          foodname,
          category_id,
          is_veg,
-         editid
+         editid,
+         duration_time,
+         Offer,
+         expirydate
       } = req.body;
       const file = req.file;
       const existfood = await foodschema.find({ _id: { $ne: editid } });
@@ -97,13 +111,12 @@ const editFood = async (req, res) => {
          res.redirect('/admin/food');
       } else {
          if (!file) {
-            await foodschema.findByIdAndUpdate({ _id: editid }, { foodname, category_id, is_veg });
+            await foodschema.findByIdAndUpdate({ _id: editid }, { foodname, category_id, is_veg,duration_time,offer:Offer,expiry_date:expirydate });
             req.flash('success', "Food Updated Successfully");
             res.redirect('/admin/food');
          } else {
             const image = `/uploads/${ file.filename }`
-            console.log(image)
-            await foodschema.findByIdAndUpdate({ _id: editid }, { foodname, category_id, is_veg, image });
+            await foodschema.findByIdAndUpdate({ _id: editid }, { foodname, category_id, is_veg,duration_time, image,offer:Offer,expiry_date:expirydate });
             req.flash('success', "Food Updated Successfully");
             res.redirect('/admin/food');
          }

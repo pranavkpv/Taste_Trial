@@ -32,6 +32,8 @@
                 <th>Sl No</th>
                 <th>Category Name</th>
                 <th>Foodname</th>
+                <th>Offer %</th>
+                <th>Expiry Date</th>
                 <th>Image</th>
                 <th>Action</th>
             </tr>
@@ -43,12 +45,17 @@
                 <td class="tableindex"><%=  startIndex+index %></td>
                 <td class="tablecategory"><%= element.categoryDetails[0].categoryname %></td>
                 <td class="tabledata"><%= element.foodname %></td>
+                <td class="tableOffer"><%= element.offer %></td>
+                <td class="tableExpiry"><%= element.formattedExpiryDate %></td>
                 <td><img src="<%= element.image %>" alt="Hotel Image" style="height:50px"></td>
                 <td class="action-icons">
-                    <a class="text-dark" href="" data-bs-toggle="modal" data-bs-target="#editfoodModal" onclick="editfun('<%= element.category_id %>','<%= element.foodname %>','<%= element.image %>','<%= element._id %>','<%= element.is_veg %>')"><i class="bi bi-pencil-square"></i></a>
+                    <a class="text-dark" href="" data-bs-toggle="modal" data-bs-target="#editfoodModal" onclick="editfun('<%= element.category_id %>','<%= element.foodname %>','<%= element.image %>','<%= element._id %>','<%= element.is_veg %>','<%= element.duration_time%>','<%= element.offer %>','<%= element.formattedExpiryDate %>')"><i class="bi bi-pencil-square"></i></a>
                     <a class="text-dark" href="" data-bs-toggle="modal" data-bs-target="#deletefoodModal" onclick="deletefun('<%= element._id %>')"><i class="bi bi-trash3-fill"></i></a>
-                    <a class="text-dark" href="" data-bs-toggle="modal" data-bs-target="#blockfoodModal" onclick="hidefun('<%= element._id %>')"><i class="bi bi-eye-slash"></i></a>
+                    <% if (element.is_blocked==true) { %>
                     <a class="text-dark" href="" data-bs-toggle="modal" data-bs-target="#unblockfoodModal" onclick="unhidefun('<%= element._id %>')"><i class="bi bi-eye"></i></a>
+                    <% } else { %>
+                    <a class="text-dark" href="" data-bs-toggle="modal" data-bs-target="#blockfoodModal" onclick="hidefun('<%= element._id %>')"><i class="bi bi-eye-slash"></i></a>
+                    <% } %>
                 </td>
                 <td class="d-none isblocked" id="isblocked"><%= element.is_blocked %></td>
             </tr>
@@ -99,6 +106,24 @@
               <option>veg</option>
               <option>non-veg</option>
             </select>
+          </div>
+          <div class="mb-3">
+            <label for="duration_time" class="form-label">Enter Duration Time</label>
+            <input type="number" class="form-control" value="0" id="duration_time" placeholder="Enter Food Name" name="duration_time">
+            <p class="text-danger d-none error-message" id="hiddenfoodname">Please Enter Duration Time !</p>
+          </div>
+
+          <div class="mb-3">
+            <label for="Offer" class="form-label">Enter Offer %</label>
+            <input type="number" class="form-control" id="Offer" min="0" placeholder="Enter title" name="offer" value="0">
+            <p class="text-danger d-none error-message" id="Offerhidden">Please Enter Offer %!</p>
+          </div>
+
+          
+
+          <div class="mb-3">
+            <label for="expiryDate" class="form-label">Select Expiry Date</label>
+            <input type="date" class="form-control" id="expiryDate" placeholder="Enter title" name="expirydate" >
           </div>
       
           <div class="mb-3">
@@ -154,6 +179,23 @@
               <option>veg</option>
               <option>non-veg</option>
             </select>
+          </div>
+
+          <div class="mb-3">
+            <label for="editOffer" class="form-label">Enter Offer %</label>
+            <input type="number" class="form-control" id="editOffer" min="0" placeholder="Enter title" name="Offer" value="0">
+            <p class="text-danger d-none error-message" id="editOfferhidden">Please Enter Offer %!</p>
+          </div>
+
+          <div class="mb-3">
+            <label for="editexpiryDate" class="form-label">Select Expiry Date</label>
+            <input type="date" class="form-control" id="editexpiryDate" placeholder="Enter title" name="expirydate">
+          </div>
+
+          <div class="mb-3">
+            <label for="duration_time" class="form-label">Enter Duration Time</label>
+            <input type="number" class="form-control" value="0" id="editduration_time" placeholder="Enter Food Name" name="duration_time">
+            <p class="text-danger d-none error-message" id="hiddenfoodname">Please Enter Duration Time !</p>
           </div>
       
           <div class="mb-3">
@@ -337,12 +379,22 @@ function editvalidateForm() {
 
 }
 
-function editfun(categoryname,foodname,image,id,isveg){
+function reverseDate(date){
+   const [day,month,year]=date.split('-');
+    return `${year}-${month}-${day}`
+}
+
+function editfun(categoryname,foodname,image,id,isveg,duration_time,offer,expiryDate){
   document.getElementById('editcategoryname').value=categoryname
   document.getElementById('editfoodname').value=foodname
   document.getElementById('editimagePreview').src=image
   document.getElementById('editid').value=id
   document.getElementById('editisveg').value=isveg
+  document.getElementById('editduration_time').value=duration_time
+  document.getElementById('editOffer').value=offer
+  const reversedate=reverseDate(expiryDate)
+  document.getElementById('editexpiryDate').value = reversedate;
+
 
 }
 function deletefun(id){

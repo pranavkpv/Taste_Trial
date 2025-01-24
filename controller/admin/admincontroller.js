@@ -1,10 +1,7 @@
 
 const adminschema = require("../../model/adminschema")
+const orderschema = require("../../model/orderschema")
 const userschema = require("../../model/usershema")
-const categoryschema = require("../../model/categoryschema")
-const foodschema = require("../../model/foodschema")
-const hotelschema = require("../../model/hotelschema")
-const bannerschema = require("../../model/bannerschema")
 
 
 
@@ -34,8 +31,40 @@ const login = (req, res) => {
    res.render("admin/login", { loginvalidmessage, nocondentloginmessage });
 };
 
-const dashboard = (req, res) => {
-   res.render("admin/dashboard")
+const dashboard =async (req, res) => {
+   try {
+      const orders=await orderschema.find({})
+      console.log(orders)
+      const totalOrderAmount=orders.reduce((sum,element)=>{
+        return sum+=element.totalAmount
+      },0)
+      const totalOfferAmount=orders.reduce((sum,element)=>{
+         return sum+=element.totalOffer
+      },0)
+      const order=await orderschema.aggregate([{
+         $lookup:{
+            from:"coupons",
+            localField:"couponId",
+            foreignField:"_id",
+            as:"couponDetails"
+         }
+      }])
+      const couponSum = order.reduce((sum, element) => {
+         if (element.couponDetails.length > 0) {
+            sum = sum + ((element.totalAmount - element.totalOffer) * element.couponDetails[0].discount_per / 100)
+         }
+         return sum
+      }, 0)
+
+      const usersCount=await userschema.countDocuments()
+      const blockUserCount=await userschema.countDocuments({is_blocked:true})
+      const unblockUserCount=await userschema.countDocuments({is_blocked:false})
+      const orderNumber = await orderschema.countDocuments()
+      res.render('admin/dashboard',{orderNumber,totalOrderAmount,totalOfferAmount,couponSum,
+         usersCount,blockUserCount,unblockUserCount})
+   } catch (error) {
+      console.log(error)
+   }
 }
 
 

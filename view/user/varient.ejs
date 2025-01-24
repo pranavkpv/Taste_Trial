@@ -87,6 +87,12 @@
 
 <%- include('partials/userheader') %>
 <h1 class="m-5">Available Varients</h1>
+<select id="price" class="form-select form-select-lg m-3 ms-5" aria-label="Large select example" style="width:120px"
+    onchange="price()"> <!-- Use onchange event -->
+    <option value="" disabled selected>Price</option> <!-- Add value="" to the placeholder -->
+    <option value="lth">Low To High</option>
+    <option value="htl">High To Low</option>
+  </select>
 <div class="row m-5">
    <% varients.forEach(element=> { %>
       <div class="col-3">
@@ -135,9 +141,20 @@ function searchItem(value) {
   clearTimeout(debounceTimer);
   debounceTimer = setTimeout(() => {
     const currentPage = 1; // Reset to the first page for a new search
-    window.location.href = `/user/varient?varient=${encodeURIComponent(value)}&hotelId=${encodeURIComponent('<%= hotels?._id || "" %>')}&foodId=${encodeURIComponent('<%= foods?._id || "" %>')}`;
+    window.location.href = `/user/varient?varient=${encodeURIComponent(value)}&hotelId=${encodeURIComponent('<%= hotels?._id || "" %>')}&foodId=${encodeURIComponent('<%= foods?._id || "" %>')}`; // Redirect to the URL
   }, 700);
 }
+
+function price() {
+  const price = document.getElementById('price').value; // Get the selected value
+  const urlParams = new URLSearchParams(window.location.search); // Get current URL parameters
+  const varient = urlParams.get('varient') || ''; // Retrieve the varient parameter if it exists
+
+  if (price) { // Ensure the value is not empty
+    window.location.href = `/user/varient?varient=${encodeURIComponent(varient)}&hotelId=${encodeURIComponent('<%= hotels?._id || "" %>')}&foodId=${encodeURIComponent('<%= foods?._id || "" %>')}&price=${price}`; // Redirect to the URL
+  }
+}
+
 
 
 </script>

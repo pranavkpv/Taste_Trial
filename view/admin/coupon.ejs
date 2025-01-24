@@ -1,0 +1,206 @@
+<%- include('partials/admin') %>
+<link rel="stylesheet" href="/coupon.css">
+<div class="content">
+  <div class="d-flex justify-content-between align-items-center">
+    <h3 class="">Coupon Management</h3>
+    <button class=" addItem" onclick="addItem()" data-bs-toggle="modal" data-bs-target="#addCouponModal"> + Add
+      Item</button>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="row search-bar mt-4">
+    <div class="col-md-6">
+      <div class="input-group">
+        <span class="input-group-text bg-secondary text-light"><i class="fas fa-search"></i></span>
+        <input type="text" id="searchInput" oninput="searchCoupon(this.value)" class="form-control"
+          placeholder="Search by Category..." value="">
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="table-responsive custom-table-bg">
+    <table class="table table-hover text-center" id="categorylist">
+      <thead>
+        <tr>
+          <th>Sl No</th>
+          <th>Coupon Code</th>
+          <th>Discount %</th>
+          <th>Expiry Date</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody class="tableBody">
+        <!-- loop of category data -->
+        <% formattedCoupons.forEach((element,index) => { %>
+        <tr>
+          <td class="tableindex"><%= index+1 %></td>
+          <td class="tabledata"><%= element.couponCode %></td>
+          <td class="tablediscount"><%= element.discount_per %></td>
+          <td class="tablexpDate"><%= element.expiryDate %></td>
+          <td class="action-icons">
+            <a class="text-dark" href="" data-bs-toggle="modal" data-bs-target="#editCouponModal"
+              onclick="editFun('<%= element._id %>','<%= element.couponCode %>','<%= element.discount_per %>','<%= element.expiryDate %>')"><i
+                class="bi bi-pencil-square"></i></a>
+            <a class="text-dark" href="" data-bs-toggle="modal" data-bs-target="#DeleteCoupon"
+              onclick="deleteFun('<%= element._id %>')"><i class="bi bi-trash3-fill"></i></a>
+          </td>
+        </tr>
+        <% }) %>
+        <!-- /close the loop -->
+      </tbody>
+    </table>
+    <div id="pagination" style="text-align: center; margin-bottom: 20px;">
+      <% for (let i = 1; i <= 5; i++) { %>
+      <button onclick="loadPage('<%= i %>')" class="btn btn-success">
+        <%= i %>
+      </button>
+      <% } %>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Add Coupon -->
+<div class="modal fade" id="addCouponModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered custom-modal-width">
+    <div class="modal-content">
+      <form action="/admin/addcoupon" method="post" onsubmit="return validateForm()">
+        <div class="modal-body">
+          <div class="mb-3">
+            <h2>Add Coupon</h2>
+            <label for="couponCode" class="form-label">Enter Coupon Code</label>
+            <input type="text" class="form-control" id="couponCode" placeholder="Enter code" name="couponCode">
+            <p class="text-danger d-none error-message" id="couponhidden">Please Enter coupon code!</p>
+          </div>
+          <div class="mb-3">
+            <label for="discount" class="form-label">Enter Discount %</label>
+            <input type="number" class="form-control" id="discount" min="0" placeholder="Enter title" name="discount"
+              value="0">
+            <p class="text-danger d-none error-message" id="discounthidden">Please Enter Discount %!</p>
+          </div>
+          <div class="mb-3">
+            <label for="expiryDate" class="form-label">Select Expiry Date</label>
+            <input type="date" class="form-control" id="expiryDate" placeholder="Enter title" name="expirydate">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-success">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Coupon -->
+<div class="modal fade" id="editCouponModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered custom-modal-width">
+    <div class="modal-content">
+      <form action="/admin/editCoupon" method="post" onsubmit="return validateForm()">
+        <div class="modal-body">
+          <div class="mb-3">
+            <h2>Edit Coupon</h2>
+            <input type="hidden" id="editId" name="couponId">
+            <label for="couponCode" class="form-label">Enter Coupon Code</label>
+            <input type="text" class="form-control" id="editcouponCode" placeholder="Enter code" name="couponCode">
+            <p class="text-danger d-none error-message" id="couponhidden">Please Enter coupon code!</p>
+          </div>
+          <div class="mb-3">
+            <label for="discount" class="form-label">Enter Discount %</label>
+            <input type="number" class="form-control" id="editdiscount" min="0" placeholder="Enter title"
+              name="discount" value="0">
+            <p class="text-danger d-none error-message" id="discounthidden">Please Enter Discount %!</p>
+          </div>
+          <div class="mb-3">
+            <label for="expiryDate" class="form-label">Select Expiry Date</label>
+            <input type="date" class="form-control" id="editexpiryDate" placeholder="Enter title" name="expirydate">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-success">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<!-- delete Category -->
+<div class="modal fade" id="DeleteCoupon" tabindex="-1" aria-labelledby="deleteCategoryModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered custom-modal-width">
+    <div class="modal-content">
+      <form action="/admin/deleteCoupon" method="post">
+        <input type="hidden" id="deleteid" name="deleteid">
+        <div class="modal-body">
+          <p>Do you want to delete the category?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+          <button type="submit" class="btn btn-success">Yes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  function editFun(id, couponCode, discount, expiryDate) {
+    document.getElementById('editcouponCode').value = couponCode
+    document.getElementById('editId').value = id
+    document.getElementById('editdiscount').value = discount
+    const actualDate = expiryDate.split('/').reverse().join('-')
+    document.getElementById('editexpiryDate').value = actualDate
+  }
+
+  function deleteFun(id){
+    document.getElementById('deleteid').value=id
+  }
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<% if (successmessage && successmessage.length>0) { %>
+<script>
+  Swal.fire({
+    text: "<%= successmessage %>",
+    icon: "success",
+    draggable: true
+  });
+</script>
+<% } %>
+
+<% if (existmessage && existmessage.length > 0) { %>
+<script>
+  Swal.fire({
+    text: "<%= existmessage %>",
+    icon: "info",
+    confirmButtonText: "OK",
+  }).then(() => {
+    // Re-open the modal after SweetAlert
+    const addcoupon = document.getElementById('addCouponModal');
+    if (addcoupon) {
+      const modalInstance = new bootstrap.Modal(addcoupon);
+      modalInstance.show();
+    }
+  });
+</script>
+<% } %>
+
+
+<% if (editExistmessage && editExistmessage.length>0) { %>
+  <script>
+    Swal.fire({
+      text: "<%= editExistmessage %>",
+      icon: "info",
+      draggable: true
+    });
+  </script>
+  <% } %>
+
+
+

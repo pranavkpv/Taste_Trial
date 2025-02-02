@@ -164,6 +164,7 @@ const cart = async (req, res) => {
            { $match: searchFilter },
            { $count: "total" },
        ]);
+  
 
        // Calculate total pages
        const successmessage = req.flash('success');

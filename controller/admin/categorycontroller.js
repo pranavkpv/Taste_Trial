@@ -57,6 +57,16 @@ const addcategory = async (req, res) => {
       const file = req.file;
       const image = `/uploads/${ file.filename }`;
       const existcategory = await categoryschema.findOne({ categoryname });
+      if(offer==0 && expirydate==""){
+         const newCategorys=new categoryschema({
+            categoryname,
+            offer,
+            image
+         })
+         await newCategorys.save()
+         req.flash("success", "Category saved Successfully")
+         return res.redirect("/admin/category");
+      }
       if (existcategory) {
          req.flash('exist', "Category is already Exist")
          res.redirect('/admin/category')

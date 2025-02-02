@@ -3,6 +3,7 @@ const userschema=require('../../model/usershema')
 const foodschema=require('../../model/foodschema')
 const hotelschema=require('../../model/hotelschema')
 const { ObjectId } = require('mongodb');
+const categoryschema = require('../../model/categoryschema');
 
 
 const varient = async (req, res) => {
@@ -16,6 +17,8 @@ const varient = async (req, res) => {
 
   const foodId = req.query.foodId;
   const hotelId = req.query.hotelId;
+  const foods=await foodschema.findOne({_id:foodId})
+  const categorys=await categoryschema.findOne({_id:foods.category_id})
 
   const baseFilter = {
     food_id: new ObjectId(foodId),
@@ -69,7 +72,7 @@ const varient = async (req, res) => {
     const foods = await foodschema.findOne({ _id: foodId });
     const hotels = await hotelschema.findOne({ _id: hotelId });
 
-    res.render("user/varient", { varients, searcheditemname, foods, hotels, searchmessage: "varients" });
+    res.render("user/varient", { varients,price, searcheditemname, foods, hotels, searchmessage: "varients",categorys });
   } catch (err) {
     console.error(err);
     res.status(500).send("Error retrieving variants.");

@@ -16,11 +16,23 @@
        id="searchInput" 
        oninput="searchFood(this.value)" 
        class="form-control" 
-       placeholder="Search by Category..." 
+       placeholder="Search by Foodname..." 
        value="<%= searchedfoodname || '' %>">
 
-     </div>
-     
+     </div>  
+    </div>
+    <div class="col-md-6">
+      <select name="" id="selectCategory" class="form-control w-50" onchange="selectCategory()">
+        <option value="" class="d-none"><% if (category && category!="all") { %>
+         <%= selectedCategory.categoryname %> 
+         <% } else { %>
+          All    
+        <% } %></option>
+        <option value="all">All</option>
+        <% categories.forEach(element => { %>
+         <option value="<%= element._id %>"><%= element.categoryname %></option>
+        <% }) %>
+      </select>
     </div>
   </div>
 
@@ -40,7 +52,7 @@
         </thead>
         <tbody class="tableBody">
             <!-- loop of food data -->
-            <% foods.forEach((element, index) => { %>
+            <% foodss.forEach((element, index) => { %>
             <tr>
                 <td class="tableindex"><%=  startIndex+index %></td>
                 <td class="tablecategory"><%= element.categoryDetails[0].categoryname %></td>
@@ -108,7 +120,7 @@
             </select>
           </div>
           <div class="mb-3">
-            <label for="duration_time" class="form-label">Enter Duration Time</label>
+            <label for="duration_time" class="form-label">Enter Duration Time (min)</label>
             <input type="number" class="form-control" value="0" id="duration_time" placeholder="Enter Food Name" name="duration_time">
             <p class="text-danger d-none error-message" id="hiddenfoodname">Please Enter Duration Time !</p>
           </div>
@@ -193,7 +205,7 @@
           </div>
 
           <div class="mb-3">
-            <label for="duration_time" class="form-label">Enter Duration Time</label>
+            <label for="duration_time" class="form-label">Enter Duration Time (min)</label>
             <input type="number" class="form-control" value="0" id="editduration_time" placeholder="Enter Food Name" name="duration_time">
             <p class="text-danger d-none error-message" id="hiddenfoodname">Please Enter Duration Time !</p>
           </div>
@@ -270,22 +282,36 @@
   </div>
 </div>
 
+<%- include('partials/footer') %>
 <script>
   
   let debounceTimer;
 
-function searchFood(value) {
+
+
+
+  function searchFood(value) {
    clearTimeout(debounceTimer);
    debounceTimer = setTimeout(() => {
-      const currentPage = 1; // Reset to the first page for a new search
-      window.location.href = `/admin/food?pagenumber=${currentPage}&food=${encodeURIComponent(value)}`;
-   }, 700); // Adjust delay (in milliseconds) as needed
+      const currentPage = 1;
+      const selectedCategory = document.getElementById("selectCategory").value
+      window.location.href = `/admin/food?pagenumber=${currentPage}&food=${encodeURIComponent(value)}&category=${encodeURIComponent(selectedCategory)}`;
+   }, 700);
 }
 
 function loadPage(pageNumber) {
+   const selectCategory = document.getElementById("selectCategory").value;
    const searchValue = document.getElementById('searchInput').value || '';
-   window.location.href = `/admin/food?pagenumber=${pageNumber}&food=${encodeURIComponent(searchValue)}`;
+   window.location.href = `/admin/food?pagenumber=${pageNumber}&food=${encodeURIComponent(searchValue)}&category=${encodeURIComponent(selectCategory)}`;
 }
+
+function selectCategory() {
+   const currentPage = 1;
+   const searchValue = document.getElementById('searchInput').value || '';
+   const selectCategory = document.getElementById("selectCategory").value;
+   window.location.href = `/admin/food?pagenumber=${currentPage}&food=${encodeURIComponent(searchValue)}&category=${encodeURIComponent(selectCategory)}`;
+}
+
 
   function previewImage(event) {
     const imageInput = event.target;
@@ -418,6 +444,8 @@ document.querySelectorAll(".isblocked").forEach((statusElement, index) => {
 
     }
   });
+
+ 
  
 </script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

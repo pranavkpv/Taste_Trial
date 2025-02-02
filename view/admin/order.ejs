@@ -1,4 +1,9 @@
 <%- include('partials/admin') %>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+
+
+
 <link rel="stylesheet" href="/order.css">
 <div class="content">
    <div class="d-flex justify-content-between align-items-center mb-4">
@@ -59,7 +64,19 @@
 
                <td>
                   <div class="dropdown">
-                     <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                     <button class="btn dropdown-toggle <% if (element.items.status=="processing") { %>
+                      btn-warning
+                     <% } else if (element.items.status=="packing") { %>
+                      btn-info
+                      <% } else if(element.items.status=="onTheWay") { %>
+                        btn-secondary
+                        <% } else if (element.items.status=="delivered") { %>
+                         btn-success
+                         <% } else if (element.items.status=="cancelled") { %>
+                          btn-danger
+                          <% } else { %>
+                           btn-danger
+                     <% } %>" type="button" data-bs-toggle="dropdown"
                         aria-expanded="false">
                         <%= element.items.status %>
                      </button>
@@ -120,6 +137,9 @@
 
 </div>
 
+<%- include('partials/footer') %>
+<!-- Bootstrap JS Bundle (Includes Popper.js) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Zj0jHA9aU3xw8pZTGrt/5ZxnAq8X+ZdkrRek+6hsoTL9P1c2rNphthY9gLh7z81C" crossorigin="anonymous"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>

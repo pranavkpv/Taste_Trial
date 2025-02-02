@@ -3,148 +3,271 @@
 <link rel="stylesheet" href="/dashboard.css">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <style>
-  .card-container {
-    margin-top: 20px;
-  }
+    :root {
+        --primary-color: #ff4757;
+        --secondary-color: #2ed573;
+        --dark-color: #2f3542;
+    }
 
-  /* Food Card Styling */
-  .food-card {
-    background: white;
-    border: none;
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    text-align: left;
-    cursor: pointer;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
+    .header-section {
+        background: linear-gradient(135deg, #ff4757 0%, #ff6b81 100%);
+        padding: 2rem 0;
+        color: white;
+        margin-bottom: 2rem;
+        border-radius: 0 0 20px 20px;
+    }
 
-  .food-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
-  }
+    .filter-section {
+        background: white;
+        padding: 1rem;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+    }
 
-  /* Image Styling */
-  .food-img-container {
-    position: relative;
-    overflow: hidden;
-  }
+    .filter-btn {
+        padding: 0.5rem 1rem;
+        border: 1px solid #ddd;
+        border-radius: 20px;
+        margin-right: 0.5rem;
+        background: white;
+        transition: all 0.3s ease;
+    }
 
-  .food-img {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-    transition: scale 0.3s ease;
-  }
+    .filter-btn:hover, .filter-btn.active {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+    }
 
-  .food-card:hover .food-img {
-    scale: 1.1;
-  }
+    .hotel-card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+        margin-bottom: 2rem;
+        border: none;
+        cursor: pointer;
+    }
 
-  .offer-badge {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    background: #ff6b6b;
-    color: white;
-    padding: 5px 10px;
-    font-size: 14px;
-    border-radius: 20px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-  }
+    .hotel-card:hover {
+        transform: translateY(-5px);
+    }
 
-  /* Details Section */
-  .food-details {
-    padding: 15px;
-  }
+    .hotel-image {
+        position: relative;
+        height: 200px;
+        overflow: hidden;
+    }
 
-  .food-title {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 5px;
-    color: #333;
-  }
+    .hotel-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
 
-  .food-hotel {
-    font-size: 14px;
-    color: #888;
-    margin-bottom: 10px;
-  }
+    .hotel-card:hover .hotel-image img {
+        transform: scale(1.1);
+    }
 
-  .food-info {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
+    .hotel-badge {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: var(--primary-color);
+        color: white;
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
 
-  .veg-badge,
-  .rating-badge {
-    font-size: 12px;
-    padding: 5px 10px;
-  }
+    .hotel-details {
+        padding: 1.5rem;
+    }
+
+    .hotel-name {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: var(--dark-color);
+    }
+
+    .hotel-info {
+        color: #666;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .rating-badge {
+        background: #ffd700;
+        color: var(--dark-color);
+        padding: 0.3rem 0.6rem;
+        border-radius: 15px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-right: 1rem;
+    }
+
+    .contact-info {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 1rem;
+        color: #666;
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 2rem;
+        padding: 1rem;
+    }
+
+    .page-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 1px solid #ddd;
+        background: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .page-btn:hover, .page-btn.active {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+    }
+
+    .features {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .feature {
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+        font-size: 0.9rem;
+        color: #666;
+    }
+
+    .search-bar {
+        position: relative;
+        margin-bottom: 1rem;
+    }
+
+    .search-bar input {
+        width: 100%;
+        padding: 0.8rem 1rem 0.8rem 3rem;
+        border: 1px solid #ddd;
+        border-radius: 25px;
+        font-size: 1rem;
+    }
+
+    .search-bar i {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #666;
+    }
 </style>
 
 <%- include('partials/userheader') %>
-<h1 class="m-5">Available Hotels(<%= foodname.foodname %>)</h1>
-<div class="row m-5">
-  <% hotels.forEach(element=> { %>
-  <div class="col-3">
-    <div class="container mt-5">
-      <form action="/user/varient" method="get" class="card-container"
-        style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
-        <input type="hidden" name="hotelId" value="<%= element._id %>">
-        <input type="hidden" name="foodId" value="<%= foodId %>">
-        <button type="submit" class="food-card">
-          <!-- Food Image -->
-          <div class="food-img-container">
-            <img src="<%= element.image %>" alt="Food Image" class="food-img" style="width:100%;height:300px">
-          </div>
-
-          <!-- Food Details -->
-          <div class="food-details">
-            <h5 class="food-title"><%= element.hotelname %></h5>
-            <div class="food-info d-flex">
-              <span class="rating-badge">
-                <i class="fas fa-star"></i> 4.8
-              </span>
-              <div class="hoteldetails" style="line-height: 1px;">
-                <p><%= element.hoteladdress %></p>
-                <p><%= element.contact_no %></p>
-                <p class="text-danger"><%= element.alternative_no %></p>
-              </div>
-            </div>
-          </div>
-        </button>
-      </form>
+   <div class="header-section" style="margin-top:71px">
+        <div class="container">
+            <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='%236c757d'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                  <li class="breadcrumb-item"><a href="/user/home">Home</a></li>
+                  <li class="breadcrumb-item"><a href="/user/product?categoryId=<%= category._id %>">Product</a></li>
+                  <li class="breadcrumb-item active" aria-current="page">Hotel</li>
+                </ol>
+              </nav>
+            <h1 class="mb-2">Available Hotels (<%= foodname.foodname %>)</h1>
+            <p class="mb-0">Find the perfect hotel for your favorite dish</p>
+        </div>
     </div>
-  </div>
 
-  <% }) %>
-  <div id="pagination" style="text-align: center; margin-bottom: 20px;">
-    <% for (let i = 1; i <= page; i++) { %>
-       <button onclick="loadPage('<%= i %>')" class="btn <%= i === selectedpage ? 'btn-danger' : 'btn-success' %>">
-          <%= i %>
-       </button>
-    <% } %>
-  </div>
-</div>
+    <div class="container">
+        <div class="filter-section">
+            <div class="d-flex flex-wrap gap-2">
+                <button class="filter-btn active">All</button>
+                <button class="filter-btn">Top Rated</button>
+            </div>
+        </div>
 
+        <div class="row">
+            <% hotels.forEach(element => { %>
+            <div class="col-md-4">
+                <form action="/user/varient" method="get">
+                    <input type="hidden" name="hotelId" value="<%= element._id %>">
+                    <input type="hidden" name="foodId" value="<%= foodId %>">
+                    <button type="submit" class="hotel-card w-100">
+                        <div class="hotel-image">
+                            <span class="hotel-badge">Featured</span>
+                            <img src="<%= element.image %>" alt="<%= element.hotelname %>">
+                        </div>
+                        <div class="hotel-details">
+                            <h3 class="hotel-name "><%= element.hotelname %></h3>
+                            <div class="d-flex align-items-center mb-2">
+                                <span class="rating-badge ms-5">
+                                    <i class="fas fa-star"></i> 4.8
+                                </span>
+                                <span class="text-muted">(200+ reviews)</span>
+                            </div>
+                            <div class="hotel-info ">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <%= element.hoteladdress %>
+                            </div>
+                            <div class="contact-info">
+                                <i class="fas fa-phone ms-5"></i>
+                                <%= element.contact_no %>
+                                <% if (element.alternative_no) { %>
+                                    <span class="text-danger">| <%= element.alternative_no %></span>
+                                <% } %>
+                            </div>
+                        </div>
+                    </button>
+                </form>
+            </div>
+            <% }) %>
+        </div>
+
+        <div class="pagination">
+            <% for (let i = 1; i <= page; i++) { %>
+                <button onclick="loadPage('<%= i %>')" 
+                        class="page-btn <%= i === selectedpage ? 'active' : '' %>">
+                    <%= i %>
+                </button>
+            <% } %>
+        </div>
+    </div>
 <%- include('partials/userfooter') %>
 
 <script>
-   let debounceTimer;
+  let debounceTimer;
 
-function searchItem(value) {
-   clearTimeout(debounceTimer);
-   debounceTimer = setTimeout(() => {
+  function searchItem(value) {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
       const currentPage = 1; // Reset to the first page for a new search
-      window.location.href = `/user/hotels?pagenumber=${currentPage}&hotel=${encodeURIComponent(value)}&foodId=<%= foodId %>`;
-   }, 700); // Adjust delay (in milliseconds) as needed
-}
+      window.location.href = `/user/hotels?pagenumber=${ currentPage }&hotel=${ encodeURIComponent(value) }&foodId=<%= foodId %>`;
+    }, 700); // Adjust delay (in milliseconds) as needed
+  }
 
-function loadPage(pageNumber) {
-   const searchValue = document.getElementById('searchInput').value || '';
-   window.location.href = `/user/hotels?pagenumber=${pageNumber}&hotel=${encodeURIComponent(searchValue)}&foodId=<%= foodId %>`;
-}
+  function loadPage(pageNumber) {
+    const searchValue = document.getElementById('searchInput').value || '';
+    window.location.href = `/user/hotels?pagenumber=${ pageNumber }&hotel=${ encodeURIComponent(searchValue) }&foodId=<%= foodId %>`;
+  }
 </script>

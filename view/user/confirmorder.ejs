@@ -7,82 +7,203 @@
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 <style>
+   .container {
+      max-width: 1200px;
+      margin: 0 auto;
+   }
+
+   .card {
+      border: none;
+      box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+      margin-bottom: 25px;
+      border-radius: 12px;
+   }
+
+   .card-header {
+      background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+      color: white;
+      border-radius: 12px 12px 0 0 !important;
+      padding: 15px 20px;
+   }
+
+   .card-header h5 {
+      margin: 0;
+      font-weight: 600;
+      font-size: 1.1rem;
+   }
+
+   .form-check {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      transition: all 0.3s ease;
+   }
+
+   .form-check:hover {
+      background: #f0f7ff;
+      transform: translateY(-2px);
+   }
+
+   .form-check-input:checked {
+      background-color: #0d6efd;
+      border-color: #0d6efd;
+   }
+
+   .form-check-label {
+      width: 100%;
+      cursor: pointer;
+   }
+
+   .product-image {
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+   }
+
+   .rateDetails {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 12px;
+   }
+
+   .rateDetails h3 {
+      color: #198754;
+      font-size: 1.5rem;
+      margin-bottom: 15px;
+   }
+
    .rateDetails p {
-      line-height: 10px;
+      margin-bottom: 10px;
+      color: #495057;
+   }
+
+   .rateDetails p strong {
+      color: #212529;
    }
 
    .coupon-box {
-      background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      background: #f8f9fa;
       padding: 20px;
-      width: 300px;
-      text-align: center;
+      border-radius: 12px;
+      margin-bottom: 20px;
    }
 
    .coupon-box h2 {
-      margin-bottom: 20px;
-      font-size: 20px;
+      font-size: 1.25rem;
+      margin-bottom: 15px;
+      color: #212529;
    }
 
    .coupon-box input[type="text"] {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 10px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      font-size: 16px;
+      width: 70%;
+      padding: 10px 15px;
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      margin-right: 10px;
    }
 
    .coupon-box button {
-      background-color: #007bff;
-      color: #fff;
-      padding: 10px 15px;
+      background: #0d6efd;
+      color: white;
       border: none;
-      border-radius: 5px;
-      font-size: 16px;
+      padding: 10px 20px;
+      border-radius: 8px;
       cursor: pointer;
-      width: 100%;
+      transition: all 0.3s ease;
    }
 
    .coupon-box button:hover {
-      background-color: #0056b3;
+      background: #0b5ed7;
    }
 
    .net-amount {
-      margin-top: 20px;
-      font-size: 18px;
-      font-weight: bold;
-      color: #333;
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      font-weight: 600;
+   }
+
+   #submitButton {
+      padding: 12px 40px;
+      font-size: 1.1rem;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+   }
+
+   #submitButton:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(40, 167, 69, 0.2);
+   }
+
+   .custom-modal-width {
+      max-width: 400px;
+   }
+
+   .modal-content {
+      border-radius: 12px;
+      border: none;
+   }
+
+   .modal-header {
+      border-radius: 12px 12px 0 0;
+   }
+
+   .modal-body {
+      padding: 20px;
+      text-align: center;
+      font-size: 1.1rem;
+   }
+
+   .modal-footer {
+      border-top: none;
+      padding: 15px 20px;
+   }
+
+   .btn-remove-coupon {
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 8px;
+      margin-left: 20px;
+      transform: translateY(-20px);
+   }
+
+   .btn-remove-coupon:hover {
+      background: #c82333;
+   }
+
+   hr {
+      margin: 25px 0;
+      opacity: 0.15;
+   }
+
+   .d-flex {
+      align-items: center;
+   }
+
+   @media (max-width: 768px) {
+      .d-flex {
+         flex-direction: column;
+         gap: 20px !important;
+      }
+
+      .rateDetails {
+         width: 100%;
+      }
+
+      .coupon-box input[type="text"] {
+         width: 100%;
+         margin-bottom: 10px;
+      }
    }
 </style>
-<%- include('partials/profileheadr') %>
-<div class="container mt-5">
+<%- include('partials/userheader') %>
+<div class="container " style="margin-top:100px">
    <h2 class="text-center mb-4">Order Details </h2>
 
-   <!-- Address Selection -->
-   <div class="card shadow-sm mb-4">
-      <div class="card-header bg-primary text-white">
-         <h5>Select Delivery Address</h5>
-      </div>
-      <div class="card-body">
-         <form>
-            <% addressess.forEach((element, index) => { %>
-               <div class="form-check">
-                  <input class="form-check-input" type="radio" name="address" onchange="setAddress('<%= element._id %>')">
-                  <label class="form-check-label" for="address<%= index %>">
-                     <b><%= element.addresstype.toUpperCase() %> Address</b>, <%= element.landmark %>, <%= element.city %>,
-                     <%= element.state %>, PIN :<%= element.pin_code %>, MOB:<%= element.mobile_no %>,
-                     <span><%= element.alternative_no %></span>
-                  </label>
-               </div>
-               <% }) %>
-               
 
 
-         </form>
-      </div>
-   </div>
 
    <!-- Order Summary Table -->
    <div class="card shadow-sm mb-5">
@@ -104,7 +225,7 @@
             </div>
             <div class="rateDetails">
                <h3 class="text-success">Rate Details</h3>
-               <p><strong>Base Rate : </strong><%= element.number*element.rateDetails.rate %></p>
+               <p><strong>Base Rate : </strong><%= (element.number*element.rateDetails.rate)%></p>
                <p><strong>Gst Amount :
                   </strong><%= element.number*(element.rateDetails.rate*element.rateDetails.gst_per/100) %></p>
                <p><strong>Packing Charge :
@@ -174,16 +295,47 @@ datas.forEach(element => {
          <h5>Choose Payment Method/ Apply Coupon</h5>
       </div>
       <div class="card-body">
+         <button class="btn btn-info" style="margin-left:846px" data-bs-toggle="modal"
+            data-bs-target="#couponsModal">View Avaliable Coupon</button>
+         <div class="modal fade" id="couponsModal" tabindex="-1" aria-labelledby="couponsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+               <div class="modal-content">
+                  <div class="modal-header">
+                     <h5 class="modal-title" id="couponsModalLabel">Available Coupons</h5>
+                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                     <!-- Sample Coupon Cards -->
+                     <% availCoupons.forEach(element => { %>
+                     <div class="coupon-card">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                           <span class="coupon-code " style="font-weight: bold;"><%= element._doc.couponCode %></span>
+
+                        </div>
+                        <p class="mb-1"><%= element._doc.discount_per %> OFF</p>
+                        <small class="text-muted">Valid until: <%= element.expiryDates %></small>
+                     </div>
+                     <% }) %>
+
+
+                  </div>
+               </div>
+            </div>
+         </div>
+
          <form action="/user/applyCoupon" method="post">
             <input type="hidden" value="<%= userid %>">
             <div class="coupon-box">
                <h2>Apply Coupon Code</h2>
                <% datas.forEach(element => { %>
-               <input type="text" value="<%= element._id %>" name="cartIDS">
-               <input type="text" value="<%= element.number %>" name="purchaseQty">
+               <input type="hidden" value="<%= element._id %>" name="cartIDS">
+               <input type="hidden" value="<%= element.number %>" name="purchaseQty">
                <% }) %>
-               <input type="text" id="couponCode" placeholder="Enter Coupon Code" name="couponCode">
+               <input type="text" id="couponCode" placeholder="Enter Coupon Code" name="couponCode"
+                  value="<%= couponCodestr %>">
                <button onclick="" type="sumbit">Apply</button>
+               <p class="text-success" id="couponMessage"></p>
+
             </div>
             <% if (couponsuccessmessage && couponsuccessmessage.length>0) { %>
             <div class="net-amount text-danger fs-5 ms-5" id="netAmount">Net Amount: $ <span
@@ -194,36 +346,91 @@ datas.forEach(element => {
             <% } %>
 
          </form>
+         <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+               <h5>Select Delivery Address</h5>
+            </div>
+            <div class="card-body">
+               <form>
+                  <% addressess.forEach((element, index) => { %>
+                  <div class="form-check">
+                     <input class="form-check-input" type="radio" name="address" id="address<%= index %>"
+                        onchange="setAddress('<%= element._id %>')">
+                     <label class="form-check-label" for="address<%= index %>">
+                        <b><%= element.addresstype.toUpperCase() %> Address</b>, <%= element.landmark %>,
+                        <%= element.city %>,
+                        <%= element.state %>, PIN :<%= element.pin_code %>, MOB:<%= element.mobile_no %>,
+                        <span><%= element.alternative_no %></span>
+                     </label>
+                  </div>
+                  <% }) %>
+                  <p style="text-align: right;"><a href="/user/address">Add Address+</a></p>
+               </form>
+
+            </div>
+         </div>
+
+         <% if (couponsuccessmessage &&  couponsuccessmessage.length>0) { %>
+         <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#removeCoupon"
+            style="width: 263px;margin-left: 20px;margin-top: -94px;"
+            onclick="removecoupon('<%= coupons._id %>')">Remove</button>
+         <% } %>
+
          <form action="/user/orderSuccess" method="POST" id="checkout_form">
-            <input type="text" id="addressId" name="addressId">
+            <input type="hidden" id="addressId" name="addressId">
             <% datas.forEach(element => { %>
-            <input type="text" value="<%= element._id %>" name="cartId">
-            <input type="text" value="<%= element.number %>" name="numberofproduct">
+            <input type="hidden" value="<%= element._id %>" id=cartId name="cartId">
+            <input type="hidden" value="<%= element.number %>" id="numberofproduct" name="numberofproduct">
             <% }) %>
             <!-- Hidden field to store the selected payment method -->
-            <input type="text" id="selectedPaymentMethod" name="selectedPaymentMethod" value="COD">
+            <input type="hidden" id="selectedPaymentMethod" name="selectedPaymentMethod" value="COD">
             <% if (couponsuccessmessage && couponsuccessmessage.length>0) { %>
-            <input type="text" value="<%= coupons._id %>" name="couponId">
+            <input type="hidden" value="<%= coupons._id %>" name="couponId" id="couponId">
             <% } %>
 
             <div class="form-check">
                <input class="form-check-input" type="radio" name="paymentMethod" value="COD" id="cod"
-                      onchange="updateButton()" checked>
+                  onchange="updateButton()" checked>
                <label class="form-check-label" for="cod">Cash on Delivery</label>
-           </div>
-           <div class="form-check">
+            </div>
+            <div class="form-check">
                <input class="form-check-input" type="radio" name="paymentMethod" value="razorpay" id="razorpay"
-                      onchange="updateButton()">
+                  onchange="updateButton()">
                <label class="form-check-label" for="razorpay">Razorpay</label>
-           </div>
-           <div class="form-check">
+            </div>
+            <div class="form-check">
                <input class="form-check-input" type="radio" name="paymentMethod" value="wallet" id="wallet"
-                      onchange="updateButton()">
+                  onchange="updateButton()">
                <label class="form-check-label" for="wallet">From Wallet</label>
-           </div>
-           <div class="mt-4 text-center">
+            </div>
+            <div class="mt-4 text-center">
+               <input type="hidden" id="payment_id">
                <button type="submit" class="btn btn-success" id="submitButton">Place Order</button>
-           </div>       
+            </div>
+         </form>
+
+      </div>
+   </div>
+</div>
+
+
+<!-- removeCoupon -->
+<div class="modal fade" id="removeCoupon" tabindex="-1" aria-labelledby="removeCouponModal" aria-hidden="true">
+   <div class="modal-dialog modal-dialog-centered custom-modal-width">
+      <div class="modal-content">
+         <form action="/user/removeCoupon" method="post">
+            <% datas.forEach(element => { %>
+            <input type="hidden" value="<%= element._id %>" name="cartId">
+            <input type="hidden" value="<%= element.number %>" name="numberofproduct">
+            <% }) %>
+            <input type="hidden" id="unhideid" name="removecouponId">
+            <div class="modal-body">
+               <p>Do you want to Remove the Coupon?</p>
+            </div>
+            <div class="modal-footer">
+               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+               <button type="submit" class="btn btn-success">Yes</button>
+            </div>
          </form>
 
       </div>
@@ -234,101 +441,151 @@ datas.forEach(element => {
 
 
 <%- include('partials/userfooter') %>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
-   function setAddress(id){
+   function setAddress(id) {
       document.getElementById('addressId').value = id;
    }
- 
+
 
    function updateButton() {
-    const selectedMethod = document.querySelector('input[name="paymentMethod"]:checked');
-    const submitButton = document.getElementById('submitButton');
-    const selectedInput = document.getElementById('selectedPaymentMethod');
+      const selectedMethod = document.querySelector('input[name="paymentMethod"]:checked');
+      const submitButton = document.getElementById('submitButton');
+      const selectedInput = document.getElementById('selectedPaymentMethod');
 
-    if (selectedMethod) {
-        // Update the text input field
-        selectedInput.value = selectedMethod.value;
+      if (selectedMethod) {
+         // Update the text input field
+         selectedInput.value = selectedMethod.value;
 
-        // Update the button text based on the selected payment method
-        if (selectedMethod.value === 'COD') {
+         // Update the button text based on the selected payment method
+         if (selectedMethod.value === 'COD') {
             submitButton.innerText = 'Place Order';
-        } else if (selectedMethod.value === 'razorpay') {
+         } else if (selectedMethod.value === 'razorpay') {
             submitButton.innerText = 'Pay with Razorpay';
-        } else if (selectedMethod.value === 'wallet') {
+         } else if (selectedMethod.value === 'wallet') {
             submitButton.innerText = 'Pay from Wallet';
-        }
-    } else {
-        console.error("No payment method selected.");
-    }
-}
+         }
+      } else {
+         console.error("No payment method selected.");
+      }
+   }
+
+   function removecoupon(id) {
+      document.getElementById('unhideid').value = id
+   }
 
 
    //-----------------------------------------------
 
    document.querySelector('#checkout_form').addEventListener('submit', async function (e) {
-
       e.preventDefault();
       try {
          const selectedPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
          if (selectedPaymentMethod === 'COD' || selectedPaymentMethod === 'wallet') {
             this.submit();
             return;
-         }else{
+         } else {
             let netAmountElement = document.querySelector('#withCoupon') || document.querySelector('#withoutCoupon');
             let amount = netAmountElement ? parseInt(netAmountElement.innerText.trim()) : 0;
-         const response = await fetch('/pay/create-order', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ amount })
-         });
-
-         const data = await response.json();
-         if (!data.success) {
-            Swal.fire({
-               title: "Error!",
-               text: "Failed to create order. Please try again.",
-               icon: "error",
-               showConfirmButton: false,
-               timer: 2000
+            const response = await fetch('/pay/create-order', {
+               method: 'POST',
+               headers: { 'Content-Type': 'application/json' },
+               body: JSON.stringify({ amount })
             });
-            return;
-         }
 
-         const options = {
-            key: '<%= process.env.RAZORPAY_KEY_ID %>',
-            amount: data.amount,
-            currency: data.currency,
-            name: 'Taste Trial',
-            description: 'Test Transaction',
-            image: '',
-            order_id: data.order_id,
-            handler: function (response) {
+            const data = await response.json();
+            if (!data.success) {
                Swal.fire({
-                  title: "Success!",
-                  text: "Payment successful!",
-                  icon: "success",
+                  title: "Error!",
+                  text: "Failed to create order. Please try again.",
+                  icon: "error",
                   showConfirmButton: false,
                   timer: 2000
-               }).then(() => {
-                  // Submit the form after successful payment
-                  const form = document.querySelector('#checkout_form');
-                  document.getElementById('payment_id').value = response.razorpay_payment_id;
-                  form.submit();
                });
-            },
-            prefill: {
-               name: '',
-               email: '',
-               contact: ''
-            },
-            theme: { color: '#3399cc' }
-         };
+               return;
+            }
 
-         const rzp1 = new Razorpay(options);
-         rzp1.open();
+            const options = {
+               key: '<%= process.env.RAZORPAY_KEY_ID %>',
+               amount: data.amount,
+               currency: data.currency,
+               name: 'Taste Trial',
+               description: 'Test Transaction',
+               image: '',
+               order_id: data.order_id,
+               handler: function (response) {
+                  Swal.fire({
+                     title: "Success!",
+                     text: "Payment successful!",
+                     icon: "success",
+                     showConfirmButton: false,
+                     timer: 2000
+                  }).then(() => {
+                     // Submit the form after successful payment
+                     const form = document.querySelector('#checkout_form');
+                     document.getElementById('payment_id').value = response.razorpay_payment_id;
+                     form.submit();
+                  });
+               },
+               prefill: {
+                  name: '<%= users.firstname %>',
+                  email: '<%= users.email %>',
+                  contact: '<%= users.phonenumber %>'
+               },
+               theme: { color: '#3399cc' }
+            };
+
+            const rzp1 = new Razorpay(options);
+            rzp1.on('payment.failed', async function (response) {
+               try {
+                  await Swal.fire({
+                     title: "Payment Failed!",
+                     text: "Your payment was unsuccessful. Placing the order with unpaid status.",
+                     icon: "error",
+                     showConfirmButton: false,
+                     timer: 3000
+                  });
+
+                  rzp1.close();
+
+                  // Store the fetch response in a variable and await it
+                  const orderResponse = await fetch('/pay/failedOrder', {
+                     method: "POST",
+                     headers: { "Content-Type": "application/json" },
+                     body: JSON.stringify({
+                        status: 'unpaid',
+                        addressId: document.getElementById('addressId').value,
+                        cartId: document.getElementById('cartId').value,
+                        numberofproduct: document.getElementById('numberofproduct').value,
+                        selectedPaymentMethod: document.getElementById('selectedPaymentMethod').value,
+                        couponId: document.getElementById('couponId').value
+                     })
+                  });
+
+                  const orderData = await orderResponse.json();
+
+                  if (!orderData.success) {
+                     throw new Error('Failed to create unpaid order');
+                  }
+
+                
+
+               } catch (error) {
+                  console.error('Failed order creation error:', error);
+                  Swal.fire({
+                     title: "Error!",
+                     text: "Failed to process your order. Please contact support.",
+                     icon: "error",
+                     showConfirmButton: true
+                  });
+               }
+            });
+
+            rzp1.open();
          }
       } catch (error) {
-         console.log("Hai")
+         console.error("Payment error:", error);
          Swal.fire({
             title: "Error!",
             text: "An error occurred. Please try again.",
@@ -338,7 +595,6 @@ datas.forEach(element => {
          });
       }
    });
-
    //----------------------------------------------- 
 
 

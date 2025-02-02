@@ -1,0 +1,236 @@
+
+
+<script>
+    const PDFDocument = require('pdfkit');
+const fs = require('fs');
+const path = require('path');
+const ObjectId = require('mongoose').Types.ObjectId;
+
+const COLORS = {
+    primary: '#2563eb',    
+    secondary: '#475569',  
+    accent: '#f97316',     
+    text: '#1e293b',      
+    lightGray: '#e2e8f0',
+    white: '#ffffff'
+};
+
+const downloadBill = async (req, res) => {
+    try {
+        const orderId = req.query.orderId;
+        if (!orderId) {
+            return res.status(400).json({ error: "Order ID is required" });
+        }
+
+        const orders = await orderSchema.aggregate([
+            { $match: { _id: new ObjectId(orderId) } },
+            { $unwind: { path: "$items", preserveNullAndEmptyArrays: true } },
+            { 
+                $lookup: {
+                    from: "rates",
+                    localField: "items.rate_id",
+                    foreignField: "_id",
+                    as: "rateDetails"
+                }
+            },
+            { 
+                $lookup: {
+                    from: "foods",
+                    localField: "rateDetails.food_id",
+                    foreignField: "_id",
+                    as: "foodDetails"
+                }
+            },
+            { 
+                $lookup: {
+                    from: "users",
+                    localField: "user_id",
+                    foreignField: "_id",
+                    as: "userDetails"
+                }
+            },
+            {
+                $lookup: {
+                    from: "hotels",
+                    localField: "rateDetails.hotel_id",
+                    foreignField: "_id",
+                    as: "hotelDetails"
+                }
+            }
+        ]);
+
+        if (!orders || orders.length === 0) {
+            return res.status(404).json({ error: "Order not found" });
+        }
+
+        const calculateCharges = (orders) => {
+            return {
+                gst: orders.reduce((sum, element) => 
+                    sum += (element.items.quantity * element.items.rate * element.items.gst_per / 100), 0),
+                packingCharge: orders.reduce((sum, element) => 
+                    sum += (element.items.quantity * element.items.rate * element.items.packing_per / 100), 0),
+                deliveryCharge: orders.reduce((sum, element) => 
+                    sum += (element.items.quantity * element.items.rate * element.items.delivery_per / 100), 0)
+            };
+        };
+
+        const generatePDF = async (orders, charges) => {
+            const order = orders[0];
+            const invoicePath = path.join(__dirname, `../invoices/invoice-${orderId}.pdf`);
+            // Set a fixed page size with autofit
+            const doc = new PDFDocument({ 
+                margin: 50,
+                size: 'A4',
+                autoFirstPage: true
+            });
+            const stream = fs.createWriteStream(invoicePath);
+
+            return new Promise((resolve, reject) => {
+                doc.pipe(stream);
+
+                const drawRect = (x, y, w, h, color) => {
+                    doc.rect(x, y, w, h).fill(color);
+                };
+
+                // Header Section (reduced height)
+                drawRect(0, 0, doc.page.width, 120, COLORS.primary);
+                
+                doc.fontSize(30)
+                   .fillColor(COLORS.white)
+                   .text('Taste Trial', 50, 40, { align: 'center' })
+                   .fontSize(12)
+                   .text('Delicious Food Delivered', 50, 80, { align: 'center' });
+
+                // Order Information Box (moved up)
+                drawRect(50, 140, doc.page.width - 100, 80, COLORS.lightGray);
+                
+                doc.fontSize(12)
+                   .fillColor(COLORS.text)
+                   .text('INVOICE DETAILS', 70, 150)
+                   .fontSize(10)
+                   .text(`Order ID: ${order._id}`, 70, 170)
+                   .text(`Date: ${new Date(order.createdAt).toLocaleString()}`, 70, 185)
+                   .fontSize(12)
+                   .text('CUSTOMER DETAILS', doc.page.width - 250, 150)
+                   .fontSize(10)
+                   .text(`${order.userDetails[0].firstname} ${order.userDetails[0].lastname}`, 
+                         doc.page.width - 250, 170);
+
+                // Table Header (moved up)
+                const tableY = 240;
+                drawRect(50, tableY, doc.page.width - 100, 30, COLORS.primary);
+                
+                doc.fillColor(COLORS.white)
+                   .fontSize(10);
+
+                const columns = [
+                    { x: 60, width: 30, text: "No." },
+                    { x: 100, width: 120, text: "Hotel" },
+                    { x: 230, width: 120, text: "Item" },
+                    { x: 360, width: 50, text: "Qty" },
+                    { x: 420, width: 70, text: "Rate" },
+                    { x: 500, width: 70, text: "Total" }
+                ];
+
+                columns.forEach(col => {
+                    doc.text(col.text, col.x, tableY + 10, { 
+                        width: col.width, 
+                        align: col.text === "No." ? "center" : "left" 
+                    });
+                });
+
+                // Items (with dynamic positioning)
+                let y = tableY + 40;
+                orders.forEach((item, index) => {
+                    const food = item.foodDetails[0];
+                    const rate = item.rateDetails[0];
+                    const hotel = item.hotelDetails[0];
+                    const itemTotal = rate.rate * item.items.quantity;
+
+                    if (index % 2 === 0) {
+                        drawRect(50, y - 5, doc.page.width - 100, 25, '#f8fafc');
+                    }
+
+                    doc.fillColor(COLORS.text)
+                       .fontSize(9)
+                       .text(`${index + 1}`, 60, y, { width: 30, align: 'center' })
+                       .text(hotel.hotelname, 100, y, { width: 120 })
+                       .text(food.foodname, 230, y, { width: 120 })
+                       .text(item.items.quantity.toString(), 360, y, { width: 50 })
+                       .text(`${rate.rate}`, 420, y, { width: 70 })
+                       .text(`${itemTotal}`, 500, y, { width: 70 });
+
+                    y += 25;
+                });
+                // Summary Box (with dynamic positioning)
+                const summaryY = y + 20;
+                const summaryHeight = 150;
+                drawRect(doc.page.width - 250, summaryY, 200, summaryHeight, COLORS.lightGray);
+                
+                const { gst, packingCharge, deliveryCharge } = charges;
+                const totalAmount = orders[0].totalAmount;
+                const grandTotal = totalAmount + packingCharge + deliveryCharge + gst;
+
+                doc.fontSize(10)
+                   .fillColor(COLORS.text)
+                   .text('Order Summary', doc.page.width - 230, summaryY + 10)
+                   .fontSize(9)
+                   .text('Subtotal:', doc.page.width - 230, summaryY + 35)
+                   .text(`${totalAmount}`, doc.page.width - 90, summaryY + 35)
+                   .text('Packing Charge:', doc.page.width - 230, summaryY + 55)
+                   .text(`${packingCharge}`, doc.page.width - 90, summaryY + 55)
+                   .text('Delivery Charge:', doc.page.width - 230, summaryY + 75)
+                   .text(`${deliveryCharge}`, doc.page.width - 90, summaryY + 75)
+                   .text('GST :', doc.page.width - 230, summaryY + 95)
+                   .text(`${gst}`, doc.page.width - 90, summaryY + 95);
+
+                // Grand Total
+                drawRect(doc.page.width - 250, summaryY + 120, 200, 30, COLORS.primary);
+                doc.fontSize(12)
+                   .fillColor(COLORS.white)
+                   .text('Grand Total:', doc.page.width - 230, summaryY + 128)
+                   .text(`${grandTotal.toFixed(2)}`, doc.page.width - 90, summaryY + 128);
+
+
+                // Footer (positioned relative to content)
+                const footerY = Math.max(summaryY + summaryHeight + 20, doc.page.height - 80);
+                const footerHeight = 60;
+                drawRect(0, footerY, doc.page.width, footerHeight, COLORS.secondary);
+                
+                doc.fontSize(10)
+                   .fillColor(COLORS.white)
+                   .text('Thank you for your order!', 50, footerY + 15, { align: 'center' })
+                   .fontSize(8)
+                   .text('For any issues, contact support@tastetrial.com | +91 1234567890', 50, footerY + 30, { align: 'center' })
+                   .text('© 2024 Taste Trial. All rights reserved.', 50, footerY + 45, { align: 'center' });
+
+                doc.end();
+                stream.on("finish", () => resolve(invoicePath));
+                stream.on("error", reject);
+            });
+        };
+
+        const charges = calculateCharges(orders);
+        const invoicePath = await generatePDF(orders, charges);
+
+        res.download(invoicePath, `invoice-${orderId}.pdf`, (err) => {
+            if (err) {
+                console.error("Download error:", err);
+                return res.status(500).json({ error: "Error downloading the invoice" });
+            }
+            fs.unlink(invoicePath, (unlinkErr) => {
+                if (unlinkErr) console.error("Error removing temporary file:", unlinkErr);
+            });
+        });
+
+    } catch (error) {
+        console.error("Invoice generation error:", error);
+        res.status(500).json({ 
+            error: "Failed to generate invoice",
+            details: error.message 
+        });
+    }
+};
+
+module.exports = { downloadBill };
+</script>

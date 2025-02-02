@@ -1,53 +1,544 @@
 
+<style>
+  .dashboard-card {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  position: relative;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.dashboard-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,255,255,0));
+  pointer-events: none;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+.card-icon {
+  position: absolute;
+  top: -15px;
+  right: -15px;
+  width: 80px;
+  height: 80px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.2;
+}
+
+.card-icon i {
+  font-size: 2.5rem;
+  color: white;
+}
+
+.card-content {
+  position: relative;
+  z-index: 1;
+}
+
+.card-content h5 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: #1e293b;
+}
+
+.metric {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.metric-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  transition: transform 0.2s ease;
+}
+
+.metric-item:hover {
+  transform: translateX(5px);
+}
+
+.metric-item i {
+  font-size: 1.25rem;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  color: white;
+}
+
+.metric-info {
+  flex: 1;
+}
+
+.metric-info .label {
+  display: block;
+  font-size: 0.875rem;
+  color: #64748b;
+  margin-bottom: 0.25rem;
+}
+
+.metric-info .value {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+/* Card specific styles */
+.dashboard-card.sales {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+}
+
+.dashboard-card.users {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.dashboard-card.orders {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+.sales .metric-item i {
+  background: rgba(59, 130, 246, 0.2);
+}
+
+.users .metric-item i {
+  background: rgba(16, 185, 129, 0.2);
+}
+
+.pending .metric-item i {
+  background: rgba(245, 158, 11, 0.2);
+}
+
+.sales .metric-info .label,
+.users .metric-info .label,
+.orders .metric-info .label {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.sales .metric-info .value,
+.users .metric-info .value,
+.orders .metric-info .value,
+.sales h5,
+.users h5,
+.orders h5 {
+  color: white;
+}
+
+.metric-item.large {
+  padding: 1.5rem;
+}
+
+.metric-item.large i {
+  font-size: 2rem;
+  width: 60px;
+  height: 60px;
+}
+
+.metric-item.large .value {
+  font-size: 2rem;
+}
+
+@media (max-width: 768px) {
+  .dashboard-card {
+    margin-bottom: 1rem;
+  }
+  
+  .card-icon {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .card-icon i {
+    font-size: 1.75rem;
+  }
+}
+#dateRangeForm .form-control {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+#dateRangeForm .form-control:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+#dateRangeForm .btn-primary {
+  background: #3b82f6;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1.5rem;
+  transition: all 0.3s ease;
+}
+
+#dateRangeForm .btn-primary:hover {
+  background: #2563eb;
+  transform: translateY(-2px);
+}
+
+#dateRangeForm label {
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+</style>
 
 <%- include('partials/admin') %>
-<!-- Main Content -->
-<div class="content flex-grow-1 " style="width:70%;margin-left:300px">
-   <div class="container-fluid ">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-     <!-- Cards Section -->
-     <div class="row">
-      <div class="col-md-4" style="margin-top: 100px;">
-        <button style="border: none;;width:100%" onclick="window.location.href='/admin/salesReport'">
-          <div class="card text-white bg-primary mb-3">
-            <div class="card-body">
-              <h5 class="card-title">Sales Report Summary</h5>
-              <p class="card-text">
-                <strong>Total Sales Count:</strong> <%= orderNumber %><br>
-                <strong>Total Order Amount:</strong> ₹ <%= totalOrderAmount %><br>
-                <strong>Overall Discount:</strong> ₹ <%= totalOfferAmount+couponSum %>
-              </p>
-            </div>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-8" style="margin-left: 300px; margin-top: 100px;">
+      <div class="dashboard-card">
+        <form id="dateRangeForm" class="d-flex align-items-center gap-4">
+          <div class="form-group mb-0">
+            <label for="fromDate" class="form-label text-sm text-gray-600">From Date</label>
+            <input type="date" id="fromDate" name="fromDate" class="form-control" value="<%= fromDate %>">
           </div>
-        </button>
-      </div>
-      <div class="col-md-4" style="margin-top: 100px;">
-        <button style="border: none;;width:100%" onclick="window.location.href='/admin/usermanagement'">
-          <div class="card text-white bg-success mb-3">
-            <div class="card-body">
-              <h5 class="card-title">User Report</h5>
-              <p class="card-text">
-                <strong>Total Users:</strong> <%= usersCount %><br>
-                <strong>Blocked Users:</strong><%= blockUserCount %><br>
-                <strong>Unblocked Users:</strong><%= unblockUserCount %>
-              </p>
-            </div>
+          
+          <div class="form-group mb-0">
+            <label for="toDate" class="form-label text-sm text-gray-600">To Date</label>
+            <input type="date" id="toDate" name="toDate" class="form-control" value="<%= toDate %>">
           </div>
-        </button>
-      </div>
-       <div class="col-md-4" style="margin-top: 100px;">
-         <div class="card text-white bg-warning mb-3">
-           <div class="card-body" style="height:136px">
-             <h5 class="card-title">Pending Orders</h5>
-             <p class="card-text">25</p>
-           </div>
-         </div>
-       </div>
-     </div>
 
-     <!-- Table Section -->
-     
-     </div>
-   </div>
- </div>
+
+          <div class="form-group mb-0">
+            <label for="month" class="form-label text-sm text-gray-600">Select Month</label>
+            <select id="month" name="month" class="form-control" value="">
+              <option value=""><%= corrMonth %></option>
+              <option value="1">January</option>
+              <option value="2">February</option>
+              <option value="3">March</option>
+              <option value="4">April</option>
+              <option value="5">May</option>
+              <option value="6">June</option>
+              <option value="7">July</option>
+              <option value="8">August</option>
+              <option value="9">September</option>
+              <option value="10">October</option>
+              <option value="11">November</option>
+              <option value="12">December</option>
+            </select>
+          </div>
+
+          <div class="form-group mb-0">
+            <label for="year" class="form-label text-sm text-gray-600">Year</label>
+            <select id="year" name="year" class="form-control">
+              <option value=""><%= year %></option>
+              <% const currentYear = new Date().getFullYear(); %>
+              <% for (let i = currentYear; i >= currentYear - 10; i--) { %>  
+                <option value="<%= i %>" <%= year == i ? 'selected' : '' %>><%= i %></option>
+              <% } %>
+            </select>
+            
+          </div>
+          
+          
+          <button type="submit" class="btn btn-primary align-self-end mb-0" style="height: 38px;">
+            Apply Filter
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>
+
+<!-- Main Content -->
+<div class="content flex-grow-1" style="width:70%;margin-left:300px">
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sales Report Card -->
+      <div class="col-md-4" style="margin-top: 100px;">
+        <div class="dashboard-card sales" onclick="window.location.href='/admin/salesReport'">
+          <div class="card-icon">
+            <i class="fas fa-chart-line"></i>
+          </div>
+          <div class="card-content">
+            <h5>Sales Report Summary</h5>
+            <div class="metric">
+              <div class="metric-item">
+                <i class="fas fa-shopping-cart"></i>
+                <div class="metric-info">
+                  <span class="label">Sales Count</span>
+                  <span class="value"><%= orderNumber.length %></span>
+                </div>
+              </div>
+              <div class="metric-item">
+                <i class="fas fa-rupee-sign"></i>
+                <div class="metric-info">
+                  <span class="label">Total Amount</span>
+                  <span class="value">₹<%= totalOrderAmount.toFixed(2) %></span>
+                </div>
+              </div>
+              <div class="metric-item">
+                <i class="fas fa-tags"></i>
+                <div class="metric-info">
+                  <span class="label">Discounts</span>
+                  <span class="value">₹<%= (totalOfferAmount+couponSum).toFixed(2) %></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- User Report Card -->
+      <div class="col-md-4" style="margin-top: 100px;">
+        <div class="dashboard-card users" onclick="window.location.href='/admin/usermanagement'">
+          <div class="card-icon">
+            <i class="fas fa-users"></i>
+          </div>
+          <div class="card-content">
+            <h5>User Report</h5>
+            <div class="metric">
+              <div class="metric-item">
+                <i class="fas fa-user-check"></i>
+                <div class="metric-info">
+                  <span class="label">Total Users</span>
+                  <span class="value"><%= usersCount %></span>
+                </div>
+              </div>
+              <div class="metric-item">
+                <i class="fas fa-user-slash"></i>
+                <div class="metric-info">
+                  <span class="label">Blocked</span>
+                  <span class="value"><%= blockUserCount %></span>
+                </div>
+              </div>
+              <div class="metric-item">
+                <i class="fas fa-user-shield"></i>
+                <div class="metric-info">
+                  <span class="label">Active</span>
+                  <span class="value"><%= unblockUserCount %></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- order details     -->
+      <div class="col-md-4" style="margin-top: 100px;">
+        <div class="dashboard-card orders" >
+          <div class="card-icon">
+            <i class="fas fa-chart-line"></i>
+          </div>
+          <div class="card-content">
+            <h5>Order Details </h5>
+            <div class="metric">
+              <div class="metric-item">
+                <i class="fas fa-spinner"></i>
+                <div class="metric-info">
+                  <span class="label">Pending Orders</span>
+                  <span class="value">₹ <%= pendingCount %></span>
+                </div>
+              </div>
+              <div class="metric-item">
+                <i class="fas fa-thumbs-up"></i>
+                <div class="metric-info">
+                  <span class="label">Delivered Order</span>
+                  <span class="value">₹ <%= deliveredCount %></span>
+                </div>
+              </div>
+              <div class="metric-item">
+                <i class="fas fa-exchange-alt"></i>
+                <div class="metric-info">
+                  <span class="label">Return Order</span>
+                  <span class="value">₹ <%= returnedCount %></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+<h4 style="margin-left: 316px;margin-top: 50px;">Sales Report</h4>
+<canvas id="salesChart" width="50%" height="20" style="margin-left: 300px;margin-top:50px"></canvas>
+
+<h4 style="margin-left: 316px;margin-top:50px">Top 10 Selling Products</h4>
+<div style="height:700px;">
+  <canvas id="productChart"  style="margin-left: 300px;margin-top:50px"></canvas>
+</div>
+
+<h4 style="margin-left: 316px;margin-top:50px">Top 10 Selling Categories</h4>
+<div style="height:700px;">
+  <canvas id="categoryChart"  style="margin-left: 300px;margin-top:50px"></canvas>
+</div>
+
+<h4 style="margin-left: 316px;margin-top:50px">Top 10  Hotels</h4>
+<div style="height:800px;">
+  <canvas id="hotelChart"  style="margin-left: 300px;margin-top:50px"></canvas>
+</div>
+
+
+
+
+<script>
+
+//sales chart
+const arrayDate = <%- arrayDate %>;
+const sumofSale = <%- sumofSale %>;
+  const ctx = document.getElementById('salesChart').getContext('2d');
+  const salesChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: arrayDate, 
+      datasets: [{
+        label: 'Sales (in ₹)',
+        data: sumofSale, 
+        backgroundColor: '#92cfe0',
+        borderColor: '#6792a6',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+
+    }
+  });
+
+
+  // product chart
+  const arrayOforder=<%- arrayOforder %>;
+  const arratOfproduct=<%- arratOfproduct %>;
+  const productChart=document.getElementById('productChart').getContext('2d')
+  const top10Pchart =  new Chart(productChart, {
+    type: 'pie',
+    data: {
+      labels: arratOfproduct, 
+      datasets: [{
+        data: arrayOforder, 
+        backgroundColor: ["#fa6c07","#eefa07","#067a40","#017e8a","#053775","#0d0b7a","#2d078c","#8009ab","#eb07aa","#ed074c"],
+        borderColor: '#6792a6',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      },
+      plugins: {
+            legend: {
+                display: true,
+                position: 'right'  
+            }
+        }
+    }
+  });
+
+
+  //categoryChart
+  const arrayofCategory=<%- arrayofCategory %>;
+  const arraycategoryCount=<%- arraycategoryCount %>;
+  const categoryChart = document.getElementById('categoryChart').getContext('2d');
+  const top10Category = new Chart(categoryChart, {
+    type: 'doughnut',
+    data: {
+      labels: arrayofCategory, 
+      datasets: [{
+        label: 'Sales (in ₹)',
+        data: arraycategoryCount, 
+        backgroundColor: [
+  "#212121", "#424242", "#616161", "#757575", "#9E9E9E",
+  "#BDBDBD", "#E0E0E0", "#F5F5F5", "#FAFAFA", "#FFFFFF"
+],
+        borderColor: '#6792a6',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      },
+      plugins: {
+            legend: {
+                display: true,
+                position: 'right'  
+            }
+        }
+
+    }
+  });
+
+  //hotelChart
+  const arrayOfHotel=<%- arrayOfHotel %>;
+  const arrayorderHotel=<%- arrayorderHotel %>;
+  const hotelChart = document.getElementById('hotelChart').getContext('2d');
+  const top10Hotel = new Chart(hotelChart, {
+    type: 'polarArea',
+    data: {
+      labels: arrayOfHotel,
+      datasets: [{
+        label: 'Sales (in ₹)',
+        data: arrayorderHotel,
+        backgroundColor: [
+  "#34495E", "#2E86C1", "#5DADE2", "#48C9B0", "#1ABC9C",
+  "#2ECC71", "#58D68D", "#F4D03F", "#E67E22", "#E74C3C"
+],
+        borderColor: '#6792a6',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      },
+      plugins: {
+            legend: {
+                display: true,
+                position: 'right'  
+            }
+        }
+
+    }
+  });
+
+
+
+</script>
+
+
+
+
+<%- include('partials/footer') %>

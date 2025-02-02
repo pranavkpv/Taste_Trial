@@ -1,166 +1,596 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-<link rel="stylesheet" href="/dashboard.css">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
 <style>
-  .product-main-img {
-    height: 400px;
-    object-fit: cover;
-    border-radius: 10px;
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
   }
 
-  .product-sub-img {
-    height: 100px;
-    object-fit: cover;
-    border: 2px solid #f8f9fa;
-    border-radius: 5px;
-    cursor: pointer;
+  body {
+    background: #f8fafc;
   }
 
-  .rate-details {
-    background: #f8f9fa;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  .top {
+    margin-top: 50px;
+    max-width: 1400px;
+    padding: 32px;
   }
 
-  .rate-details h5 {
-    color: #495057;
+  .product-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    margin-bottom: 48px;
   }
 
-  .btn-action {
+  .gallery-container {
+    position: sticky;
+    top: 32px;
+  }
+
+  .main-image {
+    position: relative;
+    border-radius: 24px;
+    overflow: hidden;
+    aspect-ratio: 1;
+    background: white;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+
+  .main-image img {
     width: 100%;
-    margin-bottom: 10px;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
   }
 
-  .review-section {
-    margin-top: 30px;
+  .main-image:hover img {
+    transform: scale(1.03);
   }
 
-  .review-item {
-    margin-bottom: 15px;
-    border-bottom: 1px solid #e9ecef;
-    padding-bottom: 10px;
+  .thumbnail-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-top: 16px;
   }
 
-  .review-item:last-child {
-    border-bottom: none;
+  .thumbnail {
+    aspect-ratio: 1;
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    position: relative;
   }
 
-  .product-main-img:hover {
-    transform: scale(1.5);
+  .thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: all 0.3s ease;
   }
 
-  .product-main-img {
-    transition: transform 0.3s ease 0.2s;
+  .thumbnail::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.03);
+    opacity: 1;
+    transition: opacity 0.3s ease;
+  }
+
+  .thumbnail:hover::after {
+    opacity: 0;
+  }
+
+  .thumbnail.active {
+    box-shadow: 0 0 0 3px #3b82f6;
+  }
+
+  .product-info {
+    padding: 32px;
+    background: white;
+    border-radius: 24px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+
+  .product-header {
+    margin-bottom: 24px;
+  }
+
+  .category-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    background: #eff6ff;
+    color: #3b82f6;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 12px;
+  }
+
+  .title {
+    font-size: 32px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    color: #6b7280;
+    font-size: 16px;
+  }
+
+  .price-container {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 24px 0;
+  }
+
+  .current-price {
+    font-size: 36px;
+    font-weight: 700;
+    color: #1f2937;
+  }
+
+  .original-price {
+    font-size: 20px;
+    color: #9ca3af;
+    text-decoration: line-through;
+  }
+
+  .discount-badge {
+    padding: 6px 12px;
+    background: #dcfce7;
+    color: #059669;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .stock-container {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .stock-badge {
+    padding: 6px 12px;
+    background: #fee2e2;
+    color: #dc2626;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .quantity-input {
+    width: 120px;
+    padding: 12px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+  }
+
+  .quantity-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  .action-buttons {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .btn {
+    padding: 16px 32px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: none;
+  }
+
+  .btn-primary {
+    background: linear-gradient(to right, #3b82f6, #2563eb);
+    color: white;
+    grid-column: span 2;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px -4px rgba(59, 130, 246, 0.2);
+  }
+
+  .btn-secondary {
+    background: white;
+    border: 2px solid currentColor;
+  }
+
+  .btn-wishlist {
+    color: #dc2626;
+  }
+
+  .btn-wishlist:hover {
+    background: #fee2e2;
+  }
+
+  .btn-order {
+    color: #059669;
+  }
+
+  .btn-order:hover {
+    background: #dcfce7;
+  }
+
+  .reviews-section {
+    background: white;
+    border-radius: 24px;
+    padding: 32px;
+    margin-top: 48px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+
+  .reviews-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+
+  .rating-summary {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .average-rating {
+    font-size: 48px;
+    font-weight: 700;
+    color: #1f2937;
+  }
+
+  .rating-stars {
+    color: #fbbf24;
+    font-size: 24px;
+  }
+
+  .review-card {
+    padding: 24px;
+    border-radius: 16px;
+    background: #f8fafc;
+    margin-bottom: 16px;
+  }
+
+  .review-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  .reviewer-name {
+    font-weight: 600;
+    color: #1f2937;
+  }
+
+  .review-date {
+    color: #6b7280;
+    font-size: 14px;
+  }
+
+  .review-stars {
+    color: #fbbf24;
+    margin-bottom: 8px;
+  }
+
+  .review-text {
+    color: #4b5563;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 1024px) {
+    .product-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .gallery-container {
+      position: static;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .container {
+      padding: 16px;
+    }
+
+    .action-buttons {
+      grid-template-columns: 1fr;
+    }
+
+    .btn-primary {
+      grid-column: span 1;
+    }
   }
 </style>
 
 <%- include('partials/userheader') %>
 
-<div class="container my-5">
-  <div class="row g-4">
-    <!-- Image Section -->
-    <div class="col-md-6">
-      <img id="main-product-img" src="<%= rates.images[0] %>" alt="Main Product Image"
-        class="img-fluid product-main-img mb-3 mt-5">
-      <div class="d-flex gap-2">
-        <img src="<%= rates.images[0] %>" alt="Sub Image 1" class="product-sub-img" onclick="changeMainImage(this)">
-        <img src="<%= rates.images[1] %>" alt="Sub Image 2" class="product-sub-img" onclick="changeMainImage(this)">
-        <img src="<%= rates.images[2] %>" alt="Sub Image 3" class="product-sub-img" onclick="changeMainImage(this)">
+
+<div class="mx-5 top">
+  <div class="product-grid">
+    <!-- Gallery Section -->
+    <div class="gallery-container">
+      <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='%236c757d'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/user/home">Home</a></li>
+          <li class="breadcrumb-item"><a href="/user/product?categoryId=<%= categories._id %>">Product</a></li>
+          <li class="breadcrumb-item"><a href="/user/hotels?foodId=<%= foods._id %>">Hotel</a></li>
+          <li class="breadcrumb-item"><a href="/user/varient?hotelId=<%= hotels._id %>&foodId=<%= foods._id %>">Varient</a></li>
+          <li class="breadcrumb-item active" aria-current="page">Shop</li>
+
+    
+        </ol>
+      </nav>
+      <div class="main-image">
+        <img id="mainImage" src="<%= rates.images[0] %>" alt="Chicken Biriyani">
+      </div>
+      <div class="thumbnail-grid">
+        <% rates.images.forEach((image, index) => { %>
+        <div class="thumbnail <%= index === 0 ? 'active' : '' %>" onclick="changeImage(this, '<%= image %>')">
+          <img src="<%= image %>" alt="Product view <%= index + 1 %>">
+        </div>
+        <% }) %>
       </div>
     </div>
 
-    <!-- Product Details Section -->
-    <div class="col-md-6">
-      <form>
-        <input type="hidden" name="rateid" id="rateId" value="<%= rates._id %>">
-        <input type="hidden" name="hotelid" id="hotelId" value="<%= hotels._id %>">
-        <input type="hidden" name="foodid" id="foodId" value="<%= foods._id %>">
-        <input type="hidden" name="varientid" id="varientId" value="<%= varients._id %>">
-        <input type="hidden" value="<%= userid %>">
+    <!-- Product Info Section -->
+    <div class="product-info">
+      <div class="product-header">
+        <span class="category-badge"><%= categories.categoryname %></span>
+        <h1 class="title"><%= foods.foodname %>(<%= varients.varientname %>)</h1>
+        <p class="subtitle"><%= hotels.hotelname %></p>
+      </div>
 
+      <div class="price-container">
+        <span class="current-price">₹<%= rates.rate %></span>
+        <% if (foods.offer > 0 || categories.offer > 0) { %>
+        <span class="original-price">₹<%= rates.rate %></span>
+        <span class="discount-badge"><%= Math.max(foods.offer, categories.offer) %>% OFF</span>
+        <% } %>
+      </div>
 
-        <h2 class="fw-bold"><%= foods.foodname %>(<%= varients.varientname %>)</h2>
-        <p class="text-muted"><%= hotels.hotelname %></p>
-        <div class="rate-details">
-          <h5>Rate Details</h5>
-          <ul class="list-unstyled">
-            <li>Base Price: <strong>₹<%= rates.rate %></strong></li>
-            <li>GST: <strong>₹ <%= rates.rate*rates.gst_per/100 %></strong></li>
-            <li>Packing Charge: <strong>₹ <%= rates.rate*rates.packing_per/100 %></strong></li>
-            <li>Delivery Charge: <strong>₹ <%= rates.rate*rates.delivery_per/100 %></strong></li>
-            <% if (foods.offer > 0 || categories.offer > 0) { %>
-              <% if (foods.offer > categories.offer) { %>
-                <!-- Offer is based on foods -->
-                <li>Offer Price: <strong>₹ <%= (rates.rate * foods.offer) / 100 %></strong></li>
-                <li class="fw-bold">Total: <strong>₹ 
-                  <%= rates.rate + 
-                      (rates.rate * rates.gst_per / 100) +
-                      (rates.rate * rates.packing_per / 100) +
-                      (rates.rate * rates.delivery_per / 100) -
-                      (rates.rate * foods.offer / 100) %>
-                </strong></li>
-              <% } else { %>
-                <!-- Offer is based on categories -->
-                <li>Offer Price: <strong>₹ <%= (rates.rate * categories.offer) / 100 %></strong></li>
-                <li class="fw-bold">Total: <strong>₹ 
-                  <%= rates.rate + 
-                      (rates.rate * rates.gst_per / 100) +
-                      (rates.rate * rates.packing_per / 100) +
-                      (rates.rate * rates.delivery_per / 100) -
-                      (rates.rate * categories.offer / 100) %>
-                </strong></li>
-              <% } %>
-            <% } else { %>
-              <!-- No offer applied -->
-              <li class="fw-bold">Total: <strong>₹ 
-                <%= rates.rate + 
-                    (rates.rate * rates.gst_per / 100) +
-                    (rates.rate * rates.packing_per / 100) +
-                    (rates.rate * rates.delivery_per / 100) %>
-              </strong></li>
-            <% } %>
-            
+      <div class="stock-container">
+        <span class="stock-badge"><%= rates.stock %> items left</span>
+        <input type="number" name="numberofstock" id="numberofstock" min="1" value="1" max="<%= rates.stock %>"
+          class="quantity-input">
+        <input type="hidden" id="rateId" value="<%= rates._id %>">
+        <input type="hidden" id="hotelId" value="<%= hotels._id %>">
+        <input type="hidden" id="foodId" value="<%= foods._id %>">
+        <input type="hidden" id="varientId" value="<%= varients._id %>">
+        <input type="hidden" id="userId" value="<%= userid %>">
 
-            <li class="text-danger">Total No.of Stock available: <strong>₹ <%= rates.stock %></strong></li>
-            <label for="">No .of stock you purchase</label>
-            <input class="form-control" type="number" placeholder="stock" name="numberofstock" value="1"
-              style="width:100px" min="1" id="numberofstock">
+      </div>
 
-          </ul>
-        </div>
+      <div class="action-buttons">
+        <button class="btn btn-primary" id="addToCart">Add to Cart</button>
+        <button class="btn text-dark btn-wishlist" id="wishlistButton" style="border-color: red;">
+          Add to Wishlist
+        </button>
+        
+        <button class="btn btn-secondary btn-order">Order Now</button>
+      </div>
 
-        <!-- Action Buttons -->
-        <div class="mt-4">
-          <button type="submit" id="addToCart" class="btn btn-primary btn-action">Add to Cart</button>
-          <button class="btn btn-outline-danger btn-action" id="addToWishlist">Add to Wishlist</button>
-          <button class="btn btn-success btn-action">Order Now</button>
-        </div>
-      </form>
+      <div class="delivery-info">
+        <h3>Price Breakdown</h3>
+        <ul class="price-details">
+          <li>Base Price: ₹<%= rates.rate %></li>
+          <li>GST: ₹<%= rates.rate*rates.gst_per/100 %></li>
+          <li>Packing: ₹<%= rates.rate*rates.packing_per/100 %></li>
+          <li>Delivery: ₹<%= rates.rate*rates.delivery_per/100 %></li>
+        </ul>
+      </div>
     </div>
   </div>
 
-  <!-- Review Section -->
-  <div class="review-section">
-    <h3 class="fw-bold mt-5">Reviews</h3>
-    <div class="review-item">
-      <strong>John Doe</strong> <span class="text-muted">- 5 Stars</span>
-      <p class="text-muted">"The food was amazing and delivered on time. Highly recommended!"</p>
+  <!-- Reviews Section -->
+  <div class="reviews-section">
+    <div class="reviews-header">
+      <h2>Customer Reviews</h2>
+      <div class="rating-summary">
+        <span class="average-rating">4.8</span>
+        <div class="rating-stars">★★★★★</div>
+        <span>(128 reviews)</span>
+      </div>
     </div>
-    <div class="review-item">
-      <strong>Jane Smith</strong> <span class="text-muted">- 4 Stars</span>
-      <p class="text-muted">"Great taste but delivery was slightly late."</p>
-    </div>
-    <div class="review-item">
-      <strong>Rahul Sharma</strong> <span class="text-muted">- 3 Stars</span>
-      <p class="text-muted">"Food quality was okay, but the packaging could be improved."</p>
+
+    <div class="reviews-list">
+      <div class="review-card">
+        <div class="review-header">
+          <span class="reviewer-name">Rahul M.</span>
+          <span class="review-date">2 days ago</span>
+        </div>
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">Absolutely delicious! The biriyani was perfectly spiced and the chicken was tender.
+          Portion size was generous. Will definitely order again!</p>
+      </div>
+
+      <div class="review-card">
+        <div class="review-header">
+          <span class="reviewer-name">Priya S.</span>
+          <span class="review-date">1 week ago</span>
+        </div>
+        <div class="review-stars">★★★★☆</div>
+        <p class="review-text">Great taste and authentic flavor. Delivery was quick and packaging was good. Would
+          recommend!</p>
+      </div>
+
+      <div class="review-card">
+        <div class="review-header">
+          <span class="reviewer-name">Ahmed K.</span>
+          <span class="review-date">2 weeks ago</span>
+        </div>
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">One of the best biryanis I've had in a while. The aroma and taste are amazing. Fast
+          delivery too!</p>
+      </div>
     </div>
   </div>
 </div>
 
+
+
+
+
+
+
+
+
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+<script>
+  function changeImage(element, src) {
+    document.getElementById('mainImage').src = src;
+    document.querySelectorAll('.thumbnail').forEach(thumb => {
+      thumb.classList.remove('active');
+    });
+    element.classList.add('active');
+  }
+
+  function changeMainImage(subImg) {
+    // Get the main product image element
+    const mainImg = document.getElementById('main-product-img');
+
+    // Update the src attribute of the main image with the clicked sub-image's src
+    mainImg.src = subImg.src;
+  }
+
+  document.getElementById('addToCart').addEventListener('click', async function () {
+    const url = '/user/productcart';
+    const data = {
+      rateid: document.getElementById('rateId').value,
+      hotelid: document.getElementById('hotelId').value,
+      foodid: document.getElementById('foodId').value,
+      varientid: document.getElementById('varientId').value,
+      numberofstock: document.getElementById('numberofstock').value
+    }
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data)
+    })
+    const givendata = await response.json()
+    if (givendata.stockError) {
+      Swal.fire({
+        title: givendata.stockError,
+        icon: "info",
+        draggable: true
+      });
+    }
+    if (givendata.existProduct) {
+      Swal.fire({
+        title: givendata.existProduct,
+        icon: "info",
+        draggable: true
+      });
+    }
+    if (givendata.success) {
+      Swal.fire({
+        title: givendata.success,
+        icon: "success",
+        draggable: true
+      });
+    }
+
+  })
+
+
+  document.addEventListener("DOMContentLoaded", function () {
+  const wishlistButton = document.getElementById("wishlistButton");
+
+  // Check if the item is already in the wishlist
+  let isInWishlist = false; // This should be set dynamically based on server response
+
+  // Function to update button appearance & action
+  function updateButton() {
+    if (isInWishlist) {
+      wishlistButton.textContent = "Remove from Wishlist";
+      wishlistButton.classList.remove("text-dark");
+      wishlistButton.classList.add("btn-danger");
+    } else {
+      wishlistButton.textContent = "Add to Wishlist";
+      wishlistButton.classList.remove("btn-danger");
+      wishlistButton.classList.add("text-dark");
+    }
+  }
+
+  // Initial button state
+  updateButton();
+
+  // Event listener for button click
+  wishlistButton.addEventListener("click", async function () {
+    const url = isInWishlist ? "/user/removeWishData" : "/user/addToWishlist";
+    const data = {
+      rateid: document.getElementById('rateId').value,
+      userid:document.getElementById('userId').value
+    };
+
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+      console.log(result);
+
+      if (result.successWishlist || result.removeMessage) {
+        isInWishlist = !isInWishlist; // Toggle wishlist state
+        updateButton(); // Update UI
+        Swal.fire({
+          title: isInWishlist ? "Added to Wishlist!" : "Removed from Wishlist!",
+          icon: "success",
+          confirmButtonText: "OK",
+        });
+      } else {
+        throw new Error("Operation failed.");
+      }
+    } catch (error) {
+      Swal.fire({
+        title: "Error",
+        text: "Something went wrong!",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
+      console.error(error);
+    }
+  });
+});
+
+
+
+
+</script>
 
 <%- include('partials/userfooter') %>
 
@@ -189,77 +619,3 @@
   });
 </script>
 <% } %>
-
-
-<script>
-  function changeMainImage(subImg) {
-    // Get the main product image element
-    const mainImg = document.getElementById('main-product-img');
-
-    // Update the src attribute of the main image with the clicked sub-image's src
-    mainImg.src = subImg.src;
-  }
-
-  document.getElementById('addToCart').addEventListener('click', function () {
-    const url = '/user/productcart';
-    const data = {
-      rateid: document.getElementById('rateId').value,
-      hotelid: document.getElementById('hotelId').value,
-      foodid: document.getElementById('foodId').value,
-      varientid: document.getElementById('varientId').value,
-      numberofstock: document.getElementById('numberofstock').value
-    }
-
-    fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data)
-    }).then((response) => {
-      if (response.ok) {
-        return response.json(); // Parse JSON response
-      }
-      throw new Error('Network response was not ok');
-    })
-      .then((data) => {
-        console.log('Success:', data);
-      })
-      .catch((error) => {
-        console.error('Error:', error);
-      });
-  })
-
-
-  document.getElementById('addToWishlist').addEventListener('click', function () {
-    console.log('Add to Wishlist clicked!');
-    const url = '/user/addToWishlist';
-    const data = {
-      rateid: document.getElementById('rateId').value
-    };
-
-    console.log('Sending data:', data);
-
-    fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    })
-      .then((response) => {
-        if (response.ok) {
-          return response.json(); // Parse JSON response
-        }
-        throw new Error('Network response was not ok');
-      })
-      .then((data) => {
-        console.log('Success:', data);
-        alert(data.message); // Optional: Display success message
-      })
-      .catch((error) => {
-        console.error('Error:', error);
-      });
-  });
-
-</script>

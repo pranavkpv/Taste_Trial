@@ -86,46 +86,64 @@
 </style>
 
 <%- include('partials/userheader') %>
-<h1 class="m-5">Available Varients</h1>
-<select id="price" class="form-select form-select-lg m-3 ms-5" aria-label="Large select example" style="width:120px"
+<h1  style="margin-top: 81px; margin-left:50px">Available Varients</h1>
+<div class="container-fluid">
+  <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='%236c757d'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/user/home">Home</a></li>
+      <li class="breadcrumb-item"><a href="/user/product?categoryId=<%= categorys._id %>">Product</a></li>
+      <li class="breadcrumb-item"><a href="/user/hotels?foodId=<%= foods._id %>">Hotel</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Varient</li>
+
+    </ol>
+  </nav>
+  <select id="price" class="form-select form-select-lg m-3 " aria-label="Large select example" style="width:120px;margin-left:100px"
     onchange="price()"> <!-- Use onchange event -->
-    <option value="" disabled selected>Price</option> <!-- Add value="" to the placeholder -->
+    <option value="" disabled selected>
+      <% if (price=="lth") { %>
+       Low To High
+       <% } else if (price=="htl") { %>
+        High To Low
+        <% } else { %>
+         Price
+      <% } %>
+    </option> <!-- Add value="" to the placeholder -->
     <option value="lth">Low To High</option>
     <option value="htl">High To Low</option>
   </select>
+</div>
 <div class="row m-5">
    <% varients.forEach(element=> { %>
       <div class="col-3">
          <div class="container mt-5">
-            <form action="/user/productDetail" method="get" class="card-container"
-              style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+            <form action="/user/productDetail" method="get" class="food-card-form">
+                      <!-- Hidden Inputs -->
+                      <input type="hidden" name="rateid" value="<%= element._id %>">
+                      <input type="hidden" name="hotelid" value="<%= hotels._id %>">
+                      <input type="hidden" name="foodid" value="<%= foods._id %>">
+                      <input type="hidden" name="varientid" value="<%= element.varientDetails[0]._id %>">
           
-              <!-- Hidden Inputs -->
-              <input type="hidden" name="rateid" value="<%= element._id  %>">
-              <input type="hidden" name="hotelid" value="<%= hotels._id %>">
-              <input type="hidden" name="foodid" value="<%= foods._id %>">
-              <input type="hidden" name="varientid" value="<%= element.varientDetails[0]._id %>">
+                      <!-- Food Card -->
+                      <button type="submit" class="food-card">
+                          <!-- Food Image -->
+                          <div class="food-img-container">
+                              <img src="<%= element.images[0] %>" alt="<%= foods.foodname %>" class="food-img">
+                          </div>
           
-              <!-- Food Card -->
-              <button type="submit" class="food-card">
-                <!-- Food Image -->
-                <div class="food-img-container">
-                  <img src="<%= element.images[0] %>" alt="Food Image" class="food-img" style="width:100%;height:300px">
-                </div>
-          
-                <!-- Food Details -->
-                <div class="d-flex justify-content-between">
-                  <div class="food-details">
-                    <h1 class="food-title"><%= foods.foodname %></h1>
-                    <h1 class="food-title">(<%= element.varientDetails[0].varientname %>)</h1>
-                  </div>
-                  <div class="rate">
-                    <h3>₹<%= element.rate %></h3>
-                    <h6><%= element.delivery_time %>min</h6>
-                  </div>
-                </div>
-              </button>
-            </form>
+                          <!-- Food Details -->
+                          <div class="food-details">
+                              <div class="food-info">
+                                  <h2 class="food-title"><%= foods.foodname %></h2>
+                                  <h3 class="food-title">(<%= element.varientDetails[0].varientname %>)</h3>
+                              </div>
+                              <div class="rate">
+                                  <h3>₹<%= element.rate %></h3>
+                                  <h6><%= element.delivery_time %> min</h6>
+                              </div>
+                          </div>
+                      </button>
+                  </form>
+         
           </div>
       </div>
       

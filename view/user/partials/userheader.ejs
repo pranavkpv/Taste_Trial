@@ -1,39 +1,259 @@
-<style>
+<!DOCTYPE html>
+<html lang="en">
 
-</style>
-<header class="d-flex align-items-center justify-content-between p-3 shadow">
-  <!-- Logo and Title -->
-  <div class="d-flex align-items-center">
-    <img src="/uploads/logo.jpeg" class="col-md-2" alt="Company Logo" style="height: 69px;
-     margin-right: 6px;
-     width: 78px;
-     border-radius: 50px;">
-    <h1 style="font-family: fantasy;" class="col-md-2">Taste Trial</h1>
-    <div class="row search-bar col-md-6" style="margin-left: 100px;">
-      <div class=" ">
-        <div class="input-group">
-          <span class="input-group-text bg-secondary text-light"><i class="fas fa-search"></i></span>
-          <input type="text" id="searchInput" oninput="searchItem(this.value)" class="form-control"
-            placeholder="Search by <%= searchmessage %>..." value="<%= searcheditemname %>">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css">
+  <title>Document</title>
+
+  <head>
+    <style>
+      .main-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem 2rem;
+        background: white;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        height: 70px;
+      }
+
+      /* Left Section Styles */
+      .header-left {
+        flex: 0 0 auto;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .brand-logo {
+        height: 40px;
+        width: 40px;
+        border-radius: 20px;
+        object-fit: cover;
+      }
+
+      .brand-name {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0;
+      }
+
+      /* Middle Section Styles */
+      .header-center {
+        flex: 0 1 600px;
+        padding: 0 2rem;
+      }
+
+      .search-container {
+        width: 100%;
+      }
+
+      .search-wrapper {
+        position: relative;
+        width: 100%;
+      }
+
+      .search-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #64748b;
+        font-size: 0.875rem;
+      }
+
+      .search-input {
+        width: 100%;
+        padding: 0.75rem 1rem 0.75rem 2.5rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        background: #f8fafc;
+        font-size: 0.875rem;
+        transition: all 0.2s ease;
+      }
+
+      .search-input:focus {
+        outline: none;
+        border-color: #2563eb;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+      }
+
+      /* Right Section Styles */
+      .header-right {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+      }
+
+      .header-nav {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .nav-icon {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        color: #64748b;
+        transition: all 0.2s ease;
+        position: relative;
+      }
+
+      .nav-icon:hover {
+        background: #f1f5f9;
+        color: #2563eb;
+        transform: translateY(-2px);
+      }
+
+      .nav-icon i {
+        font-size: 1.25rem;
+      }
+
+      .logout-button {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1.25rem;
+        background: #ef4444;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+      }
+
+      .logout-button:hover {
+        background: #dc2626;
+        transform: translateY(-2px);
+      }
+
+      .logout-button i {
+        font-size: 1rem;
+      }
+
+      /* Responsive Styles */
+      @media (max-width: 1024px) {
+        .header-center {
+          flex: 0 1 400px;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .main-header {
+          padding: 1rem;
+        }
+
+        .header-center {
+          display: none;
+          /* Hide search on mobile */
+        }
+
+        .brand-name {
+          font-size: 1.25rem;
+        }
+
+        .nav-icon {
+          width: 35px;
+          height: 35px;
+        }
+
+        .logout-button span {
+          display: none;
+          /* Hide logout text on mobile */
+        }
+      }
+
+      /* Hover Effects */
+      .nav-icon::after {
+        content: attr(title);
+        position: absolute;
+        bottom: -25px;
+        left: 50%;
+        transform: translateX(-50%) translateY(10px);
+        background: #1e293b;
+        color: white;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+      }
+
+      .nav-icon:hover::after {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(-50%) translateY(0);
+      }
+    </style>
+  </head>
+
+<body>
+  <header class="main-header">
+    <!-- Left Section: Logo & Title -->
+    <div class="header-left">
+      <div class="brand">
+        <img src="/uploads/logo.jpeg" alt="Company Logo" class="brand-logo">
+        <h1 class="brand-name">Taste Trial</h1>
+      </div>
+    </div>
+
+    <!-- Middle Section: Search -->
+    <div class="header-center">
+      <div class="search-container">
+        <div class="search-wrapper">
+          <i class="fas fa-search search-icon"></i>
+          <input type="text" id="searchInput" class="search-input" placeholder="Search by <%= searchmessage %>..."
+            value="<%= searcheditemname %>" oninput="searchItem(this.value)">
         </div>
       </div>
     </div>
-    <div class="rightside d-flex col-md-3">
-      <div class="icons">
-        <a href="" class="text-dark"><i class="bi bi-cart" style="font-size: 30px;"></i></a>
-        <a href="" class="text-dark"><i class="bi bi-heart-fill" style="font-size: 30px;"></i></a>
-        <a href="" class="text-dark"><i class="bi bi-wallet" style="font-size: 30px;"></i></a>
-        <a href="/user/dashboard" class="text-dark"><i class="bi bi-person-circle" style="font-size: 30px;"></i></a>
-      </div>   
-      <button class="btn btn-danger" style="margin-left: 400px;" onclick="logoutfun()">
-        <i class="bi bi-box-arrow-right"></i>
-        logout
+
+    <!-- Right Section: Navigation & Actions -->
+    <div class="header-right">
+      <nav class="header-nav">
+        <a href="/user/cart" class="nav-icon" title="Cart">
+          <i class="fas fa-shopping-cart"></i>
+        </a>
+        <a href="/user/wishlist" class="nav-icon" title="Wishlist">
+          <i class="fas fa-heart"></i>
+        </a>
+        <a href="/user/wallethistory" class="nav-icon" title="Wallet">
+          <i class="fas fa-wallet"></i>
+        </a>
+        <a href="/user/dashboard" class="nav-icon" title="Profile">
+          <i class="fas fa-user-circle"></i>
+        </a>
+      </nav>
+      <button class="logout-button" onclick="logoutfun()">
+        <i class="fas fa-sign-out-alt"></i>
+        <span>Logout</span>
       </button>
     </div>
-  </div>
-</header>
-<script>
-  function logoutfun() {
-    window.location.href = "/user/logout"
-  }
-</script>
+  </header>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    function logoutfun() {
+      window.location.href = "/user/logout"
+    }
+  </script>

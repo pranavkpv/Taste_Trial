@@ -52,13 +52,6 @@
         <!-- /close the loop -->
       </tbody>
     </table>
-    <div id="pagination" style="text-align: center; margin-bottom: 20px;">
-      <% for (let i = 1; i <= 5; i++) { %>
-      <button onclick="loadPage('<%= i %>')" class="btn btn-success">
-        <%= i %>
-      </button>
-      <% } %>
-    </div>
 
   </div>
 
@@ -78,7 +71,7 @@
           </div>
           <div class="mb-3">
             <label for="discount" class="form-label">Enter Discount %</label>
-            <input type="number" class="form-control" id="discount" min="0" placeholder="Enter title" name="discount"
+            <input type="number" class="form-control" id="discount" min="0" placeholder="Enter discount" name="discount"
               value="0">
             <p class="text-danger d-none error-message" id="discounthidden">Please Enter Discount %!</p>
           </div>
@@ -148,6 +141,7 @@
   </div>
 </div>
 
+<%- include('partials/footer') %>
 <script>
   function editFun(id, couponCode, discount, expiryDate) {
     document.getElementById('editcouponCode').value = couponCode

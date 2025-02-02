@@ -5,6 +5,7 @@ const foodschema=require('../../model/foodschema')
 const rateschema=require('../../model/rateschema')
 const cartSchema=require('../../model/cartschema')
 const categoryschema=require('../../model/categoryschema')
+const wishlistSchema= require("../../model/wishlistschema")
 
 
 const productDetail = async (req, res) => {
@@ -16,6 +17,8 @@ const productDetail = async (req, res) => {
       const foods = await foodschema.findOne({ _id: foodid });
       const rates = await rateschema.findOne({ _id: rateid });
       const categories = await categoryschema.findOne({_id:foods.category_id})
+      const wishlistData = await wishlistSchema.findOne({user_id:userid,rate_id:rateid})
+
 
       const successmessage = req.flash('success'); // Read success flash message
       const errormessage = req.flash('error'); // Read error flash message
@@ -30,7 +33,8 @@ const productDetail = async (req, res) => {
          searcheditemname: "",
          searchmessage: "",
          userid,
-         categories
+         categories,
+         wishlistData
       });
    } catch (error) {
       console.error(error);
@@ -41,13 +45,14 @@ const productDetail = async (req, res) => {
 
 const productcart = async (req, res) => {
    try {
+      
       const userid = req.session.user;
       const carts = await cartSchema.find({ user_id: userid });
       const rates = await rateschema.findOne({ _id: req.body.rateid });
 
       if (parseInt(req.body.numberofstock) > parseInt(rates.stock)) {
-         req.flash('error', "Please check the total No of stock Available");
-         return res.redirect(`/user/productDetail?varientid=${req.body.varientid}&hotelid=${req.body.hotelid}&foodid=${req.body.foodid}&rateid=${req.body.rateid}`);
+        
+        return res.json({stockError: "Please check the total No of stock Available"});
       }
 
       let exists = false;
@@ -58,19 +63,18 @@ const productcart = async (req, res) => {
       });
 
       if (exists) {
-         req.flash('error', "Product is Already Exist in the cart");
-         return res.redirect(`/user/productDetail?varientid=${req.body.varientid}&hotelid=${req.body.hotelid}&foodid=${req.body.foodid}&rateid=${req.body.rateid}`);
-      } else {
-         // Add product to cart
+        
+         return res.json({existProduct: "Product is Already Exist in the cart"});
+      } 
+   
          const newCart = new cartSchema({
             user_id: userid,
             rate_id: rates._id,
             number: parseInt(req.body.numberofstock),
          });
          await newCart.save();
-         req.flash('success', "Product Added to Cart Successfully");
-         res.redirect(`/user/productDetail?varientid=${req.body.varientid}&hotelid=${req.body.hotelid}&foodid=${req.body.foodid}&rateid=${req.body.rateid}`);
-      }
+         return res.json({success: "Product Added to Cart Successfully"});
+      
    } catch (error) {
       console.error(error);
    }

@@ -8,13 +8,19 @@ const salesReport = async (req, res) => {
        const toDate = todate ? new Date(todate) : null;
        const targetMonth = month ? parseInt(month, 10) : null;
        const targetYear = year ? parseInt(year, 10) : null;
-
+        
+       if (toDate) {
+         // Include the entire day in `toDate`
+         toDate.setHours(23, 59, 59, 999);
+      }
+      
+      // Build the match filter dynamically
+      var matchFilter = {};
+      if (fromDate) matchFilter.createdAt = { $gte: fromDate };
+      if (toDate) matchFilter.createdAt = { ...matchFilter.createdAt, $lte: toDate };
+      if (targetMonth) matchFilter['$expr'] = { $eq: [{ $month: "$createdAt" }, targetMonth] };
+      if (targetYear) matchFilter['$expr'] = { ...matchFilter['$expr'], $eq: [{ $year: "$createdAt" }, targetYear] };
        // Build the match filter dynamically
-       const matchFilter = {};
-       if (fromDate) matchFilter.createdAt = { $gte: fromDate };
-       if (toDate) matchFilter.createdAt = { ...matchFilter.createdAt, $lte: toDate };
-       if (targetMonth) matchFilter['$expr'] = { $eq: [{ $month: "$createdAt" }, targetMonth] };
-       if (targetYear) matchFilter['$expr'] = { ...matchFilter['$expr'], $eq: [{ $year: "$createdAt" }, targetYear] };
 
       const orders = await orderschema.aggregate([
          {$match:matchFilter},
@@ -73,6 +79,7 @@ const salesReport = async (req, res) => {
          }
          return sum
       }, 0)
+   
       orders.forEach(element => {
          const day = String(element.createdAt.getDate()).padStart(2, '0');
          const month = String(element.createdAt.getMonth() + 1).padStart(2, '0');
@@ -80,9 +87,15 @@ const salesReport = async (req, res) => {
          const formattedDate = `${ day }-${ month }-${ year }`;
          element.formattedCreatedAt = formattedDate;
       })
-      const sum = await orderschema.aggregate([{ $group: { _id: null, totalAmount: { $sum: "$totalAmount" } } }])
-      const offersum = await orderschema.aggregate([{ $group: { _id: null, totalOffer: { $sum: "$totalOffer" } } }])
-      res.render('admin/salesReport', { orders, sum, offersum, couponSum ,fromdate,todate,month,year})
+      const sumTotal=orders.reduce((sum,element)=>{
+         return sum+=element.totalAmount
+      },0)
+      const offersum=orders.reduce((sum,element)=>{
+         return sum+=element.totalOffer
+      },0)
+      
+     
+      res.render('admin/salesReport', { orders, offersum, couponSum ,fromdate,todate,month,year,sumTotal})
    } catch (error) {
       console.log(error)
    }

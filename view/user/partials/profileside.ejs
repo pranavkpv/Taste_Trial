@@ -1,48 +1,190 @@
 
- <style>
-body {
-   font-family: 'Arial', sans-serif;
-   background-color: #f4f6f9;
- }
- .menu {
-   height: 100vh;
-   background-color: #343a40;
-   padding-top: 20px;
-   padding-left: 15px;
-   border-right: 2px solid #dee2e6;
- }
- .menu a {
-   display: block;
-   padding: 10px 15px;
-   color: #ced4da;
-   text-decoration: none;
-   margin-bottom: 10px;
-   border-radius: 5px;
-   transition: background 0.3s, color 0.3s;
- }
+<style>
+  .sidebar {
+      min-height: 100vh;
+      background: #2c3e50;
+      padding: 0;
+      transition: all 0.3s ease;
+      width: 250px;
+      margin-left: -15px;
+  }
 
- .content-header {
-   background-color: #ffffff;
-   padding: 20px;
-   border-bottom: 2px solid #dee2e6;
- }
- .content-header h1 {
-   font-size: 1.8rem;
-   color: #495057;
- }
- .main-content {
-   padding: 20px;
- }
- </style>
+  .sidebar-header {
+      padding: 20px;
+      background: #243342;
+      text-align: center;
+  }
+
+  .sidebar-header img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      margin-bottom: 10px;
+  }
+
+  .sidebar-header h4 {
+      color: white;
+      margin: 0;
+      font-size: 1.2rem;
+  }
+
+  .nav-links {
+      padding: 0;
+      list-style: none;
+  }
+
+  .nav-links a {
+      display: flex;
+      align-items: center;
+      padding: 12px 20px;
+      color: #ecf0f1;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      border-left: 3px solid transparent;
+      height:75px
+  }
+
+  .nav-links a:hover {
+      background: #34495e;
+      border-left: 3px solid #3498db;
+      padding-left: 25px;
+  }
+
+  .nav-links a.active {
+      background: #34495e;
+      border-left: 3px solid #3498db;
+  }
+
+  .nav-links i {
+      margin-right: 10px;
+      width: 20px;
+      text-align: center;
+  }
+
+  .nav-links span {
+      font-size: 0.9rem;
+  }
+
+  .danger-zone {
+      border-top: 1px solid #34495e;
+      margin-top: 20px;
+      padding-top: 20px;
+  }
+
+  .danger-zone a {
+      color: #e74c3c;
+  }
+
+  .danger-zone a:hover {
+      background: #c0392b;
+      color: white;
+      border-left: 3px solid #e74c3c;
+  }
+
+  .logout-btn {
+      margin-top: 20px;
+  }
+
+  .logout-btn a {
+      background: #e74c3c;
+      color: white;
+  }
+
+  .logout-btn a:hover {
+      background: #c0392b;
+      border-left: 3px solid #e74c3c;
+  }
+
+  /* Add this for responsiveness */
+  @media (max-width: 768px) {
+      .sidebar {
+          width: 100%;
+          position: relative;
+          height:800px
+      }
+  }
+</style>
  
-<a href="/user/dashboard" class="active">Dashboard </a>
-<a href="#" class="review">My Reviews</a>
-<a href="/user/address" class="address">My Address</a>
-<a href="/user/order" class="order">My Orders </a>
-<a href="/user/cart" class="cart">Manage Carts</a>
-<a href="/user/wishlist" class="wishlist">Manage Wishlist</a>
-<a href="#" class="wallet">Wallet</a>
-<a href="/user/changeAccount" class="changeaccount">Change Account Details</a>
-<a href="/user/changePassword" class="changePassword">Change Password</a>
-<a href="#" class="deletesccount">Delete Account</a>
-<a href="#" >Logout</a>
+
+<div class="sidebar">
+    <div class="sidebar-header">
+        <img src="/api/placeholder/80/80" alt="Profile Picture">
+        <h4>User Name</h4>
+    </div>
+
+    <ul class="nav-links">
+        <li>
+            <a href="/user/dashboard" class="active">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+        </li>
+        <li>
+            <a href="#" class="review">
+                <i class="fas fa-star"></i>
+                <span>My Reviews</span>
+            </a>
+        </li>
+        <li>
+            <a href="/user/address" class="address">
+                <i class="fas fa-map-marker-alt"></i>
+                <span>My Address</span>
+            </a>
+        </li>
+        <li>
+            <a href="/user/order" class="order">
+                <i class="fas fa-shopping-bag"></i>
+                <span>My Orders</span>
+            </a>
+        </li>
+        <li>
+            <a href="/user/cart" class="cart">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Manage Cart</span>
+            </a>
+        </li>
+        <li>
+            <a href="/user/wishlist" class="wishlist">
+                <i class="fas fa-heart"></i>
+                <span>Manage Wishlist</span>
+            </a>
+        </li>
+        <li>
+            <a href="/user/wallethistory" class="wallet">
+                <i class="fas fa-wallet"></i>
+                <span>Wallet</span>
+            </a>
+        </li>
+        <li>
+            <a href="/user/changeAccount" class="changeaccount">
+                <i class="fas fa-user-edit"></i>
+                <span>Change Account Details</span>
+            </a>
+        </li>
+        <li>
+            <a href="/user/changePassword" class="changePassword">
+                <i class="fas fa-key"></i>
+                <span>Change Password</span>
+            </a>
+        </li>
+
+        <!-- Danger Zone -->
+        <li class="danger-zone">
+            <a href="#" class="deletesccount">
+                <i class="fas fa-user-times"></i>
+                <span>Delete Account</span>
+            </a>
+        </li>
+
+        <!-- Logout Button -->
+        <li class="logout-btn">
+            <a href="#">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a>
+        </li>
+    </ul>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+

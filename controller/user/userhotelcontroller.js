@@ -1,6 +1,7 @@
 const hotelschema = require('../../model/hotelschema')
 const userschema = require('../../model/usershema')
 const foodschema = require('../../model/foodschema')
+const categoryschema = require('../../model/categoryschema')
 const hotel = async (req, res) => {
    try {
       const foodId = req.query.foodId
@@ -26,7 +27,8 @@ const hotel = async (req, res) => {
       // Get filtered and paginated data
       const hotels = await hotelschema.find(finalFilter).skip(skip).limit(limit);
       const foodname = await foodschema.findOne({ _id: foodId })
-      res.render('user/hotel', { hotels, foodname,page,searcheditemname,foodId ,selectedpage,searchmessage:"hotels"})
+      const category = await categoryschema.findOne({_id:foodname.category_id})
+      res.render('user/hotel', { hotels,category, foodname,page,searcheditemname,foodId ,selectedpage,searchmessage:"hotels"})
    } catch (error) {
       console.log(error)
    }

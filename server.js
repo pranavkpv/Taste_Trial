@@ -23,6 +23,7 @@ const orderSchema=require('./model/orderschema')
 const wishlistSchema=require('./model/wishlistschema')
 const couponSchema=require('./model/couponschema')
 const paymentRoute=require('./routes/payment')
+const walletSchema=require('./model/walletSchema')
 require('dotenv').config(); // Load environment variables
 
 const Razorpay = require('razorpay');
@@ -83,6 +84,12 @@ app.use((req, res, next) => {
     return done(err, false);
   }
 }));
+
+app.use((req, res, next) => {
+  req.xhr = req.headers['x-requested-with'] === 'XMLHttpRequest';
+  next();
+});
+
 
 // Serialize user into session
 passport.serializeUser((user, done) => {

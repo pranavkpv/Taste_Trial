@@ -22,6 +22,19 @@
      </div>
      
     </div>
+    <div class="col-md-6">
+      <select name="" id="selectFood" class="form-control w-50" onchange="selectFood()">
+        <option value="" class="d-none"><% if (selectedfoodname && selectedfoodname!="both") { %>
+          <%= foodss.foodname %>
+          <% } else { %>
+           All
+        <% } %></option>
+        <option value="both">All</option>
+        <% foods.forEach(element => { %>
+         <option value="<%= element._id %>"><%= element.foodname %></option>
+        <% }) %>
+      </select>
+    </div>
   </div>
 
   <!-- Table -->
@@ -37,7 +50,7 @@
         </thead>
         <tbody class="tableBody">
             <!-- loop of food data -->
-            <% varients.forEach((element, index) => { %>
+            <% varientss.forEach((element, index) => { %>
             <tr>
                 <td class="tableindex"><%= startIndex+index %></td>
                 <td class="tablefood"><%= element.foodDetails[0].foodname %></td>
@@ -192,6 +205,7 @@
   </div>
 </div>
 
+<%- include('partials/footer') %>
 <script>
  function validateForm() {
     const foodname = document.getElementById('foodname');
@@ -222,15 +236,24 @@
 function searchVarient(value) {
    clearTimeout(debounceTimer);
    debounceTimer = setTimeout(() => {
+    const selectFood=document.getElementById('selectFood').value
       const currentPage = 1; // Reset to the first page for a new search
-      window.location.href = `/admin/varient?pagenumber=${currentPage}&varient=${encodeURIComponent(value)}`;
+      window.location.href = `/admin/varient?pagenumber=${currentPage}&varient=${encodeURIComponent(value)}&food=${selectFood}`;
    }, 700); // Adjust delay (in milliseconds) as needed
 }
 
 function loadPage(pageNumber) {
+  const selectFood=document.getElementById('selectFood').value
    const searchValue = document.getElementById('searchInput').value || '';
-   window.location.href = `/admin/varient?pagenumber=${pageNumber}&varient=${encodeURIComponent(searchValue)}`;
+   window.location.href = `/admin/varient?pagenumber=${pageNumber}&varient=${encodeURIComponent(searchValue)}&food=${selectFood}`;
 }
+
+function selectFood(){
+    const currentPage = 1; 
+   const searchValue = document.getElementById('searchInput').value || '';
+    const selectFood=document.getElementById("selectFood").value;
+    window.location.href = `/admin/varient?pagenumber=${pageNumber}&varient=${encodeURIComponent(searchValue)}&food=${selectFood}`
+  }
 
 
 function editfun(foodname,varientname,id){
@@ -284,6 +307,9 @@ document.querySelectorAll(".isblocked").forEach((statusElement, index) => {
 
     }
   });
+
+
+
 
 
 </script>

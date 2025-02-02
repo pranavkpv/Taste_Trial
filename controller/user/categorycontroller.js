@@ -1,35 +1,35 @@
-const categoryschema = require("../../model/categoryschema")
+const rateschema=require('../../model/rateschema')
 
 const category = async (req, res) => {
    try {
-      const searcheditemname = req.query.category || ''; // Get the search query
-      const alphabet = req.query.alphabet
-      const selectedpage = Number(req.query.pagenumber) || 1; // Get the page number
-      const limit = 9; // Number of categories per page
-      const skip = (selectedpage - 1) * limit; // Calculate the skip value
+      const userId=req.session.user
+      const rates=await rateschema.aggregate([{
+        $lookup:{
+         from:"foods",
+         localField:"food_id",
+         foreignField:"_id",
+         as:"foodDetails"
+        }
+      },{
+         $lookup:{
+            from:"hotels",
+            localField:"hotel_id",
+            foreignField:"_id",
+            as:"hotelDetails"
+         }
+      },
+      {
+         $lookup:{
+            from:"varients",
+            localField:"varient_id",
+            foreignField:"_id",
+            as:"varientDetails"
+         }
+      }
+   ])
 
-      // Search filter
-      const searchFilter = searcheditemname
-         ? { categoryname: { $regex: searcheditemname, $options: 'i' } }
-         : {};
 
-      const finalFilter = {
-         ...searchFilter,
-         isdeleted: false, // Add this condition
-      };
-
-      // Get filtered data count
-      const totaldata = await categoryschema.countDocuments(finalFilter);
-      const page = Math.ceil(totaldata / limit);
-
-     if(alphabet=="atz"){
-      var categories = await categoryschema.find(finalFilter).skip(skip).limit(limit).sort({categoryname:1}).collation({ locale: 'en', strength: 2 });
-     }else if(alphabet=="zta"){
-      var categories = await categoryschema.find(finalFilter).skip(skip).limit(limit).sort({categoryname:-1}).collation({ locale: 'en', strength: 2 });
-     }else{
-      var categories = await categoryschema.find(finalFilter).skip(skip).limit(limit)
-     }
-      res.render('user/category', { categories, searchmessage: "category",searcheditemname,page,selectedpage })
+      res.render('user/category',{rates,searchmessage:"",searcheditemname:"",userId})
    } catch (error) {
       console.log(error)
    }

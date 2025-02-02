@@ -1,8 +1,10 @@
 const foodschema = require('../../model/foodschema')
 const categoryschema = require('../../model/categoryschema')
+const mongoose = require('mongoose')
 
 const food = async (req, res) => {
    try {
+      const category=req.query.category
       const searchedfoodname = req.query.food || ''; // Get the search query
       const selectedpage = Number(req.query.pagenumber) || 1; // Get the page number
       const limit = 5; // Number of categories per page
@@ -32,10 +34,15 @@ const food = async (req, res) => {
                as: "categoryDetails"
             }
          },
-         {$match:searchFilter},
-         { $skip: skip }, // Skip the specified number of documents
-         { $limit: limit } // Limit the number of documents returned
+         {
+            $match: { 
+               ...searchFilter, 
+            }
+         },
+         { $skip: skip }, 
+         { $limit: limit } 
       ]);
+      
       foods = foods.map(food => {
          if (food.expiry_date) {
             food.formattedExpiryDate = new Date(food.expiry_date)
@@ -45,8 +52,17 @@ const food = async (req, res) => {
          }
          return food;
       });
-      const categories = await categoryschema.find()
-      res.render('admin/food', { foods, categories, errormessage, successmessage, existmessage, editexistmessage,searchedfoodname ,startIndex,page})
+     if(category && category!="all"){
+      var foodss=foods.filter((element)=>element.categoryDetails[0]._id==category)
+      var selectedCategory=await categoryschema.findOne({_id:category})
+     }else{
+      var foodss=foods
+      var selectedCategory="All" 
+     }
+      const categories = await categoryschema.find({isdeleted:false})
+      res.render('admin/food', { foodss, categories, errormessage, successmessage, existmessage, editexistmessage,searchedfoodname ,startIndex,page,
+         category,selectedCategory
+      })
    } catch (error) {
       console.log(error)
       req.flash('error', "An Error Occured");
@@ -59,6 +75,20 @@ const addFood = async (req, res) => {
       const { foodname, category_id, isveg,duration_time,offer,expirydate } = req.body;
       const file = req.file;
       const existFood = await foodschema.findOne({ foodname })
+      if(offer==0 && expirydate==""){
+         const image = `/uploads/${ file.filename }`
+         const newFoods = new foodschema({
+            foodname,
+            category_id,
+            is_veg: isveg,
+            image,
+            duration_time,
+            offer
+         })
+         await newFoods.save()
+         req.flash('success', "Food Is Saved SuccessFully");
+         res.redirect('/admin/food');
+      }
       if (existFood) {
          req.flash('exist', "Food Is Already Exist");
          res.redirect('/admin/food');

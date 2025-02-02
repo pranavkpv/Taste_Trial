@@ -6,123 +6,284 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <style>
-   .status-badge {
-      font-size: 0.9rem;
-      padding: 0.4rem 0.8rem;
-      border-radius: 12px;
-   }
+    :root {
+            --primary-color: #3b82f6;
+            --success-color: #22c55e;
+            --warning-color: #f59e0b;
+        }
 
-   .status-cancelled {
-      background-color: #f8d7da;
-      color: #721c24;
-   }
+        body {
+            background-color: #f8fafc;
+        }
 
-   .status-delivered {
-      background-color: #d4edda;
-      color: #155724;
-   }
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+        }
 
-   .status-processing {
-      background-color: #fff3cd;
-      color: #856404;
-   }
+        .order-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
 
-   .product-photo {
-      width: 100px;
-      height: 100px;
-      object-fit: cover;
-      border-radius: 8px;
-   }
+        .order-header {
+            background: linear-gradient(135deg, var(--primary-color), #2563eb);
+            color: white;
+            padding: 20px;
+            position: relative;
+        }
 
-   .order {
-      background-color: #495057;
-   }
+        .order-status {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
 
-   .order-details-container {
-      margin-top: 20px;
-      padding: 20px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-   }
+        .status-delivered {
+            background: var(--success-color);
+            color: white;
+        }
 
-   .product-image {
-      max-width: 150px;
-      border-radius: 8px;
-      border: 1px solid #ddd;
-      padding: 5px;
-   }
+        .status-processing {
+            background: var(--warning-color);
+            color: white;
+        }
 
-   .user-address,
-   .order-summary {
-      margin-top: 20px;
-   }
+        .order-body {
+            padding: 30px;
+        }
 
-   .section-title {
-      font-weight: bold;
-      margin-bottom: 10px;
-   }
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .product-card {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: transform 0.2s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .product-image {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .product-details h5 {
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+
+        .hotel-badge {
+            background: var(--primary-color);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .amount-card {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .amount-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            color: #64748b;
+        }
+
+        .amount-row.total {
+            color: #1e293b;
+            font-weight: 600;
+            font-size: 1.1rem;
+            border-top: 2px dashed #e2e8f0;
+            padding-top: 12px;
+            margin-top: 12px;
+        }
+
+        .offer-badge {
+            background: #dcfce7;
+            color: var(--success-color);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .delivery-address {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .address-label {
+            background: #e2e8f0;
+            color: #475569;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            margin-bottom: 12px;
+            display: inline-block;
+        }
+
+        .tracking-info {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .tracking-info::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #e2e8f0;
+        }
+
+        .tracking-step {
+            position: relative;
+            padding-bottom: 20px;
+        }
+
+        .tracking-step::before {
+            content: '';
+            position: absolute;
+            left: -30px;
+            top: 0;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--primary-color);
+        }
+
+        .tracking-step.completed::before {
+            background: var(--success-color);
+        }
+
+        .tracking-date {
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .product-card {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .product-image {
+                margin-bottom: 15px;
+            }
+        }
 </style>
 
 
-<%- include('partials/profileheadr') %>
+<%- include('partials/userheader') %>
 <div class="row">
    <div class="col-md-2 menu">
       <%- include('partials/profileside') %>
    </div>
-   <div class="col-md-10 p-5">
-      <div class="order-details-container">
-         <!-- Order Summary Section -->
-         <div class="order-summary">
-            <h4 class="section-title">Order Summary</h4>
-            <div class="d-flex align-items-center mb-4">
-               <img src="<%= rates.images[0] %>" alt="Product Image" class="product-image">
-               <div class="ms-4" style="line-height: 7px;">
-                  <h5> <%= foods.foodname %>(<%= varients.varientname %>) </h5>
-                  <p><strong>Base rate:</strong> <%= rates.rate %> </p>
-                  <p><strong>Gst Amount:</strong> <%= rates.rate*rates.gst_per/100 %> </p>
-                  <p><strong>Delivery Charge:</strong><%= rates.rate*rates.delivery_per/100 %></p>
-                  <p><strong>Packing Charge:</strong><%= rates.rate*rates.packing_per/100 %></p>
-                  <% if (foods.offer > categories.offer) { %>
-                  <p><strong>Offer Amount:</strong><%= rates.rate * foods.offer/100 %></p>
-                  <p><strong>Number:</strong><%= Quantity %></p>
-                  <p class="text-danger"><strong>Total
-                        Amount:</strong><%=Quantity*(rates.rate+(rates.rate*rates.delivery_per/100)+(rates.rate*rates.gst_per/100)+(rates.rate*rates.packing_per/100)-(rates.rate * foods.offer/100)) %>
+   <div class="col-md-10" style="margin-top:81px">
+      <div class="order-card">
+          <div class="order-header">
+              <h4 class="m-0">Order <%= orders._id %></h4>
+              <p class="mb-0">Ordered <%= formattedDate %></p>
+          </div>
+          
+          <div class="order-body">
+              <!-- Products Section -->
+              <h5 class="section-title"> Item Details</h5>
+              <div class="product-card d-flex gap-4">
+                  <img src="<%= foods.image %>" alt="Food" class="product-image">
+                  <div class="product-details flex-grow-1">
+                      <span class="hotel-badge"><%= hotels.hotelname %></span>
+                      <h5><%= foods.foodname %></h5>
+                      <p class="mb-2">Variant: <%= varients.varientname %> | Quantity: <%= Quantity %></p>
+                      <span class="offer-badge"><%= items[0].offer_per %> OFF Applied</span>
+                  </div>
+                  <div class="text-end">
+                      <h5 class="mb-1">$<%= items[0].quantity*items[0].rate %></h5>
+                      <small class="text-muted">Base price</small>
+                  </div>
+              </div>
+
+              <!-- Amount Details -->
+              <h5 class="section-title mt-4">Price Details</h5>
+              <div class="amount-card">
+                  <div class="amount-row">
+                      <span>Base Rate</span>
+                      <span>$<%= items[0].quantity*items[0].rate %></span>
+                  </div>
+                  <div class="amount-row">
+                      <span>GST (<%= items[0].gst_per %>)%</span>
+                      <span>$ <%= items[0].quantity*(items[0].rate*items[0].gst_per/100) %></span>
+                  </div>
+                  <div class="amount-row">
+                      <span>Packing Charges</span>
+                      <span>$<%= items[0].quantity*(items[0].rate*items[0].packing_per/100) %></span>
+                  </div>
+                  <div class="amount-row">
+                      <span>Delivery Charges</span>
+                      <span>$<%= items[0].quantity*(items[0].rate*items[0].delivery_per/100) %></span>
+                  </div>
+                  <div class="amount-row">
+                      <span>Offer Discount</span>
+                      <span class="text-success">-$<%= items[0].quantity*(items[0].rate*items[0].offer_per/100) %></span>
+                  </div>
+                  <div class="amount-row total">
+                      <span>Total Amount</span>
+                      <span>$<%= items[0].quantity*items[0].rate+items[0].quantity*(items[0].rate*items[0].delivery_per/100)+
+                      items[0].quantity*(items[0].rate*items[0].packing_per/100)+ items[0].quantity*(items[0].rate*items[0].gst_per/100)-
+                      items[0].quantity*(items[0].rate*items[0].offer_per/100)
+                       %></span>
+                  </div>
+              </div>
+
+              <!-- Delivery Address -->
+              <h5 class="section-title mt-4">Delivery Address</h5>
+              <div class="delivery-address">
+                  <span class="address-label"><%= addresses.addresstype %></span>
+                  <p class="mb-2"><%= users.firstname %><%= users.lastname %></p>
+                  <p class="mb-2"><%= addresses.landmark %><br><%= addresses.city %>, <%= addresses.state %>,<%= addresses.pin_code %></p>
+                  <p class="mb-0">
+                      <strong>Phone:</strong> (+91) <%= addresses.mobile_no %><br>
+                      <strong>Alternative:</strong> (+91) <%= addresses.alternative_no %>
                   </p>
-                  <% } else { %>
-                  <p><strong>Offer Amount:</strong><%= rates.rate * categories.offer/100 %></p>
-                  <p><strong>Number:</strong><%= Quantity %></p>
-                  <p class="text-danger"><strong>Total
-                        Amount:</strong><%=Quantity*(rates.rate+(rates.rate*rates.delivery_per/100)+(rates.rate*rates.gst_per/100)+(rates.rate*rates.packing_per/100)-(rates.rate * categories.offer/100)) %>
-                  </p>
-                  <% } %>
                </div>
-            </div>
-         </div>
-
-         <!-- User Address Section -->
-         <div class="user-address" style="line-height: 10px;">
-            <h4 class="section-title">Shipping Address</h4>
-            <p><strong>Name:</strong><%= users.firstname %> </p>
-            <p><strong>Email:</strong><%= users.email %> </p>
-            <p><strong>Phone:</strong> <%= addresses.mobile_no %> </p>
-            <p><strong>Address:</strong>
-               <%= addresses.addresstype %> ,
-               <%= addresses.landmark %> ,
-               <%= addresses.city %> ,
-               <%= addresses.state %> ,
-               <%= addresses.pin_code %>
-            </p>
-         </div>
-
-         <!-- Order Details -->
-         <div class="order-details mt-4">
-            <h4 class="section-title">Order Details</h4>
-            <p><strong>Order ID:</strong> #INV <%= orders._id %> </p>
-            <p><strong>Order Date:</strong> <%= formattedDate %> </p>
-         </div>
+              
+          </div>
       </div>
-   </div>
+  </div>
 </div>
 <%- include('partials/userfooter') %>
 

@@ -1,6 +1,7 @@
 const userschema = require('../../model/usershema')
 const usermanagement = async (req, res) => {
    try {
+      const {status}=req.query
       const searcheduser = req.query.user || ''; // Get the search query
       const selectedpage = Number(req.query.pagenumber) || 1; // Get the page number
       const limit = 5; // Number of categories per page
@@ -16,14 +17,21 @@ const usermanagement = async (req, res) => {
       const page = Math.ceil(totaldata / limit);
 
       // Get filtered and paginated data
-      const users = await userschema.find(searchFilter).skip(skip).limit(limit);
+      let users = await userschema.find(searchFilter).skip(skip).limit(limit);
+      if(req.query.status==='block'){
+         var userData=users.filter(element=>element.is_blocked===true)
+      }else if(req.query.status==='unblock'){
+         var userData=users.filter(element=>element.is_blocked===false)
+      }else {
+         var userData=users
+      }
+      console.log(userData)
       const startIndex=skip+1
       const successmessage = req.flash('success')
       const errormessage = req.flash('error')
-      res.render("admin/usermanagement", { users, errormessage, successmessage,searcheduser ,startIndex,page})
+      res.render("admin/usermanagement", { userData,status, errormessage, successmessage,searcheduser ,startIndex,page})
    } catch (error) {
       req.flash("error", "An Error Occured")
-      res.redirect("/admin/login")
    }
 }
 

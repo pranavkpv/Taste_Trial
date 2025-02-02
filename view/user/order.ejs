@@ -6,103 +6,254 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <style>
-   .status-badge {
+   :root {
+      --primary-color: #2563eb;
+      --secondary-color: #1e40af;
+      --success-color: #059669;
+      --warning-color: #d97706;
+      --danger-color: #dc2626;
+      --light-bg: #f8fafc;
+   }
+
+   body {
+      background-color: var(--light-bg);
+   }
+
+   .page-header {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      padding: 2rem;
+      border-radius: 15px;
+      margin-bottom: 2rem;
+   }
+
+   .order-card {
+      background: white;
+      border-radius: 15px;
+      border: none;
+      transition: all 0.3s ease;
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+   }
+
+   .order-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+   }
+
+   .invoice-section {
+      background: #f8fafc;
+      padding: 1rem;
+      border-radius: 10px;
+      margin-bottom: 1rem;
+   }
+
+   .invoice-number {
+      color: var(--primary-color);
+      font-size: 1.1rem;
+   }
+
+   .order-date {
+      color: #64748b;
       font-size: 0.9rem;
-      padding: 0.4rem 0.8rem;
-      border-radius: 12px;
    }
 
-   .status-cancelled {
-      background-color: #f8d7da;
-      color: #721c24;
+   .product-image {
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 10px;
    }
 
-   .status-delivered {
-      background-color: #d4edda;
-      color: #155724;
+   .product-details {
+      padding: 1rem;
+   }
+
+   .price-info {
+      background: #f8fafc;
+      padding: 0.8rem;
+      border-radius: 8px;
+      margin: 1rem 0;
+   }
+
+   .price-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      color: #64748b;
+   }
+
+   .total-price {
+      font-weight: bold;
+      color: var(--primary-color);
+   }
+
+   .status-badge {
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 500;
    }
 
    .status-processing {
-      background-color: #fff3cd;
-      color: #856404;
+      background: #dbeafe;
+      color: var(--primary-color);
    }
 
-   .product-photo {
-      width: 100px;
-      height: 100px;
-      object-fit: cover;
+   .status-delivered {
+      background: #dcfce7;
+      color: var(--success-color);
+   }
+
+   .status-cancelled {
+      background: #fee2e2;
+      color: var(--danger-color);
+   }
+
+   .status-returned {
+      background: #fef3c7;
+      color: var(--warning-color);
+   }
+
+   .action-buttons {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+   }
+
+   .btn-action {
+      padding: 0.5rem 1.5rem;
       border-radius: 8px;
+      font-weight: 500;
+      transition: all 0.3s ease;
    }
 
-   .order {
-      background-color: #495057;
+   .pagination {
+      margin-top: 2rem;
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+   }
+
+   .page-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: white;
+      border: 1px solid #e2e8f0;
+      color: var(--primary-color);
+      transition: all 0.3s ease;
+   }
+
+   .page-btn:hover,
+   .page-btn.active {
+      background: var(--primary-color);
+      color: white;
+      border-color: var(--primary-color);
    }
 </style>
 
 
-<%- include('partials/profileheadr') %>
+<%- include('partials/userheader') %>
 <div class="row">
    <div class="col-md-2 menu">
       <%- include('partials/profileside') %>
    </div>
-   <div class="col-md-10 p-5">
-      <h2 class="text-center mb-4">Order Details</h2>
-      <div class="row gy-4">
+      <div class="col-md-10 p-4" style="margin-top:80px">
+         <div class="page-header">
+            <h2 class="text-center mb-0">Your Order History</h2>
+            <p class="text-center mb-0 mt-2 text-white-50">Track and manage your orders</p>
+         </div>
 
-         <% orders.forEach(element => { %>
-         <div class="col-md-6 ">
-            <div class="mb-3 mt-5">
-               <h5>Invoice Number: <span id="invoice-number" class="fw-bold">#INV <%= element._id %> </span></h5>
-               <p>Ordered Date: <%= element.createdAtFormatted %> <span></span></p>
-            </div>
-            <div class="card shadow-sm">
-               <div class="card-body d-flex align-items-center">
-                  <img src="<%= element.rateDetails[0].images[0] %>" alt="Egg Biriyani" class="product-photo me-3">
-                  <div class="w-100">
-                     <h5 class="card-title mb-1"><%= element.foodDetails[0].foodname  %></h5>
-                     <p class="card-text mb-2">
-                        Rate: ₹ <%= element.rateDetails[0].rate %><br>
-                        Quantity: <%= element.items.quantity %> <br>
-                        Total: ₹ <%= element.rateDetails[0].rate * element.items.quantity %>
-                     </p>
+         <div class="orders-container">
+            <% orders.forEach(element => { %>
+            <div class="order-card">
+               <div class="card-body">
+                  <div class="invoice-section">
                      <div class="d-flex justify-content-between align-items-center">
-                        <span class="status-badge status-processing" name="status"
-                           id="status"><%= element.items.status %></span>
-                        <form action="/user/orderCancel" method="post">
-                           <input type="hidden" value="<%= element.rateDetails[0]._id %>" name="rateId">
-                           <input type="hidden" value="<%= element.items.quantity %>" name="qty">
-                           <input type="hidden" value="<%= element._id %>" name="orderid">
-                           <button type="submit" class="btn btn-danger btn-sm"
-                              <% if (element.items.status == "cancelled" || element.items.status == "delivered" || element.items.status == "returned") { %>
-                              disabled <% } %>>
-                              Cancel
-                           </button>
-                        </form>
+                        <div>
+                           <span class="invoice-number">#INV <%= element._id %></span>
+                           <div class="order-date mt-1">
+                              <i class="far fa-calendar-alt me-2"></i>
+                              <%= element.createdAtFormatted %>
+                           </div>
+                        </div>
+                        <div class="status-badge status-<%= element.items.status.toLowerCase() %>">
+                           <i class="fas fa-circle me-2"></i>
+                           <%= element.items.status %>
+                        </div>
                      </div>
-                     <button type="submit" class="btn btn-primary btn-sm" style="margin-left: 368px; width: 62px;;"
-                        onclick="window.location.href=`/user/orderDetails?orderId=<%= element._id %>&rateid=<%= element.rateDetails[0]._id %>`">
-                        View</button>
-                     <form action="/user/orderReturn" method="post">
-                        <input type="hidden" value="<%= element._id %>" name="orderId">
-                        <input type="hidden" value="<%= element.rateDetails[0]._id %>" name="rateId">
-                       <% if (element.items.status == "delivered") { %>
-                        <button type="submit" class="btn btn-warning btn-sm mt-3"
-                        style="margin-left: 368px; width: 62px;;" id="return">Return</button>  
-                        <% } else { %>
-                           <button type="submit" class="btn btn-warning btn-sm mt-3"
-                           style="margin-left: 368px; width: 62px;;" id="return" disabled>Return</button>  
-                       <% } %>
-                     </form>
                   </div>
 
-               </div>
-               <!-- Add more product cards dynamically as needed -->
-            </div>
-         </div>
-         <% }) %>
+                  <div class="d-flex">
+                     <img src="<%= element.rateDetails[0].images[0] %>" class="product-image"
+                        alt="<%= element.foodDetails[0].foodname %>">
+                     <div class="product-details flex-grow-1">
+                        <h5 class="mb-3"><%= element.foodDetails[0].foodname %></h5>
 
+                        <div class="price-info">
+                           <div class="price-row">
+                              <span>Price per item</span>
+                              <span>₹ <%= element.rateDetails[0].rate %></span>
+                           </div>
+                           <div class="price-row">
+                              <span>Quantity</span>
+                              <span><%= element.items.quantity %></span>
+                           </div>
+                           <div class="price-row total-price">
+                              <span>Total Amount</span>
+                              <span>₹ <%= element.rateDetails[0].rate * element.items.quantity %></span>
+                           </div>
+                        </div>
+
+                        <div class="action-buttons">
+                           <a href="/user/orderDetails?orderId=<%= element._id %>&rateid=<%= element.rateDetails[0]._id %>"
+                              class="btn btn-primary btn-action">
+                              <i class="fas fa-eye me-2"></i>View Details
+                           </a>
+                           
+                           <button class="btn btn-success" onclick="window.location.href='/user/download-invoice?orderId=<%= element._id %>'">Download Invoice</button>
+
+                           <form action="/user/orderCancel" method="post" class="d-inline" style="margin-left:536px">
+                              <input type="hidden" value="<%= element.rateDetails[0]._id %>" name="rateId">
+                              <input type="hidden" value="<%= element.items.quantity %>" name="qty">
+                              <input type="hidden" value="<%= element._id %>" name="orderid">
+                              <button type="submit" class="btn btn-danger btn-action"
+                                 <%= (element.items.status == "cancelled" || element.items.status == "delivered" || element.items.status == "returned") ? 'disabled' : '' %>>
+                                 <i class="fas fa-times me-2"></i>Cancel
+                              </button>
+                           </form>
+
+                      
+
+                           <% if (element.items.status == "delivered") { %>
+                           <form action="/user/orderReturn" method="post" class="d-inline">
+                              <input type="hidden" value="<%= element._id %>" name="orderId">
+                              <input type="hidden" value="<%= element.rateDetails[0]._id %>" name="rateId">
+                              <button type="submit" class="btn btn-warning btn-action " >
+                                 <i class="fas fa-undo me-2"></i>Return
+                              </button>
+                           </form>
+                           <% } %>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <% }) %>
+         </div>
+
+         <div class="pagination">
+            <% for(let i = 1; i <= page; i++) { %>
+            <button class="page-btn <%= i === selectedPage ? 'active' : '' %>" onclick="pagination('<%= i %>')">
+               <%= i %>
+            </button>
+            <% } %>
+         </div>
       </div>
-   </div>
 </div>
 <%- include('partials/userfooter') %>
 
@@ -117,3 +268,9 @@
    });
 </script>
 <% } %>
+
+<script>
+   function pagination(selectedPage) {
+      window.location.href = `/user/order?page=${ selectedPage }`
+   }
+</script>

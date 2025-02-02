@@ -2,16 +2,16 @@ const rateschema = require('../../model/rateschema')
 const foodschema = require('../../model/foodschema')
 const hotelschema = require('../../model/hotelschema')
 const varientschema = require('../../model/varientschema')
+const mongoose = require("mongoose")
+const ObjectId = mongoose.Types.ObjectId;
 
 const rate = async (req, res) => {
   try {
-    const successmessage = req.flash('success')
-    const errormessage = req.flash('error')
-    const existmessage = req.flash('exist')
-    const questionmessage = req.flash('question')
-    const hotels = await hotelschema.find({})
-    const foods = await foodschema.find({})
-    const varients = await varientschema.find({})
+    const hotels = await hotelschema.find({});
+    const varients = await varientschema.find({});
+    const selectedPage = req.query.page || 1;
+    const skip = (selectedPage - 1) * 5;
+
     const ratecollections = await rateschema.aggregate([
       {
         $lookup: {
@@ -36,18 +36,38 @@ const rate = async (req, res) => {
           foreignField: "_id",
           as: "varientDetails"
         }
-      }
+      },
+      { $skip: skip },
+      { $limit: 5 }
     ]);
+    const foodss=await foodschema.find({is_blocked:false});
+    console.log(foodss)
+
+    const noOfDoc = await rateschema.countDocuments();
+    const TotalPage = Math.ceil(noOfDoc / 5);
+    const startIndex = skip + 1;
+
     res.render('admin/rate', {
-      successmessage, errormessage, existmessage, questionmessage,
-      hotels, foods, varients, ratecollections
-    })
+      successmessage: req.flash('success'),
+      errormessage: req.flash('error'),
+      existmessage: req.flash('exist'),
+      questionmessage: req.flash('question'),
+      hotels,
+      foodss,
+      varients,
+      ratecollections,
+      TotalPage,
+      startIndex
+    });
+
   } catch (error) {
-    console.log(error)
-    req.flash('error', "An Error Occured")
-    res.redirect('/admin/rate')
+    console.error('Error in rate controller:', error);
+    req.flash('error', "An Error Occured");
+    res.redirect('/admin/rate');
   }
-}
+};
+
+
 
 const addrate = async (req, res) => {
   try {
@@ -148,9 +168,19 @@ const editrate = async (req, res) => {
   }
 }
 
+const deleterate = async(req,res)=>{
+  try {
+    const {deleteId}=req.body
+    await rateschema.findByIdAndDelete({_id:deleteId})
+    req.flash('success',"Data Deleted SuccessFully")
+    res.redirect('/admin/rate')
+  } catch (error) {
+    console.log(error)
+  }
+}
 
 
 
 
 
-module.exports = { rate, addrate, editrate }
+module.exports = { rate, addrate, editrate,deleterate }

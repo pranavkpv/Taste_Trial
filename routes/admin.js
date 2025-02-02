@@ -13,13 +13,14 @@ const ordercontroller=require("../controller/admin/ordercontroller")
 const returncontroller=require("../controller/admin/returncontroller")
 const couponcontroller=require("../controller/admin/couponcontroller")
 const reportController=require("../controller/admin/reportController")
+const dashboardController=require("../controller/admin/dashboardController")
 
 
 router.get("/login",admincontroller.login)
 router.post("/login",admincontroller.validLogin)
 
 
-router.get("/dashboard",admincontroller.dashboard)
+router.get("/dashboard",dashboardController.dashboard)
 router.get("/usermanagement",usermanagecontroller.usermanagement)
 router.post("/blockUser",usermanagecontroller.blockUser)
 router.post("/unblockUser",usermanagecontroller.unblockUser)
@@ -73,6 +74,7 @@ router.post("/deletevarient",varientcontroller.deletevarient)
 router.get("/rate",ratecontroller.rate)
 router.post("/addrate",upload.array('images',3),ratecontroller.addrate)
 router.post("/editRate",upload.array('images',3),ratecontroller.editrate)
+router.post("/deleterate",ratecontroller.deleterate)
 
 
 

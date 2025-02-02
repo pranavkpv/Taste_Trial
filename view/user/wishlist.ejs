@@ -1,105 +1,32 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-<link rel="stylesheet" href="/dashboard.css">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <style>
+  /* Consolidated and corrected styles */
   body {
-    font-family: auto;
+    font-family: 'Arial', sans-serif;
+    background-color: #f5f6fa;
   }
 
+  /* Update profile header to match theme */
   .profile-header {
-    background-color: #f44336;
+    background-color: #343a40;
+    /* Changed from red to match menu */
     color: white;
     padding: 20px;
     text-align: center;
     position: relative;
   }
 
-  .profile-header .edit-profile {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-  }
-
-  .menu {
-    background-color: #fff;
-    border-right: 1px solid #ddd;
-    min-height: 100vh;
-    padding: 20px;
-  }
-
-  .menu a {
-    display: block;
-    padding: 10px;
-    color: #333;
-    text-decoration: none;
-  }
-
-  .menu a:hover {
-    background-color: #f8f9fa;
-    border-radius: 5px;
-  }
-
-  .address-card {
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    padding: 15px;
-  }
-
-  footer {
-    background-color: black;
-    color: white;
-    padding: 20px 0;
-  }
-
-  footer a {
-    color: white;
-    text-decoration: none;
-  }
-
-  body {
-    font-family: 'Arial', sans-serif;
-    background-color: #f5f6fa;
-  }
-
-  .menu {
-    height: 100vh;
-    background-color: #343a40;
-    padding-top: 20px;
-    padding-left: 15px;
-    border-right: 2px solid #dee2e6;
-  }
-
-  .menu a {
-    display: block;
-    padding: 10px 15px;
-    color: #ced4da;
-    text-decoration: none;
-    margin-bottom: 10px;
-    border-radius: 5px;
-    transition: background 0.3s, color 0.3s;
-  }
-
-  .menu a.wishlist,
-  .menu a:hover {
-    background-color: #495057;
-    color: #f8f9fa;
-  }
-
+  /* Rest of the styles remain the same but organized better */
   .content-header {
     background-color: #ffffff;
     padding: 20px;
     border-bottom: 2px solid #dee2e6;
   }
-
-  .content-header h1 {
-    font-size: 1.8rem;
-    color: #495057;
-  }
-
 
   .wishlist-title {
     font-size: 2.5rem;
@@ -114,7 +41,11 @@
     transition: transform 0.3s ease-in-out;
   }
 
-  .wishlist-card:hover {
+  .hover-lift {
+    transition: transform 0.2s ease;
+  }
+
+  .hover-lift:hover {
     transform: translateY(-5px);
   }
 
@@ -131,81 +62,202 @@
   .remove-btn {
     font-size: 0.8rem;
   }
-</style>
-<%- include('partials/profileheadr') %>
 
+  .empty-state {
+    padding: 3rem;
+    background: #f8f9fa;
+    border-radius: 1rem;
+  }
+
+  .object-fit-cover {
+    object-fit: cover;
+  }
+</style>
+
+<%- include('partials/userheader') %>
 <div class="row">
   <div class="col-md-2 menu">
     <%- include('partials/profileside') %>
   </div>
 
-  <div class="col-md-10 mt-5 ">
-    <div class="text-center mb-4">
-      <h1 class="wishlist-title">My Wishlist</h1>
-      <p class="text-muted">All your favorite items in one place!</p>
-    </div>
-    <div class="row">
-      <!-- Wishlist Item 1 -->
-      <% wishlistData.forEach(element => { %>
-      <div class="col-md-4">
-        <div class="card wishlist-card shadow-sm ms-4">
-          <img src="<%= element.rateDetails[0].images[0] %>" class="card-img-top" alt="Item Image" style="width:300px">
-          <div class="card-body">
-            <h5 class="card-title"><%= element.foodDetails[0].foodname %></h5>
-            <p class="card-text text-muted">
-              The food item belongs to the <%= element.categoryDetails[0].categoryname %> category,
-              and a variant of <%= element.foodDetails[0].foodname %> (<%= element.varientDetails[0].varientname %>)
-              has been added under the hotel name "<%= element.hotelDetails[0].hotelname %>"</p>
-            <div class="d-flex justify-content-between align-items-center">
-              <span class="price">$<%= element.rateDetails[0].rate %></span>
-              <button class="btn btn-danger btn-sm remove-btn" data-bs-toggle="modal" data-bs-target="#removewishlist"
-                onclick="removefun('<%= element._id %>')">Remove</button>
+  <!-- Wishlist Container -->
+  <div class="col-md-10">
+    <div class="bg-light" style="margin-top: 85px;">
+      <div class="row justify-content-center">
+        <div class="col-md-10">
+          <!-- Wishlist Header -->
+          <div class="text-center mb-5">
+            <h1 class="display-4 fw-bold text-primary">My Wishlist</h1>
+            <p class="lead text-muted">Discover and save your favorite culinary delights</p>
+            <div class="wishlist-stats mt-3">
+              <span class="badge bg-primary rounded-pill px-3 py-2 me-2">
+                <%= wishlistData.length %> Items
+              </span>
             </div>
+          </div>
+
+          <!-- Wishlist Grid -->
+          <div class="row g-4">
+            <% if (!wishlistData || wishlistData.length === 0) { %>
+            <div class="col-12 text-center py-5">
+              <div class="empty-state">
+                <i class="bi bi-heart text-muted" style="font-size: 4rem;"></i>
+                <h3 class="mt-4">Your Wishlist is Empty</h3>
+                <p class="text-muted">Start exploring our menu to add your favorite items!</p>
+                <a href="/menu" class="btn btn-primary mt-3">Browse Menu</a>
+              </div>
+            </div>
+            <% } else { %>
+              <% wishlistData.forEach(items => { %>
+                <div class="col-md-4 mb-4">
+                  <div class="card h-100 border-0 shadow-sm hover-lift">
+                    <!-- Image Container -->
+                    <div class="position-relative">
+                      <img src="<%= items.rateDetails[0].images[0] %>" class="card-img-top object-fit-cover"
+                        alt="<%= items.foodDetails[0].foodname %>" style="height: 250px;">
+                      <span class="position-absolute top-0 end-0 m-2 badge bg-primary">
+                        <%= items.categoryDetails[0].categoryname %>
+                      </span>
+    
+                    </div>
+    
+                    <!-- Card Content -->
+                    <div class="card-body">
+                      <div class="d-flex justify-content-between align-items-start mb-3">
+                        <h5 class="card-title mb-0 fw-bold">
+                          <%= items.foodDetails[0].foodname %>
+                        </h5>
+                        <span class="price h5 text-primary mb-0">
+                          $<%= items.rateDetails[0].rate.toFixed(2) %>
+                        </span>
+                      </div>
+    
+                      <div class="mb-3">
+                        <small class="text-muted">
+                          <i class="bi bi-shop me-1"></i>
+                          <%= items.hotelDetails[0].hotelname %>
+                        </small>
+                        <br>
+                        <small class="text-muted">
+                          <i class="bi bi-tag me-1"></i>
+                          <%= items.varientDetails[0].varientname %>
+                        </small>
+                      </div>
+    
+                      <!-- Action Buttons -->
+                      <div class="d-flex gap-2 mt-auto">
+                        <% let k = 0; %> <!-- Declare `k` at the top -->
+                        <% carts.forEach(element => { %>
+                          <% if (element.rate_id.toString() === items.rateDetails[0]._id.toString()) { k++; } %>
+                        <% }) %>
+                        
+                        <button class="btn btn-outline-primary flex-grow-1" onclick="addToCart('<%= items._id %>')">
+                          <i class="bi bi-cart-plus me-1"></i>
+                          <%= k === 0 ? "Add To Cart" : "Already Added to Cart" %>
+                        </button>
+                        
+                        <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#removewishlist"
+                          onclick="removefun('<%= items._id %>')">
+                          <i class="bi bi-trash"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <% }) %>
+            <% } %>
+          </div>
+
+          <!-- Pagination -->
+          <div class="d-flex justify-content-center gap-2 mt-5">
+            <% for(let i = 1; i <= page; i++) { %>
+            <button class="btn <%= selectedPage === i ? 'btn-primary' : 'btn-outline-primary' %>"
+              onclick="pagination('<%= i %>')">
+              <%= i %>
+            </button>
+            <% } %>
           </div>
         </div>
       </div>
-
-      <% }) %>
-      <!-- Add more wishlist items as needed -->
     </div>
   </div>
+</div>
 
-  <!-- remove Address -->
-  <div class="modal fade" id="removewishlist" tabindex="-1" aria-labelledby="removeWishlistModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered custom-modal-width">
-      <div class="modal-content">
-        <form action="/user/removeWishlist" method="post">
-          <input type="hidden" id="removeid" name="removeid">
-          <div class="modal-body">
-            <p>Do you want to Remove the Item from Cart?</p>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
-            <button type="submit" class="btn btn-success">Yes</button>
-          </div>
-        </form>
-      </div>
+
+<!-- Remove Item Modal -->
+<div class="modal fade" id="removewishlist" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form action="/user/removeWishlist" method="post">
+        <input type="hidden" id="removeid" name="removeid">
+        <input type="hidden" id="rateId" value="<%= wishlistData[0].rateDetails[0]._id %>">
+        <div class="modal-body text-center p-4">
+          <i class="bi bi-exclamation-circle text-warning display-4 mb-3"></i>
+          <h5>Remove from Wishlist?</h5>
+          <p class="text-muted">Are you sure you want to remove this item from your wishlist?</p>
+        </div>
+        <div class="modal-footer border-top-0">
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-danger">Remove Item</button>
+        </div>
+      </form>
     </div>
   </div>
+</div>
 
-  <%- include('partials/userfooter') %>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-    crossorigin="anonymous"></script>
 
-  <script>
-    function removefun(id) {
-      document.getElementById('removeid').value = id
+<%- include('partials/userfooter') %>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+  integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+<script>
+  function removefun(id) {
+    document.getElementById('removeid').value = id
+  }
+
+  function pagination(selectedpage) {
+    window.location.href = `/user/wishlist?page=${ selectedpage }`
+  }
+
+  async function addToCart() {
+    const rateId = document.getElementById('rateId').value
+    const response = await fetch('/user/AddToCart', {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ rateId: rateId })
+    })
+    const data = await response.json()
+    if (data.exist) {
+      Swal.fire({
+        title: data.exist,
+        icon: "info",
+        draggable: true
+      });
     }
-  </script>
+    if(data.nostock){
+      Swal.fire({
+        title: data.nostock,
+        icon: "info",
+        draggable: true
+      });
+    }
+    if(data.success){
+      Swal.fire({
+        title: data.success,
+        icon: "success",
+        draggable: true
+      });
+    }
+  }
+</script>
 
-  <% if (successmessage && successmessage.length>0) { %>
-  <script>
-    Swal.fire({
-      text: "<%= successmessage %>",
-      icon: "success"
-    });
-  </script>
-  <% } %>
+<% if (successmessage && successmessage.length>0) { %>
+<script>
+  Swal.fire({
+    text: "<%= successmessage %>",
+    icon: "success"
+  });
+</script>
+<% } %>

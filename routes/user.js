@@ -13,6 +13,8 @@ const profilecontroller=require("../controller/user/profilecontroller")
 const categorycontroller=require("../controller/user/categorycontroller")
 const cartcontroller=require("../controller/user/cartcontroller")
 const wishlistcontroller=require("../controller/user/wishlistcontroller")
+const walletcontroller = require("../controller/user/walletController")
+const changePasswordController = require("../controller/user/changePassword")
 
 // Route to start the Google OAuth login
 router.get('/auth/google', passport.authenticate('google', {
@@ -26,7 +28,6 @@ router.get('/signup',usercontroller.usersignup)
 router.post('/verifyOTP',usercontroller.adduser)
 router.post('/resendOTP',usercontroller.resendOTP)
 //login
-router.get('/login',usercontroller.userlogin)
 router.post('/login',usercontroller.validuser)
 
 // verifyOTP
@@ -83,14 +84,18 @@ router.post('/removeCart',cartcontroller.removeCart)
 router.get('/wishlist',wishlistcontroller.wishlist)
 router.post('/addToWishlist',wishlistcontroller.addToWishlist)
 router.post('/removeWishlist',wishlistcontroller.removeWishlist)
+router.post('/removeWishData',wishlistcontroller.removeWishData)
+router.post('/AddToCart',wishlistcontroller.AddToCart)
+
+
 
 
 //wallet
 router.get('/wallet',usercontroller.wallet)
 
 //change account
-router.get('/changepassword',usercontroller.change)
-router.post('/changepassword',usercontroller.changepassword)
+router.get('/changepassword',changePasswordController.change)
+router.post('/changepassword',changePasswordController.changepassword)
 
 //product Detail
 router.get('/productDetail',userproductDetailController.productDetail)
@@ -111,6 +116,11 @@ router.post('/orderReturn',profilecontroller.orderReturn)
 router.get('/orderDetails',profilecontroller.orderDetails)
 
 router.post('/applyCoupon',usercontroller.applyCoupon)
+router.post('/removeCoupon',usercontroller.removeCoupon)
+
+
+router.get('/wallethistory',walletcontroller.wallet)
+router.get('/download-invoice',usercontroller.downloadBill)
 
 router.get('/logout',usercontroller.logout)
 

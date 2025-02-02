@@ -1,312 +1,290 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-<link rel="stylesheet" href="/dashboard.css">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <style>
-  body {
-    font-family: auto;
-  }
-
-  .profile-header {
-    background-color: #f44336;
-    color: white;
-    padding: 20px;
-    text-align: center;
-    position: relative;
-  }
-
-  .profile-header .edit-profile {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-  }
-
-  .menu {
-    background-color: #fff;
-    border-right: 1px solid #ddd;
-    min-height: 100vh;
-    padding: 20px;
-  }
-
-  .menu a {
-    display: block;
-    padding: 10px;
-    color: #333;
-    text-decoration: none;
-  }
-
-  .menu a:hover {
-    background-color: #f8f9fa;
-    border-radius: 5px;
-  }
-
-  .address-card {
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    padding: 15px;
-  }
-
-  footer {
-    background-color: black;
-    color: white;
-    padding: 20px 0;
-  }
-
-  footer a {
-    color: white;
-    text-decoration: none;
+  :root {
+      --primary-color: #4f46e5;
+      --success-color: #10b981;
+      --danger-color: #ef4444;
+      --warning-color: #f59e0b;
+      --light-bg: #f9fafb;
   }
 
   body {
-    font-family: 'Arial', sans-serif;
-    background-color: #f5f6fa;
+      background-color: var(--light-bg);
   }
 
-  .menu {
-    height: 100vh;
-    background-color: #343a40;
-    padding-top: 20px;
-    padding-left: 15px;
-    border-right: 2px solid #dee2e6;
+  .cart-header {
+      background: linear-gradient(135deg, var(--primary-color), #818cf8);
+      color: white;
+      padding: 2rem;
+      border-radius: 15px;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   }
 
-  .menu a {
-    display: block;
-    padding: 10px 15px;
-    color: #ced4da;
-    text-decoration: none;
-    margin-bottom: 10px;
-    border-radius: 5px;
-    transition: background 0.3s, color 0.3s;
-  }
-
-  .menu a.cart,
-  .menu a:hover {
-    background-color: #495057;
-    color: #f8f9fa;
-  }
-
-  .content-header {
-    background-color: #ffffff;
-    padding: 20px;
-    border-bottom: 2px solid #dee2e6;
-  }
-
-  .content-header h1 {
-    font-size: 1.8rem;
-    color: #495057;
-  }
-
-  body {
-    background-color: #f5f5f5;
+  .cart-container {
+      padding: 2rem;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   }
 
   .cart-table {
-    margin-top: 40px;
-    background: #ffffff;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
-    padding: 20px;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 2rem;
   }
 
-  .cart-header {
-    font-size: 1.8rem;
-    font-weight: bold;
-    color: #343a40;
+  .table {
+      margin-bottom: 0;
   }
 
-  .product-image {
-    width: 80px;
-    height: 80px;
-    object-fit: cover;
-    border-radius: 8px;
-  }
-
-  .table th,
-  .table td {
-    vertical-align: middle;
-    text-align: center;
-  }
-
-  .btn-update {
-    background: #0d6efd;
-    border: none;
-    color: white;
-    transition: all 0.3s ease;
-  }
-
-  .btn-update:hover {
-    background: #0056b3;
-  }
-
-  .btn-remove {
-    background: #dc3545;
-    border: none;
-    color: white;
-    transition: all 0.3s ease;
-  }
-
-  .btn-remove:hover {
-    background: #b02a37;
-  }
-
-  body {
-    background-color: #f8f9fa;
-  }
-
-
-  .cart-container {
-    background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    padding: 30px;
-  }
-
-  .cart-header {
-    font-size: 2rem;
-    font-weight: bold;
-    text-align: center;
-    margin-bottom: 20px;
-    color: #343a40;
-  }
-
-  .table th,
-  .table td {
-    text-align: center;
-    vertical-align: middle;
+  .table thead {
+      background: var(--primary-color);
+      color: white;
   }
 
   .table th {
-    background-color: #6c757d;
-    color: white;
+      padding: 1rem;
+      font-weight: 500;
+      border: none;
+      white-space: nowrap;
   }
 
-  .btn-update,
-  .btn-remove,
-  .btn-checkout {
-    transition: all 0.3s ease;
+  .table td {
+      padding: 1rem;
+      vertical-align: middle;
+      border-bottom: 1px solid #e5e7eb;
   }
 
-  .btn-update:hover {
-    background-color: #0056b3;
+  .product-img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 8px;
+      transition: transform 0.3s ease;
   }
 
-  .btn-remove:hover {
-    background-color: #b02a37;
+  .product-img:hover {
+      transform: scale(1.1);
+  }
+
+  .form-check-input {
+      width: 1.2rem;
+      height: 1.2rem;
+      cursor: pointer;
+  }
+
+  .quantity-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+  }
+
+  .quantity-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 6px;
+      border: none;
+      background: var(--light-bg);
+      color: var(--primary-color);
+      font-weight: bold;
+      transition: all 0.3s ease;
+  }
+
+  .quantity-btn:hover {
+      background: var(--primary-color);
+      color: white;
+  }
+
+  .quantity {
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      background: var(--light-bg);
+      border-radius: 6px;
+  }
+
+  .btn-remove {
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      transition: all 0.3s ease;
+  }
+
+  .stock-badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.875rem;
+      background: #fee2e2;
+      color: var(--danger-color);
+  }
+
+  .total-row {
+      background: #f8fafc;
+      font-weight: 500;
+  }
+
+  .subtotal {
+      font-size: 1.1rem;
+      color: var(--primary-color);
+      font-weight: bold;
+  }
+
+  .btn-proceed {
+      background: var(--primary-color);
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+  }
+
+  .btn-proceed:hover {
+      background: #4338ca;
+      transform: translateY(-2px);
+  }
+
+  .pagination {
+      margin-top: 2rem;
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+  }
+
+  .page-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      border: none;
+      background: white;
+      color: var(--primary-color);
+      transition: all 0.3s ease;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  .page-btn.active {
+      background: var(--primary-color);
+      color: white;
+  }
+
+  .empty-cart {
+      text-align: center;
+      padding: 3rem;
+      color: #6b7280;
   }
 </style>
-<%- include('partials/profileheadr') %>
+<%- include('partials/userheader') %>
 
 <div class="row">
   <div class="col-md-2 menu">
     <%- include('partials/profileside') %>
   </div>
-
-  <!-- Main Content -->
-  <div class="container cart-container col-md-10">
-    <h2 class="cart-header">Your Shopping Cart</h2>
-    <p class="d-none"><%= userid %></p>
-
-    <table class="table table-bordered " style="margin-left: -119px;width: 1120px;">
-      <thead>
-        <tr>
-          <th class="fs-5">Select</th>
-          <th class="fs-5">Image</th>
-          <th class="fs-5">Product Name</th>
-          <th class="fs-5">Variant</th>
-          <th class="fs-5">Hotel</th>
-          <th class="fs-5">Rate</th>
-          <th class="fs-6" style="width:50px">Avail Stock</th>
-          <th class="fs-5">Quantity</th>
-          <th class="fs-5">Total</th>
-          <th class="fs-5">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% carts.forEach((element, index) => { %>
-        <tr>
-          <td>
-            <input type="checkbox" class="form-check-input check-cart" data-index="<%= index %>"
-              data-id="<%= element._id %>">
-          </td>
-          <td>
-            <img src="<%= element.rateDetails.images[0] %>" class="rounded" alt="Product" style="width:100px">
-          </td>
-          <td class="fs-6"><%= element.foodDetails.foodname %></td>
-          <td class="fs-6"><%= element.varientDetails[0].varientname %></td>
-          <td class="fs-6"><%= element.hotelDetails[0].hotelname %></td>
-          <% if (element.categoryDetails[0].offer>0 || element.foodDetails.offer>0) { %>
-            <% if (element.categoryDetails[0].offer > element.foodDetails.offer) { %>
-              <td class="fs-6 rateperunit">₹ <%= element.rateDetails.rate +
-                element.rateDetails.rate * element.rateDetails.gst_per / 100 +
-                element.rateDetails.rate * element.rateDetails.packing_per / 100 +
-                element.rateDetails.rate * element.rateDetails.delivery_per / 100 -
-                element.rateDetails.rate * element.categoryDetails[0].offer /100 %>
-            </td>
-            <% } else { %>
-              <td class="fs-6 rateperunit">₹ <%= element.rateDetails.rate +
-                element.rateDetails.rate * element.rateDetails.gst_per / 100 +
-                element.rateDetails.rate * element.rateDetails.packing_per / 100 +
-                element.rateDetails.rate * element.rateDetails.delivery_per / 100 -
-                element.rateDetails.rate * element.foodDetails.offer /100 %>
-            </td>  
-            <% } %>
-            <% } else { %>
-              <td class="fs-6 rateperunit">₹ <%= element.rateDetails.rate +
-                  element.rateDetails.rate * element.rateDetails.gst_per / 100 +
-                  element.rateDetails.rate * element.rateDetails.packing_per / 100 +
-                  element.rateDetails.rate * element.rateDetails.delivery_per / 100 %>
-              </td>    
-          <% } %>
-          <td class="fs-6 text-danger availQty"><%= element.rateDetails.stock %></td>
-          <td>
-            <button class="decrease btn btn-secondary">-</button>
-            <span class="quantity" name="cartstock"><%= element.number %></span>
-            <button class="increase btn btn-secondary" onclick="checkQtyfun()">+</button>
-          </td>
-          <td class="fs-6 totalRate">
-          </td>
-          <td>
-            <button class="btn btn-danger btn-sm btn-remove" data-bs-toggle="modal" data-bs-target="#removefromCart"
-              onclick="removefromCart('<%= element._id %>')">Remove</button>
-          </td>
-        </tr>
-        <% }) %>
-        <% if (carts.length == 0) { %>
-        <h4 style="margin-top: 7rem;text-align: center;">No Data Found</h4>
-        <% } else { %>
-
-        <tr <% if (selectedpage!==totalPages) { %> class="d-none" <% } %>>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td>Total Amount:</td>
-          <td><span class="subtotal">₹ <span id="total-amount"></span></span></td>
-          <td>
-            <button id="proceed" class="btn btn-primary">Proceed with Selected</button>
-          </td>
-        </tr>
-
-        <% } %>
-      </tbody>
-    </table>
-    <div style="margin-top: 600px;margin-left: 500px;">
-      <% for (let i = 1; i <= totalPages; i++) { %>
-      <button onclick="loadPage('<%= i %>')" class="btn <%= i === selectedpage ? 'btn-danger' : 'btn-success' %>">
-        <%= i %>
-      </button>
-      <% } %>
-
+  <div class="col-md-10">
+    <div class="cart-header" style="margin-top:85px">
+      <h2 class="mb-0">Your Shopping Cart</h2>
+      <p class="mb-0 text-white-50">Manage your selected items</p>
     </div>
 
+    <div class="cart-container">
+      <div class="table-responsive cart-table">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>
+                <input type="checkbox" class="form-check-input" id="selectAll">
+              </th>
+              <th>Product</th>
+              <th>Details</th>
+              <th>Price</th>
+              <th>Stock</th>
+              <th>Quantity</th>
+              <th>Total</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (carts.length === 0) { %>
+            <tr>
+              <td colspan="8">
+                <div class="empty-cart">
+                  <i class="fas fa-shopping-cart fa-3x mb-3"></i>
+                  <h4>Your cart is empty</h4>
+                  <p>Add items to get started</p>
+                </div>
+              </td>
+            </tr>
+            <% } else { %>
+            <% carts.forEach((element, index) => { %>
+            <tr>
+              <td>
+                <input type="checkbox" class="form-check-input check-cart" data-index="<%= index %>"
+                  data-id="<%= element._id %>">
+              </td>
+              <td>
+                <img src="<%= element.rateDetails.images[0] %>" class="product-img"
+                  alt="<%= element.foodDetails.foodname %>">
+              </td>
+              <td>
+                <h6 class="mb-1"><%= element.foodDetails.foodname %></h6>
+                <small class="text-muted">
+                  <%= element.varientDetails[0].varientname %><br>
+                  <%= element.hotelDetails[0].hotelname %>
+                </small>
+              </td>
+              <td class="rateperunit">
+                ₹ <%= element.rateDetails.rate %>
+              </td>
+              <td>
+                <span class="stock-badge">
+                  <%= element.rateDetails.stock %> left
+                </span>
+              </td>
+              <td>
+                <div class="quantity-controls">
+                  <button class="quantity-btn decrease">-</button>
+                  <span class="quantity"><%= element.number %></span>
+                  <button class="quantity-btn increase">+</button>
+                </div>
+              </td>
+              <td class="totalRate fw-bold">
+                ₹ <%= totalAmount %>
+              </td>
+              <td>
+                <button class="btn btn-danger btn-remove" data-bs-toggle="modal" data-bs-target="#removefromCart"
+                  onclick="removefromCart('<%= element._id %>')">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </td>
+            </tr>
+            <% }) %>
+
+            <tr class="total-row">
+              <td colspan="6" class="text-end">Total Amount:</td>
+              <td class="subtotal">₹ <span id="total-amount">0</span></td>
+              <td>
+                <button class="btn btn-proceed" id="proceed">
+                  Proceed <i class="fas fa-arrow-right ms-2"></i>
+                </button>
+              </td>
+            </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pagination">
+        <% for (let i = 1; i <= totalPages; i++) { %>
+        <button class="page-btn <%= i === selectedpage ? 'active' : '' %>" onclick="loadPage('<%= i %>')">
+          <%= i %>
+        </button>
+        <% } %>
+      </div>
+    </div>
   </div>
+
+
 </div>
 
 <!-- remove modal -->
@@ -427,7 +405,7 @@
     }).then((result) => {
       if (result.isConfirmed) {
         // Redirect or handle form submission here
-        window.location.href = `/user/confirmorder?&cartIDS=${ cartIDS }&purchaseQty=${purchaseQty}`;
+        window.location.href = `/user/confirmorder?&cartIDS=${ cartIDS }&purchaseQty=${ purchaseQty }`;
       }
     });
   });
@@ -554,37 +532,37 @@
 
 
   document.querySelectorAll('.increase, .decrease').forEach(button => {
-  button.addEventListener('click', function () {
-    const row = this.closest('tr');
-    const quantityEl = row.querySelector('.quantity');
-    const availableQty = parseInt(row.querySelector('.availQty').textContent);
-    const rateEl = row.querySelector('.rateperunit');
-    const totalEl = row.querySelector('.totalRate');
-    const ratePerUnit = parseFloat(rateEl.textContent.replace('₹', '').trim());
-    let quantity = parseInt(quantityEl.textContent);
+    button.addEventListener('click', function () {
+      const row = this.closest('tr');
+      const quantityEl = row.querySelector('.quantity');
+      const availableQty = parseInt(row.querySelector('.availQty').textContent);
+      const rateEl = row.querySelector('.rateperunit');
+      const totalEl = row.querySelector('.totalRate');
+      const ratePerUnit = parseFloat(rateEl.textContent.replace('₹', '').trim());
+      let quantity = parseInt(quantityEl.textContent);
 
-    if (this.classList.contains('increase')) {
-      if (quantity < availableQty) {
-        quantity+1;
-      } else {
-        Swal.fire('Stock Limit Reached', '', 'info');
+      if (this.classList.contains('increase')) {
+        if (quantity < availableQty) {
+          quantity + 1;
+        } else {
+          Swal.fire('Stock Limit Reached', '', 'info');
+        }
+      } else if (this.classList.contains('decrease')) {
+        if (quantity > 1) {
+          quantity - 1;
+        } else {
+          Swal.fire('Minimum Quantity Reached', '', 'info');
+        }
       }
-    } else if (this.classList.contains('decrease')) {
-      if (quantity > 1) {
-        quantity-1;
-      } else {
-        Swal.fire('Minimum Quantity Reached', '', 'info');
-      }
-    }
 
-    // Update quantity in the UI
-    quantityEl.textContent = quantity;
+      // Update quantity in the UI
+      quantityEl.textContent = quantity;
 
-    // Update the total price
-    const total = quantity * ratePerUnit;
-    totalEl.textContent = `₹ ${total.toFixed(2)}`;
+      // Update the total price
+      const total = quantity * ratePerUnit;
+      totalEl.textContent = `₹ ${ total.toFixed(2) }`;
+    });
   });
-});
 
   function updateTotal(row, quantity) {
     const ratePerUnit = parseFloat(row.querySelector('.rateperunit').textContent.replace('₹', '').trim());
@@ -623,7 +601,7 @@
     }
 
   })
-  
+
 
 
 

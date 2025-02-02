@@ -9,15 +9,8 @@
       Item</button>
   </div>
 
-  <!-- Search Bar -->
-  <div class="row search-bar">
-    <div class="col-md-6 ">
-      <div class="input-group">
-        <span class="input-group-text bg-secondary text-light"><i class="fas fa-search"></i></span>
-        <input type="text" id="searchInput" class="form-control" placeholder="Search by Hotel...">
-      </div>
-    </div>
-  </div>
+  <!-- filter -->
+
 
   <!-- Table -->
   <div class="table-responsive custom-table-bg">
@@ -38,7 +31,7 @@
 
         <% ratecollections.forEach((element,index) => { %>
         <tr>
-          <td><%= index+1 %></td>
+          <td><%= startIndex+index %></td>
           <td><%= element.hotelDetails[0].hotelname %></td>
           <td><%= element.foodDetails[0].foodname %></td>
           <td><%= element.varientDetails[0].varientname %></td>
@@ -48,8 +41,9 @@
             <a class="text-dark" href="" data-bs-toggle="modal" data-bs-target="#editrateModal"
               onclick="editFun('<%= element.hotelDetails[0].hotelname %>','<%= element.foodDetails[0].foodname %>','<%= element.varientDetails[0].varientname %>','<%= element.rate %>','<%= element.gst_per %>','<%= element.delivery_per %>','<%= element.packing_per %>','<%= element.delivery_time %>','<%= element.images[0] %>','<%= element.images[1] %>','<%= element.images[2] %>','<%= element._id %>','<%= element.stock %>','<%= element.files[0] %>','<%= element.files[1] %>','<%= element.files[2] %>')"><i
                 class="bi bi-pencil-square"></i></a>
+            <a class="text-dark" href="" data-bs-toggle="modal" data-bs-target="#deleterateModal"
+              onclick="deletefun('<%= element._id %>')"><i class="bi bi-trash3-fill"></i></a>
           </td>
-          <td class="d-none isblocked" id="isblocked">true</td>
         </tr>
 
         <% }) %>
@@ -57,6 +51,13 @@
         <!-- /close the loop -->
       </tbody>
     </table>
+    <div id="pagination" style="text-align: center; margin-bottom: 20px;">
+      <% for (let i = 1; i <= TotalPage; i++) { %>
+      <button onclick="loadPage('<%= i %>')" class="btn btn-success">
+        <%= i %>
+      </button>
+      <% } %>
+    </div>
   </div>
 
 </div>
@@ -88,7 +89,7 @@
               <label for="addfoodinput" class="form-label">Food Name</label>
               <select class="form-control" type="text" name="food_id" id="addfoodname" placeholder="Enter Food name">
                 <option value="">select</option>
-                <% foods.forEach(element => { %>
+                <% foodss.forEach(element => { %>
                 <option value="<%= element._id %>"><%= element.foodname %></option>
                 <% }) %>
 
@@ -96,6 +97,9 @@
               <p class="text-danger d-none" id="addfoodnamepop">Please Select Foodname!</p>
 
             </div>
+
+            
+            
 
             <div class="mb-3">
               <label for="addvarientinput" class="form-label">Varient Name</label>
@@ -134,8 +138,8 @@
             <div class="mb-3">
               <label for="firstImage" class="form-label">Upload First Image</label>
               <input class="form-control" type="file" id="firstImage" accept="image/*"
-                onchange="initCropper(event, 'croppedImage1', 'cropContainer1','firstfilename')" name="images" >
-                <input type="hidden" id="firstfilename"></input>
+                onchange="initCropper(event, 'croppedImage1', 'cropContainer1','firstfilename')" name="images">
+              <input type="hidden" id="firstfilename"></input>
 
               <div id="cropContainer1" style="display: none; margin-top: 10px;">
                 <img id="croppedImage1" style="max-width: 100%; height: auto;" alt="Cropped Image">
@@ -145,7 +149,7 @@
 
               <div id="previewContainer1" style="margin-top: 10px; display: none;">
                 <img id="previewImage1" class="preview mt-3" style="max-width: 100%; height: auto;" alt="Preview Image">
-                
+
               </div>
 
               <input type="hidden" id="hiddenInput1" name="croppedImageData1">
@@ -157,7 +161,7 @@
               <label for="secondImage" class="form-label">Upload Second Image</label>
               <input class="form-control" type="file" id="secondImage" accept="image/*"
                 onchange="initCropper(event, 'croppedImage2', 'cropContainer2','secondfilename')" name="images">
-                <input type="hidden" id="secondfilename"></input>
+              <input type="hidden" id="secondfilename"></input>
 
               <div id="cropContainer2" style="display: none; margin-top: 10px;">
                 <img id="croppedImage2" style="max-width: 100%; height: auto;" alt="Cropped Image">
@@ -167,7 +171,7 @@
 
               <div id="previewContainer2" style="margin-top: 10px; display: none;">
                 <img id="previewImage2" class="preview mt-3" style="max-width: 100%; height: auto;" alt="Preview Image">
-                
+
               </div>
 
               <input type="hidden" id="hiddenInput2" name="croppedImageData2">
@@ -217,8 +221,7 @@
 
             <div class="mb-3">
               <label for="stock" class="form-label">Stock</label>
-              <input class="form-control" value="0" type="number" name="stock" id="addstock"
-                placeholder="Enter stock">
+              <input class="form-control" value="0" type="number" name="stock" id="addstock" placeholder="Enter stock">
               <p class="text-danger d-none" id="deliverytimepop">Please Enter valid stock</p>
             </div>
 
@@ -227,7 +230,7 @@
               <label for="thirdImage" class="form-label">Upload Third Image</label>
               <input class="form-control" type="file" id="thirdImage" accept="image/*"
                 onchange="initCropper(event, 'croppedImage3', 'cropContainer3','thirdfilename')" name="images">
-                <input type="hidden" id="thirdfilename"></input>
+              <input type="hidden" id="thirdfilename"></input>
 
               <div id="cropContainer3" style="display: none; margin-top: 10px;">
                 <img id="croppedImage3" style="max-width: 100%; height: auto;" alt="Cropped Image">
@@ -237,7 +240,7 @@
 
               <div id="previewContainer3" style="margin-top: 10px; display: none;">
                 <img id="previewImage3" class="preview mt-3" style="max-width: 100%; height: auto;" alt="Preview Image">
-                
+
               </div>
 
               <input type="hidden" id="hiddenInput3" name="croppedImageData3">
@@ -278,9 +281,12 @@
             <div class="mb-3">
               <label for="addfoodinput" class="form-label">Food Name</label>
               <select name="" id="editfoodname" class="form-control">
-                <% foods.forEach(element => { %>
+
+                <% foodss.forEach(element => { %>
                 <option value="<%= element.foodname %>"><%= element.foodname %></option>
                 <% }) %>
+
+
               </select>
 
             </div>
@@ -288,9 +294,9 @@
             <div class="mb-3">
               <label for="addvarientinput" class="form-label">Varient Name</label>
               <select name="" id="editvarientname" class="form-control">
-                 <% varients.forEach(element => { %>
-                  <option value="<%= element.varientname %>"><%= element.varientname %></option>
-                 <% }) %>
+                <% varients.forEach(element => { %>
+                <option value="<%= element.varientname %>"><%= element.varientname %></option>
+                <% }) %>
               </select>
             </div>
 
@@ -319,9 +325,10 @@
             <div class="mb-3">
               <label for="editfirstImage" class="form-label">Upload First Image</label>
               <input class="form-control" type="file" id="editfirstImage" accept="image/*"
-                onchange="initCropper(event, 'editcroppedImage1', 'editcropContainer1','editfirstfilename')" name="images" >
+                onchange="initCropper(event, 'editcroppedImage1', 'editcropContainer1','editfirstfilename')"
+                name="images">
               <input type="hidden" id="editfirstfilename" name="editfirstfilename">
-         
+
 
               <div id="editcropContainer1" style="display: none; margin-top: 10px;">
                 <img id="editcroppedImage1" style="max-width: 100%; height: auto;" alt="Cropped Image">
@@ -332,7 +339,7 @@
               <div id="editpreviewContainer1" style="margin-top: 10px; ">
                 <img id="editpreviewImage1" class="preview mt-3" style="max-width: 100%; height: auto;"
                   alt="Preview Image">
-                
+
               </div>
 
               <input type="hidden" id="edithiddenInput1" name="editcroppedImageData1">
@@ -341,9 +348,10 @@
             <div class="mb-3">
               <label for="editsecondImage" class="form-label">Upload Second Image</label>
               <input class="form-control" type="file" id="editsecondImage" accept="image/*"
-                onchange="initCropper(event, 'editcroppedImage2', 'editcropContainer2','editsecondfilename')" name="images">
-                <input type="hidden" id="editsecondfilename" name="editsecondfilename"></input>
-               
+                onchange="initCropper(event, 'editcroppedImage2', 'editcropContainer2','editsecondfilename')"
+                name="images">
+              <input type="hidden" id="editsecondfilename" name="editsecondfilename"></input>
+
 
 
               <div id="editcropContainer2" style="display: none; margin-top: 10px;">
@@ -355,7 +363,7 @@
               <div id="editpreviewContainer2" style="margin-top: 10px; ">
                 <img id="editpreviewImage2" class="preview mt-3" style="max-width: 100%; height: auto;"
                   alt="Preview Image">
-                
+
               </div>
 
               <input type="hidden" id="edithiddenInput2" name="editcroppedImageData2">
@@ -415,8 +423,9 @@
             <div class="mb-3">
               <label for="editthirdImage" class="form-label">Upload Third Image</label>
               <input class="form-control" type="file" id="editthirdImage" accept="image/*"
-                onchange="initCropper(event, 'editcroppedImage3', 'editcropContainer3','editthirdfilename')" name="images">
-                <input type="hidden" id="editthirdfilename" name="editthirdfilename"></input>
+                onchange="initCropper(event, 'editcroppedImage3', 'editcropContainer3','editthirdfilename')"
+                name="images">
+              <input type="hidden" id="editthirdfilename" name="editthirdfilename"></input>
 
               <div id="editcropContainer3" style="display: none; margin-top: 10px;">
                 <img id="editcroppedImage3" style="max-width: 100%; height: auto;" alt="Cropped Image">
@@ -427,7 +436,7 @@
               <div id="editpreviewContainer3" style="margin-top: 10px; ">
                 <img id="editpreviewImage3" class="preview mt-3" style="max-width: 100%; height: auto;"
                   alt="Preview Image">
-                
+
               </div>
 
               <input type="hidden" id="edithiddenInput3" name="editcroppedImageData3">
@@ -486,7 +495,7 @@
   <div class="modal-dialog modal-dialog-centered custom-modal-width">
     <div class="modal-content">
       <form action="/admin/deleterate" method="post">
-        <input type="hidden" id="deleteid" name="deleteid">
+        <input type="hidden" id="deleteid" name="deleteId">
         <div class="modal-body">
           <p>Do you want to delete the rate?</p>
         </div>
@@ -498,7 +507,10 @@
     </div>
   </div>
 </div>
+
+<%- include('partials/footer') %>
 <script>
+
   function validateForm() {
     const addhotel = document.getElementById('addhotel').value;
     const addhotelpop = document.getElementById('addhotelpop');
@@ -630,10 +642,13 @@
     return isValid;
   }
 
+  function deletefun(id) {
+    document.getElementById('deleteid').value = id
+  }
 
-  
 
-  function editFun(hotelname, foodname, varientname, rate, gst, delivery, packing, time, firstimage, secondimage, thirdimage,id,stock,file1,file2,file3) {
+
+  function editFun(hotelname, foodname, varientname, rate, gst, delivery, packing, time, firstimage, secondimage, thirdimage, id, stock, file1, file2, file3) {
     document.getElementById('edithotel').value = hotelname
     document.getElementById('editfoodname').value = foodname
     document.getElementById('editvarientname').value = varientname
@@ -642,7 +657,7 @@
     document.getElementById('editdeliveryper').value = delivery
     document.getElementById('editpackingper').value = packing
     document.getElementById('editdeliverytime').value = time
-    document.getElementById('editstock').value=stock
+    document.getElementById('editstock').value = stock
     gstamount = rate * gst / 100
     document.getElementById('editgstamount').value = gstamount
     deliveryamount = rate * delivery / 100
@@ -654,10 +669,10 @@
     document.getElementById('editpreviewImage1').src = firstimage
     document.getElementById('editpreviewImage2').src = secondimage
     document.getElementById('editpreviewImage3').src = thirdimage
-    document.getElementById('editid').value=id
-    document.getElementById('editfirstfilename').value=file1
-    document.getElementById('editsecondfilename').value=file2
-    document.getElementById('editthirdfilename').value=file3
+    document.getElementById('editid').value = id
+    document.getElementById('editfirstfilename').value = file1
+    document.getElementById('editsecondfilename').value = file2
+    document.getElementById('editthirdfilename').value = file3
 
 
 
@@ -722,46 +737,39 @@
 
 
 
-
-  // document.getElementById('addform').addEventListener('submit', function(event) {
-  //   event.preventDefault(); // Prevent default form submission
-  //   validateForm();
-  // });
-
-
   let croppers = {}; // Object to hold multiple cropper instances
 
   function initCropper(event, imageId, cropContainerId, filenameId) {
     const file = event.target.files[0]; // Get the selected file
     if (file) {
-        // Update the filename in the <p> tag
-        document.getElementById(filenameId).value = file.name;
+      // Update the filename in the <p> tag
+      document.getElementById(filenameId).value = file.name;
 
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            const image = document.getElementById(imageId);
-            image.src = e.target.result; // Set the image source to the file's data URL
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const image = document.getElementById(imageId);
+        image.src = e.target.result; // Set the image source to the file's data URL
 
-            // Show the crop container
-            document.getElementById(cropContainerId).style.display = 'block';
+        // Show the crop container
+        document.getElementById(cropContainerId).style.display = 'block';
 
-            // Destroy the previous cropper instance for this imageId if it exists
-            if (croppers[imageId]) {
-                croppers[imageId].destroy();
-            }
+        // Destroy the previous cropper instance for this imageId if it exists
+        if (croppers[imageId]) {
+          croppers[imageId].destroy();
+        }
 
-            // Initialize a new cropper instance for this image
-            croppers[imageId] = new Cropper(image, {
-                aspectRatio: 1, // Adjust as per your requirement
-                viewMode: 1,
-            });
-        };
-        reader.readAsDataURL(file);
+        // Initialize a new cropper instance for this image
+        croppers[imageId] = new Cropper(image, {
+          aspectRatio: 1, // Adjust as per your requirement
+          viewMode: 1,
+        });
+      };
+      reader.readAsDataURL(file);
     } else {
-        // If no file is selected, reset the filename display
-        document.getElementById(filenameId).textContent = "No file chosen";
+      // If no file is selected, reset the filename display
+      document.getElementById(filenameId).textContent = "No file chosen";
     }
-}
+  }
 
   function saveCroppedImage(imageId, cropContainerId, previewImageId, previewContainerId, hiddenInputId) {
     if (croppers[imageId]) {
@@ -840,6 +848,57 @@
     document.getElementById("packingcharge").value = rateInput * packingper / 100
     document.getElementById('totalRate').value = rateInput + (rateInput * gstPercentage / 100) + (rateInput * deliveryper / 100) + (rateInput * packingper / 100)
   })
+
+
+  function loadPage(selectedPage) {
+    window.location.href = `/admin/rate?page=${ selectedPage }`
+  }
+
+//   async function selectHotel() {
+//     console.log("selectHotel function called");
+//     const selectedHotel = document.getElementById('addhotel').value;
+//     const displayFood = document.getElementById('addfoodname');
+
+//     console.log("Selected Hotel:", selectedHotel);
+    
+//     try {
+//         const response = await fetch(`/admin/rate?hotel=${selectedHotel}`, {
+//             method: "GET",
+//             headers: {
+//                 "Content-Type": "application/json"
+//             }
+//         });
+
+//         console.log("Fetch request sent");
+
+//         if (!response.ok) {
+//             throw new Error('Network response was not ok');
+//         }
+//       
+//         console.log("Raw response data:", foodss);
+
+//         try {
+//             const data = JSON.parse(responseData);
+//             console.log("Parsed JSON data:", data);
+
+//             displayFood.innerHTML = '<option value="">select</option>'; 
+            
+//             data.forEach(food => {
+//                 const option = document.createElement('option');
+//                 option.value = food._id;
+//                 option.text = food.foodname;
+//                 displayFood.appendChild(option);
+//             });
+//         } catch (e) {
+//             console.error("Failed to parse JSON response:", e);
+//         }
+
+//     } catch (error) {
+//         console.error('There has been a problem with your fetch operation:', error);
+//     }
+// }
+
+
 
 
 
@@ -966,4 +1025,4 @@ document.querySelectorAll(".isblocked").forEach((statusElement, index) => {
   }); -->
 
 </script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

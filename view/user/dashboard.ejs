@@ -3,176 +3,180 @@
 <link rel="stylesheet" href="/dashboard.css">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <style>
-        body {
-            font-family: auto;
-        }
-        .profile-header {
-            background-color: #f44336;
-            color: white;
-            padding: 20px;
-            text-align: center;
-            position: relative;
-        }
-        .profile-header .edit-profile {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-        }
-        .menu {
-            background-color: #fff;
-            border-right: 1px solid #ddd;
-            min-height: 100vh;
-            padding: 20px;
-        }
-        .menu a {
-            display: block;
-            padding: 10px;
-            color: #333;
-            text-decoration: none;
-        }
-        .menu a:hover {
-            background-color: #f8f9fa;
-            border-radius: 5px;
-        }
-        .address-card {
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 15px;
-        }
-        footer {
-            background-color: black;
-            color: white;
-            padding: 20px 0;
-        }
-        footer a {
-            color: white;
-            text-decoration: none;
-        }
-        body {
-      font-family: 'Arial', sans-serif;
-      background-color: #f5f6fa;
-    }
+<style>
+  /* Custom CSS */
+  :root {
+      --primary-bg: #f8f9fa;
+      --card-hover: #f0f2f5;
+  }
 
-    .menu {
-      height: 100vh;
-      background-color: #343a40;
-      padding-top: 20px;
-      padding-left: 15px;
-      border-right: 2px solid #dee2e6;
-    }
+  body {
+      background-color: var(--primary-bg);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
 
-    .menu a {
-      display: block;
-      padding: 10px 15px;
-      color: #ced4da;
-      text-decoration: none;
-      margin-bottom: 10px;
-      border-radius: 5px;
-      transition: background 0.3s, color 0.3s;
-    }
+  .menu {
+      background-color: white;
+      min-height: 100vh;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+  }
 
-    .menu a.active, .menu a:hover {
-      background-color: #495057;
-      color: #f8f9fa;
-    }
+  .content-header {
+      padding: 2rem 1rem;
+      background-color: white;
+      border-radius: 10px;
+      margin-bottom: 2rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  }
 
-    .content-header {
-      background-color: #ffffff;
-      padding: 20px;
-      border-bottom: 2px solid #dee2e6;
-    }
+  .card {
+      border: none;
+      border-radius: 15px;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+  }
 
-    .content-header h1 {
-      font-size: 1.8rem;
-      color: #495057;
-    }
-
-    .main-content {
-      padding: 20px;
-    }
-
-    .card {
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      transition: transform 0.3s;
-    }
-
-    .card:hover {
+  .card:hover {
       transform: translateY(-5px);
-    }
-    </style>
- <%- include('partials/profileheadr') %> 
+      background-color: var(--card-hover);
+      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+  }
+
+  .card-icon {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+  }
+
+  .btn {
+      border-radius: 8px;
+      padding: 0.5rem 1.5rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+  }
+
+  .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  }
+
+  .main-content {
+      padding: 1rem;
+  }
+
+  /* Custom colors for cards */
+  .orders-icon { color: #4361ee; }
+  .wishlist-icon { color: #ef476f; }
+  .wallet-icon { color: #06d6a0; }
+  .account-icon { color: #118ab2; }
+  .support-icon { color: #ffd166; }
+  .logout-icon { color: #e63946; }
+</style>
+<%- include('partials/userheader') %>
     
+
 <div class="container-fluid">
-    <div class="row">
+  <div class="row">
       <!-- Sidebar -->
       <div class="col-md-2 menu">
-        <%- include('partials/profileside') %>
+          <%- include('partials/profileside') %>
       </div>
 
-  
       <!-- Main Content -->
-      <div class="col-md-10">
-        <div class="content-header">
-          <h1>Welcome to Your Dashboard</h1>
-          <h1 class="d-none"><%= userid %></h1>
-          <p class="text-muted">Manage your account, orders, and preferences here.</p>
-        </div>
-  
-        <div class="main-content">
-          <div class="row g-4">
-            <div class="col-md-4">
-              <div class="card p-3">
-                <h5 class="fw-bold">My Orders</h5>
-                <p>Track, return, or reorder your past purchases.</p>
-                <a href="#" class="btn btn-primary btn-sm">View Orders</a>
-              </div>
-            </div>
-  
-            <div class="col-md-4">
-              <div class="card p-3">
-                <h5 class="fw-bold">Wishlist</h5>
-                <p>Manage the items you've saved for later.</p>
-                <a href="#" class="btn btn-danger btn-sm">Manage Wishlist</a>
-              </div>
-            </div>
-  
-            <div class="col-md-4">
-              <div class="card p-3">
-                <h5 class="fw-bold">Wallet</h5>
-                <p>Check your wallet balance and transactions.</p>
-                <a href="#" class="btn btn-success btn-sm">View Wallet</a>
-              </div>
-            </div>
-  
-            <div class="col-md-4">
-              <div class="card p-3">
-                <h5 class="fw-bold">Account Settings</h5>
-                <p>Update your account information and password.</p>
-                <a href="#" class="btn btn-secondary btn-sm">Update Details</a>
-              </div>
-            </div>
-  
-            <div class="col-md-4">
-              <div class="card p-3">
-                <h5 class="fw-bold">Support</h5>
-                <p>Contact us for any help or queries.</p>
-                <a href="#" class="btn btn-warning btn-sm">Get Support</a>
-              </div>
-            </div>
-  
-            <div class="col-md-4">
-              <div class="card p-3">
-                <h5 class="fw-bold">Logout</h5>
-                <p>Log out of your account securely.</p>
-                <a href="#" class="btn btn-danger btn-sm">Logout</a>
-              </div>
-            </div>
+   
+      <div class="col-md-10 py-4 " style="margin-top: 100px;">
+          <div class="content-header ms-2">
+            <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='%236c757d'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                  <li class="breadcrumb-item"><a href="/user/home">Home</a></li>
+                  <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+                </ol>
+              </nav>
+              <h1 class="fw-bold">Welcome to Your Dashboard</h1>
+              <h1 class="d-none"><%= userid %></h1>
+              <p class="text-muted mb-0">Manage your account, orders, and preferences here.</p>
           </div>
-        </div>
+
+          <div class="main-content">
+              <div class="row g-4">
+                  <!-- Orders Card -->
+                  <div class="col-md-4">
+                      <div class="card h-100">
+                          <div class="card-body p-4">
+                              <i class="fas fa-shopping-bag card-icon orders-icon"></i>
+                              <h5 class="fw-bold mb-3">My Orders</h5>
+                              <p class="text-muted">Track, return, or reorder your past purchases.</p>
+                              <a href="/user/order" class="btn btn-primary mt-2">View Orders</a>
+                          </div>
+                      </div>
+                  </div>
+
+                  <!-- Wishlist Card -->
+                  <div class="col-md-4">
+                      <div class="card h-100">
+                          <div class="card-body p-4">
+                              <i class="fas fa-heart card-icon wishlist-icon"></i>
+                              <h5 class="fw-bold mb-3">Wishlist</h5>
+                              <p class="text-muted">Manage the items you've saved for later.</p>
+                              <a href="/user/wishlist" class="btn btn-danger mt-2">Manage Wishlist</a>
+                          </div>
+                      </div>
+                  </div>
+
+                  <!-- Wallet Card -->
+                  <div class="col-md-4">
+                      <div class="card h-100">
+                          <div class="card-body p-4">
+                              <i class="fas fa-wallet card-icon wallet-icon"></i>
+                              <h5 class="fw-bold mb-3">Wallet</h5>
+                              <p class="text-muted">Check your wallet balance and transactions.</p>
+                              <a href="/user/wallethistory" class="btn btn-success mt-2">View Wallet</a>
+                          </div>
+                      </div>
+                  </div>
+
+                  <!-- Account Settings Card -->
+                  <div class="col-md-4">
+                      <div class="card h-100">
+                          <div class="card-body p-4">
+                              <i class="fas fa-user-cog card-icon account-icon"></i>
+                              <h5 class="fw-bold mb-3">Account Settings</h5>
+                              <p class="text-muted">Update your account information and password.</p>
+                              <a href="/user/changeAccount" class="btn btn-info mt-2 text-white">Update Details</a>
+                          </div>
+                      </div>
+                  </div>
+
+                  <!-- Support Card -->
+                  <div class="col-md-4">
+                      <div class="card h-100">
+                          <div class="card-body p-4">
+                              <i class="fas fa-headset card-icon support-icon"></i>
+                              <h5 class="fw-bold mb-3">Support</h5>
+                              <p class="text-muted">Contact us for any help or queries.</p>
+                              <a href="#" class="btn btn-warning mt-2">Get Support</a>
+                          </div>
+                      </div>
+                  </div>
+
+                  <!-- Logout Card -->
+                  <div class="col-md-4">
+                      <div class="card h-100">
+                          <div class="card-body p-4">
+                              <i class="fas fa-sign-out-alt card-icon logout-icon"></i>
+                              <h5 class="fw-bold mb-3">Logout</h5>
+                              <p class="text-muted">Log out of your account securely.</p>
+                              <a href="#" class="btn btn-danger mt-2">Logout</a>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
       </div>
-    </div>
   </div>
+</div>
+
 
     
 

@@ -26,5 +26,5 @@ const userschema=new mongoose.Schema({
       enum:[true,false],
       default:false
     }
-})
+},{timestamps:true})
 module.exports=mongoose.model("user",userschema)

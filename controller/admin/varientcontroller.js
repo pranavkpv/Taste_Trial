@@ -3,6 +3,7 @@ const varientschema = require("../../model/varientschema")
 
 const varient = async (req, res) => {
    try {
+      const selectedfoodname = req.query.food
       const searchedvarientname = req.query.varient || ''; // Get the search query
       const selectedpage = Number(req.query.pagenumber) || 1; // Get the page number
       const limit = 5; // Number of categories per page
@@ -24,7 +25,7 @@ const varient = async (req, res) => {
       const successmessage = req.flash('success')
       const errormessage = req.flash('error')
       const editexistmessage = req.flash('editexist')
-      const foods = await foodschema.find({})
+      const foods = await foodschema.find({is_blocked:false})
       const varients = await varientschema.aggregate([{
          $lookup: {
             from: "foods",
@@ -37,8 +38,17 @@ const varient = async (req, res) => {
          $match:searchFilter
       },{$skip:skip},{$limit:limit}])
 
-      res.render('admin/varient', { varients, 
-         foods, existmessage, 
+      if(selectedfoodname && selectedfoodname != "both"){
+         var varientss=varients.filter((element)=>element.foodDetails[0]._id==selectedfoodname)
+         var foodss=await foodschema.findOne({_id:selectedfoodname})
+      }else{
+         var varientss=varients
+         var foodss="All"
+      }
+   
+      
+      res.render('admin/varient', { varientss, foodss,
+         foods, existmessage, selectedfoodname,
          successmessage, errormessage, editexistmessage, page, searchedvarientname,startIndex })
    } catch (error) {
          console.log(error)

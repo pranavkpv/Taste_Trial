@@ -1,11 +1,13 @@
 const categoryschema = require('../../model/categoryschema')
-
-const userload=async(req,res)=>{
+const userload = async (req, res) => {
    try {
-      const categories = await categoryschema.find({isdeleted:false})
-      res.render('user/load',{categories})
+      const successsavemessage =req.flash('successsavemessage')
+      res.render('user/load',{successsavemessage});
    } catch (error) {
-      console.log(error)
+      console.log("Error:", error);
+      res.status(500).json({ message: "Internal server error" });
    }
-}
+};
+
+
 module.exports={userload}

@@ -1,75 +1,289 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-<link rel="stylesheet" href="/dashboard.css">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<style>
+   :root {
+      --primary-color: #ff4757;
+      --secondary-color: #2ed573;
+   }
 
+   .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 2rem;
+      padding: 2rem;
+   }
+
+   .product-card {
+      background: white;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+      position: relative;
+   }
+
+   .product-card:hover {
+      transform: translateY(-5px);
+   }
+
+   .product-image {
+      position: relative;
+      height: 200px;
+      overflow: hidden;
+   }
+
+   .product-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+   }
+
+   .product-card:hover .product-image img {
+      transform: scale(1.1);
+   }
+
+   .food-type {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      padding: 5px 10px;
+      border-radius: 20px;
+      color: white;
+      font-size: 0.8rem;
+      font-weight: 600;
+      z-index: 1;
+   }
+
+   .veg {
+      background-color: var(--secondary-color);
+   }
+
+   .non-veg {
+      background-color: var(--primary-color);
+   }
+
+   .wishlist-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: white;
+      border: none;
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      z-index: 1;
+   }
+
+   .wishlist-btn:hover {
+      transform: scale(1.1);
+   }
+
+   .wishlist-btn i {
+      color: var(--primary-color);
+      font-size: 1.2rem;
+   }
+
+   .product-details {
+      padding: 1.5rem;
+   }
+
+   .hotel-name {
+      color: #666;
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+   }
+
+   .product-name {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #333;
+   }
+
+   .rating {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+   }
+
+   .stars {
+      color: #ffd700;
+   }
+
+   .review-count {
+      color: #666;
+      font-size: 0.9rem;
+   }
+
+   .duration {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #666;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+   }
+
+   .product-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 1.5rem;
+      border-top: 1px solid #eee;
+   }
+
+   .price {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #333;
+   }
+
+   .cart-btn {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 25px;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+   }
+
+   .cart-btn:hover {
+      background: #ff6b81;
+      transform: translateY(-2px);
+   }
+
+   .variants {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+   }
+
+   .variant {
+      padding: 0.3rem 0.8rem;
+      border: 1px solid #ddd;
+      border-radius: 15px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+   }
+
+   .variant.active {
+      background: var(--primary-color);
+      color: white;
+      border-color: var(--primary-color);
+   }
+</style>
 
 <%- include('partials/userheader') %>
-
-<div class="container mt-5">
-   <h2 class="my-5">Select Category and Purchase</h2>
-   <select id="letter" class="form-select form-select-lg mb-3" aria-label="Large select example" style="width:150px"
-      onchange="alphabet()"> <!-- Use onchange event -->
-      <option value="" disabled selected>Alphabetic </option> <!-- Add value="" to the placeholder -->
-      <option value="atz">A To Z or a to z</option>
-      <option value="zta">Z To A or z to a</option>
-   </select>
-   <div class="row">
-      <% categories.forEach(element => { %>
-      <div class="col-4 my-2"> <!-- Each column takes 1/3 of the row -->
-         <form action="/user/product" method="get">
-            <input type="hidden" name="categoryId" value="<%= element._id %>">
-            <div class="card animated-card shadow-lg">
-               <button type="submit" style="width: 100%; border: none;">
-                  <img src="<%= element.image %>" class="card-img-top card-img" alt="Card Image"
-                     style="height: 350px; object-fit: cover;">
-                  <div class="card-body text-center">
-                     <h5 class="card-title"><%= element.categoryname %></h5>
-
-                  </div>
-               </button>
-            </div>
-         </form>
+<nav
+   style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='%236c757d'/%3E%3C/svg%3E&#34;); margin-top: 100;"
+   aria-label="breadcrumb">
+   <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/user/home">Home</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Shop Page</li>
+   </ol>
+</nav>
+<div class="product-grid" style="margin-top:81px">
+   <% rates.forEach(element => { %>
+   <div class="product-card">
+      <div class="product-image">
+         <span class="food-type veg"><% if (element.foodDetails[0].is_veg=="veg") { %>
+            Veg
+            <% } else { %>
+            Non-Veg
+            <% } %></span>
+         <button class="wishlist-btn" id="wishlistBtn">
+            <i class="far fa-heart"></i>
+         </button>
+         <img src="<%= element.images[0] %>" alt="Food Item">
       </div>
-      <% }) %>
-
+      <div class="product-details">
+         <div class="hotel-name">
+            <i class="fas fa-hotel"></i> <%= element.hotelDetails[0].hotelname %>
+         </div>
+         <h3 class="product-name"><%= element.foodDetails[0].foodname %>(<%= element.varientDetails[0].varientname %>)
+         </h3>
+         <input type="hidden" value="<%= element._id %>" id="rateId">
+         <input type="hidden" value="<%= userId %>" id="userId">
+         <div class="rating">
+            <div class="stars">
+               <i class="fas fa-star"></i>
+               <i class="fas fa-star"></i>
+               <i class="fas fa-star"></i>
+               <i class="fas fa-star"></i>
+               <i class="fas fa-star-half-alt"></i>
+            </div>
+            <span class="review-count">(245 reviews)</span>
+         </div>
+         <div class="duration">
+            <i class="far fa-clock"></i>
+            <span>25-30 mins</span>
+         </div>
+         <div class="variants">
+            <span class="variant active">Full</span>
+            <span class="variant">Half</span>
+         </div>
+      </div>
+      <div class="product-footer">
+         <div class="price">₹ <%= element.rate %></div>
+         <button class="cart-btn">
+            <i class="fas fa-shopping-cart"></i>
+            Add to Cart
+         </button>
+      </div>
    </div>
+   <% }) %>
+
 </div>
-<div id="pagination" style="text-align: center; margin-bottom: 20px;">
-   <% for (let i = 1; i <= page; i++) { %>
-   <button onclick="loadPage('<%= i %>')" class="btn <%= i === selectedpage ? 'btn-danger' : 'btn-success' %>">
-      <%= i %>
-   </button>
-   <% } %>
 </div>
+
 <%- include('partials/userfooter') %>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
-   let debounceTimer;
+   document.addEventListener('DOMContentLoaded', function () {
+     document.getElementById('wishlistBtn')
+   
+   });
 
-   function searchItem(value) {
-      clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(() => {
-         const currentPage = 1; // Reset to the first page for a new search
-         window.location.href = `/user/category?pagenumber=${ currentPage }&category=${ encodeURIComponent(value) }`;
-      }, 700); // Adjust delay (in milliseconds) as needed
-   }
+   // Variant selection
+   document.querySelectorAll('.variant').forEach(variant => {
+      variant.addEventListener('click', function () {
+         this.parentElement.querySelectorAll('.variant').forEach(v => v.classList.remove('active'));
+         this.classList.add('active');
+      });
+   });
 
-   function alphabet() {
-      const alphabet = document.getElementById('letter').value; // Get the selected value
-      if (alphabet) {
-         const urlParams = new URLSearchParams(window.location.search); // Parse existing URL parameters
-         urlParams.set('alphabet', alphabet); // Set or update the 'alphabet' parameter
-         window.location.href = `/user/category?${ urlParams.toString() }`; // Redirect with updated parameters
-      }
-   }
+   // Add to cart animation
+   document.querySelectorAll('.cart-btn').forEach(btn => {
+      btn.addEventListener('click', function () {
+         this.style.transform = 'scale(0.95)';
+         setTimeout(() => {
+            this.style.transform = 'scale(1)';
+         }, 100);
+      });
+   });
+});
 
-   function loadPage(pageNumber) {
-      const urlParams = new URLSearchParams(window.location.search); // Parse existing URL parameters
-      urlParams.set('pagenumber', pageNumber); // Set or update the 'pagenumber' parameter
-      window.location.href = `/user/category?${ urlParams.toString() }`; // Redirect with updated parameters
-   }
+
+
+
 
 </script>
+</body>
+
+</html>

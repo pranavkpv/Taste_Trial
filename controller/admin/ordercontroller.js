@@ -5,6 +5,7 @@ const varientschema = require('../../model/varientschema')
 const userschema = require('../../model/usershema')
 const addressschema = require('../../model/addressschema')
 const categoryschema = require('../../model/categoryschema')
+const hotelschema = require('../../model/hotelschema')
 const { ObjectId } = require('mongodb');
 
 const order = async (req, res) => {
@@ -58,7 +59,8 @@ const order = async (req, res) => {
                as:"categoryDetails"
             }
          }
-         ,{$match:{"items.status":{$ne:"waiting for approval"}}}, { $sort: { createdAt: -1 } }
+         ,{$match:{"items.status":{$ne:"waiting for approval"}}}, { $sort: { createdAt: -1 } },
+         {$skip:skip},{$limit:limit}
       ]);
 
 
@@ -97,6 +99,7 @@ const orderDetails = async (req, res) => {
    try {
       const orders = await orderschema.findOne({ _id: new ObjectId(req.query.orderid) })
       const rates = await rateschema.findOne({ _id: new ObjectId(req.query.rateid) })
+      console.log(rates)
       const foods = await foodschema.findOne({ _id: rates.food_id })
       const categories = await categoryschema.findOne({_id:foods.category_id})
       const varients = await varientschema.findOne({ _id: rates.varient_id })
@@ -104,13 +107,15 @@ const orderDetails = async (req, res) => {
       const addresses = await addressschema.findOne({ _id: orders.address_id })
       const date = orders.createdAt
       const formattedDate = date.toISOString().split('T')[0];
+      const hotels=await hotelschema.findOne({_id:new ObjectId(rates.hotel_id)})
+      console.log(hotels)
       let Quantity=0
       for(let i=0;i<orders.items.length;i++){
          if(orders.items[i].rate_id.toString()==new ObjectId(req.query.rateid)){
               Quantity=orders.items[i].quantity
          }
       }
-      res.render('admin/orderDetails', { rates, foods, varients, users, addresses, formattedDate, orders,Quantity,categories })
+      res.render('admin/orderDetails', { rates,hotels, foods, varients, users, addresses, formattedDate, orders,Quantity,categories })
 
    } catch (error) {
       console.log(error)

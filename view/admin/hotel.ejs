@@ -136,7 +136,7 @@
                     </div>
                   </li>
                   <li>
-                    <% foods.forEach(element => { %>
+                    <% foodss.forEach(element => { %>
                     <div class="form-check">
                       <input class="form-check-input option-checkbox food-checkbox" type="checkbox" id="option1"
                         name="foodname" value="<%= element.foodname %>">
@@ -223,7 +223,7 @@
                       <label class="form-check-label" for="selectAll">Select All</label>
                     </div>
                   </li>
-                    <% foods.forEach(element => { %>
+                    <% foodss.forEach(element => { %>
                       <li class="editlist">
                           <input class="form-check-input option-checkbox editfood-checkbox" type="checkbox" id="editoptions"
                             name="foodname" value="<%= element._id %>">
@@ -300,6 +300,7 @@
   </div>
 </div>
 
+<%- include('partials/footer') %>
 <script>
 
 let debounceTimer;
@@ -505,6 +506,9 @@ function loadPage(pageNumber) {
   });
 
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <% if (existdatamessage && existdatamessage.length > 0) { %>
 <script>

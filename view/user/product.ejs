@@ -8,148 +8,386 @@
 
 
 <style>
-  /* Container Styling */
-  .card-container {
-    margin-top: 20px;
+  /* Base Styles */
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #f5f7fa;
+    margin: 0;
+    padding: 0;
   }
 
-  /* Food Card Styling */
-  .food-card {
-    background: white;
-    border: none;
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    text-align: left;
-    cursor: pointer;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
-
-  .food-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
-  }
-
-  /* Image Styling */
-  .food-img-container {
+  /* Header Banner */
+  .header-banner {
+    background: linear-gradient(45deg, #FF6B6B, #ee5253);
+    padding: 3rem 0;
     position: relative;
     overflow: hidden;
+    margin-top: 71px;
   }
 
-  .food-img {
+  .header-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: url('data:image/svg+xml,<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><circle cx="2" cy="2" r="1" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+    opacity: 0.3;
+  }
+
+  .banner-content {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Filter Bar */
+  .filter-bar {
+    margin-top: -25px;
+    position: relative;
+    z-index: 10;
+  }
+
+  .filter-wrapper {
+    background: white;
+    border-radius: 12px;
+    padding: 1.25rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+
+  .filter-select {
+    min-width: 160px;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    background-color: white;
+    color: #2d3436;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .filter-select:hover {
+    border-color: #FF6B6B;
+  }
+
+  .filter-select:focus {
+    outline: none;
+    border-color: #FF6B6B;
+    box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.2);
+  }
+
+  .offer-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    color: #2d3436;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .offer-toggle:hover {
+    border-color: #FF6B6B;
+  }
+
+  .offer-toggle.active {
+    background: #FF6B6B;
+    border-color: #FF6B6B;
+    color: white;
+  }
+
+  /* Products Grid */
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+    padding: 1.5rem 0;
+  }
+
+  /* Product Card */
+  .product-card {
     width: 100%;
-    height: 200px;
-    object-fit: cover;
-    transition: scale 0.3s ease;
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    border: none;
+    text-align: left;
+    position: relative;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
   }
 
-  .food-card:hover .food-img {
-    scale: 1.1;
+  .product-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+  }
+
+  .product-image-wrapper {
+    position: relative;
+    padding-top: 75%;
+    overflow: hidden;
+  }
+
+  .product-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+
+  .product-card:hover .product-image {
+    transform: scale(1.1);
   }
 
   .offer-badge {
     position: absolute;
-    top: 10px;
-    left: 10px;
-    background: #ff6b6b;
+    top: 12px;
+    right: 12px;
+    background: #FF6B6B;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+  }
+
+  .offer-content {
+    text-align: center;
     color: white;
-    padding: 5px 10px;
-    font-size: 14px;
-    border-radius: 20px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    line-height: 1;
   }
 
-  /* Details Section */
-  .food-details {
-    padding: 15px;
+  .offer-value {
+    display: block;
+    font-size: 1.25rem;
+    font-weight: 700;
   }
 
-  .food-title {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 5px;
-    color: #333;
+  .offer-label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 500;
   }
 
-  .food-hotel {
-    font-size: 14px;
-    color: #888;
-    margin-bottom: 10px;
+  .product-content {
+    padding: 1.5rem;
   }
 
-  .food-info {
+  .quick-info {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 1rem;
   }
 
-  .veg-badge,
-  .rating-badge {
-    font-size: 12px;
-    padding: 5px 10px;
+  .diet-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  .diet-badge.veg {
+    background: #def7ec;
+    color: #046c4e;
+  }
+
+  .diet-badge.non-veg {
+    background: #fde8e8;
+    color: #c81e1e;
+  }
+
+  .rating {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.5rem 0.75rem;
+    background: #fef3c7;
+    color: #92400e;
+    border-radius: 6px;
+    font-size: 0.875rem;
+  }
+
+  .rating i {
+    color: #fbbf24;
+  }
+
+  .product-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1a202c;
+    margin-bottom: 1rem;
+  }
+
+  .delivery-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .time {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #64748b;
+    font-size: 0.875rem;
+  }
+
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    .filter-wrapper {
+      padding: 1rem;
+    }
+
+    .filters {
+      flex-direction: column;
+      width: 100%;
+    }
+
+    .filter-select {
+      width: 100%;
+    }
+
+    .offer-toggle {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  /* Animations */
+  @keyframes fadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .product-card-wrapper {
+    animation: fadeUp 0.5s ease-out forwards;
   }
 </style>
 
 <%- include('partials/userheader') %>
 
-
-<!-- category of food -->
-<h1 class="h1  m-5">Available <%= categoryname.categoryname %></h1>
-<div class="sort m-5 d-flex gap-5">
-  <select id="isveg" class="form-select form-select-lg mb-3" aria-label="Large select example" style="width:120px"
-    onchange="isveg()"> <!-- Use onchange event -->
-    <option value="" disabled selected>Is Veg</option> <!-- Add value="" to the placeholder -->
-    <option value="veg">Veg</option>
-    <option value="non-veg">Non-Veg</option>
-    <option value="all">All</option>
-  </select>
-  <select id="duration" class="form-select form-select-lg mb-3" aria-label="Large select example" style="width:150px"
-    onchange="duration()"> <!-- Use onchange event -->
-    <option value="" disabled selected>Duration</option> <!-- Add value="" to the placeholder -->
-    <option value="lth">Low To High</option>
-    <option value="htl">High To Low</option>
-  </select>
+<!-- Dynamic Header Banner -->
+<div class="header-banner">
+  <div class="banner-content container">
+    <div class="banner-text">
+      <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='%236c757d'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/user/home">Home</a></li>
+          <li class="breadcrumb-item active" aria-current="page">Product</li>
+        </ol>
+      </nav>
+      <h1 class="display-4 fw-bold text-white mb-0"><%= categoryname.categoryname %></h1>
+      <div class="search-stats mt-2">
+        <span class="text-white-50">Showing <%= foods.length %> delicious options</span>
+      </div>
+    </div>
+  </div>
 </div>
-<!-- loop -->
-<div class="row">
-  <% foods.forEach(element=> { %>
-  <div class="col-3">
-    <div class="container mt-5">
-      <form action="/user/hotels" method="get" class="card-container"
-        style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
-        <!-- Hidden Inputs -->
-        <input type="hidden" name="foodId" value="<%= element._id  %>">
-        <!-- Food Card -->
-        <button type="submit" class="food-card">
-          <!-- Food Image -->
-          <div class="food-img-container">
-            <img src="<%= element.image %>" alt="Food Image" class="food-img">
+
+<!-- Floating Filter Bar -->
+<div class="filter-bar container">
+  <div class="filter-wrapper">
+    <div class="d-flex flex-wrap gap-3 align-items-center justify-content-between">
+      <div class="filters d-flex gap-3 flex-grow-1">
+        <select id="isveg" class="filter-select" onchange="isveg()">
+          <option value="" disabled selected>
+            <%= isveg=="veg" ? "Vegetarian" : (isveg=="non-veg" ? "Non-Vegetarian" : (isveg=="all" ? "All Items" : "Is Veg")) %>
+          </option>
+          <option value="veg">Vegetarian</option>
+          <option value="non-veg">Non-Vegetarian</option>
+          <option value="all">All Items</option>
+        </select>
+
+        <select id="duration" class="filter-select" onchange="duration()">
+          <option value="" disabled selected>
+            <%= duration=="lth" ? "Low To High" : (duration=="htl" ? "High To Low" : "Duration") %>
+          </option>
+          <option value="lth">Low To High</option>
+          <option value="htl">High To Low</option>
+        </select>
+      </div>
+
+      <button class="offer-toggle <%= offer == 1 ? 'active' : '' %>" onclick="offerFilter()" id="offerFilter">
+        <i class="fas fa-tag"></i>
+        <span>Special Offers</span>
+      </button>
+
+    </div>
+  </div>
+</div>
+
+<!-- Product Grid -->
+<div class="container mt-4">
+  <div class="products-grid">
+    <% foods.forEach(element => { %>
+    <div class="product-card-wrapper">
+      <form action="/user/hotels" method="get">
+        <input type="hidden" name="foodId" value="<%= element._id %>">
+        <button type="submit" class="product-card">
+          <!-- Image Section -->
+          <div class="product-image-wrapper">
+            <img src="<%= element.image %>" alt="<%= element.foodname %>" class="product-image">
+            <% if (element.offer > 0) { %>
+            <div class="offer-badge">
+              <div class="offer-content">
+                <span class="offer-value"><%= element.offer %>%</span>
+                <span class="offer-label">OFF</span>
+              </div>
+            </div>
+            <% } %>
           </div>
 
-          <!-- Food Details -->
-          <div class="food-details ">
-            <div class="d-flex justify-content-between">
-              <h5 class="food-title"><%= element.foodname %></h5>
-              <p class="bg-success p-1 text-white"><%= element.offer %>%OFF</p>
+          <!-- Content Section -->
+          <div class="product-content">
+            <div class="quick-info">
+              <span class="diet-badge <%= element.is_veg === 'veg' ? 'veg' : 'non-veg' %>">
+                <i class="fas <%= element.is_veg === 'veg' ? 'fa-leaf' : 'fa-drumstick-bite' %>"></i>
+                <%= element.is_veg %>
+              </span>
+              <div class="rating">
+                <i class="fas fa-star"></i>
+                <strong>4.8</strong>
+              </div>
             </div>
-            <div class="food-info">
-              <span class="veg-badge">
-                <i class="fas fa-leaf"></i> <%= element.is_veg %>
-              </span>
-              <span class="rating-badge">
-                <i class="fas fa-star"></i> 4.8 <br>
-                <%= element.duration_time %> min
-              </span>
 
+            <h3 class="product-title"><%= element.foodname %></h3>
+
+            <div class="delivery-info">
+              <div class="time">
+                <i class="fas fa-clock"></i>
+                <span><%= element.duration_time %> min</span>
+              </div>
             </div>
           </div>
         </button>
       </form>
     </div>
+    <% }); %>
   </div>
-
-  <% }) %>
 </div>
+
+
 <div id="pagination" style="text-align: center; margin-bottom: 20px;">
   <% for (let i = 1; i <= page; i++) { %>
   <button onclick="loadPage('<%= i %>')" class="btn <%= i === selectedpage ? 'btn-danger' : 'btn-success' %>">
@@ -158,6 +396,7 @@
   <% } %>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
   let debounceTimer;
 
@@ -171,32 +410,33 @@
 
   function loadPage(pageNumber) {
     const searchValue = document.getElementById('searchInput').value || '';
-    window.location.href = `/user/product?pagenumber=${ pageNumber }&product=${ encodeURIComponent(searchValue) }&categoryId=<%= categoryId %> }`;
+    window.location.href = `/user/product?pagenumber=${ pageNumber }&product=${ encodeURIComponent(searchValue) }&categoryId=<%= categoryId %> `;
   }
 
   function isveg() {
     const isveg = document.getElementById('isveg').value; // Get the selected value
     console.log(`Selected value: ${ isveg }&categoryId=<%= categoryId %>`); // Debugging log
     if (isveg) { // Ensure the value is not empty
-      window.location.href = `/user/product?isveg=${ isveg }&categoryId=<%= categoryId %>`; // Redirect to the URL
+      window.location.href = `/user/product?isveg=${ isveg }&categoryId=<%= categoryId %>&duration=<%= duration %>`; // Redirect to the URL
     }
   }
 
   function duration() {
     const duration = document.getElementById('duration').value; // Get the selected value
     if (duration) { // Ensure the value is not empty
-      window.location.href = `/user/product?duration=${ duration }&categoryId=<%= categoryId %>`; // Redirect to the URL
+      window.location.href = `/user/product?duration=${ duration }&categoryId=<%= categoryId %>&isveg=<%= isveg %>`; // Redirect to the URL
     }
   }
+  function offerFilter() {
+    const duration = document.getElementById('duration').value; // Get the selected value
+    const currentOffer = new URLSearchParams(window.location.search).get('offer'); // Get current offer value
+    
+    // Toggle the offer value: if it's '1', set it to '', otherwise set it to '1'
+    const newOffer = currentOffer === '1' ? '' : '1';
+    
+    window.location.href = `/user/product?offer=${newOffer}&duration=${duration}&categoryId=<%= categoryId %>&isveg=<%= isveg %>`;
+}
+
 
 </script>
-
-
-
-
-
-<!-- /loop -->
-
-
-
 <%- include('partials/userfooter') %>

@@ -8,6 +8,7 @@
 	<link href="https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 	<link rel="stylesheet" href="/login.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
@@ -20,20 +21,26 @@
 						<div class="icon d-flex align-items-center justify-content-center">
 							<span class="fa fa-user-o"></span>
 						</div>
-						<form action="/admin/login" class="login-form" method="post">
+						<form class="login-form" onsubmit="return loginSuccess(event)">
 							<input type="text" name="email" style="display: none;" autocomplete="username">
 							<input type="password" name="password" style="display: none;" autocomplete="current-password">
+
 							<div class="form-group">
 								<input type="text" class="form-control rounded-left" placeholder="Username" name="username"
 									id="username">
+								<div id="username-error" class="error-message text-danger"></div>
 							</div>
-							<div class="form-group d-flex">
+
+							<div class="form-group">
 								<input type="password" class="form-control rounded-left" placeholder="Password" name="password"
 									id="password">
+								<div id="password-error" class="error-message text-danger"></div>
 							</div>
+
 							<div class="form-group d-md-flex">
 								<div class="w-50"></div>
 							</div>
+
 							<div class="form-group">
 								<button type="submit" class="btn btn-primary rounded submit p-3 px-5">Get Started</button>
 							</div>
@@ -44,28 +51,74 @@
 		</div>
 	</section>
 
-	<% if (loginvalidmessage && loginvalidmessage.length>0) { %>
+	
+
+
+
+
+
 	<script>
-		Swal.fire({
-			text: "<%= loginvalidmessage %>", // Show only the first message
-			icon: "error",
-			confirmButtonText: "OK"
-		});
+		async function loginSuccess(event) {
+			event.preventDefault(); // Prevent form submission
+
+			// Get the values from the form
+			const username = document.getElementById('username').value;
+			const password = document.getElementById('password').value;
+
+			// Clear previous errors
+			document.getElementById('username-error').innerText = '';
+			document.getElementById('password-error').innerText = '';
+
+			try {
+				const response = await fetch('/admin/login', {
+					method: 'POST',
+					headers: {
+						"Content-Type": "application/json"
+					},
+					body: JSON.stringify({ username, password })
+				});
+
+				const data = await response.json();
+
+				if (data.message) {
+					const errorMessages = data.message.split(',');
+					if (errorMessages.includes("Username Is Required")) {
+						document.getElementById('username-error').innerText = "Username is required.";
+					}
+					if (errorMessages.includes("Password Is Required")) {
+						document.getElementById('password-error').innerText = "Password is required.";
+					}
+					if (errorMessages.includes("Username Is Wrong")) {
+						document.getElementById('username-error').innerText = "Username is incorrect.";
+					}
+					if (errorMessages.includes("Password is Wrong")) {
+						document.getElementById('password-error').innerText = "Password is incorrect.";
+					} else {
+						Swal.fire({
+							title: "Login SuccessFully",
+							icon: "success",
+							draggable: true,
+							confirmButtonText: "OK"
+						}).then((result) => {
+							if (result.isConfirmed) {
+								window.location.href = "/admin/dashboard"; // Change URL as needed
+							}
+						});
+
+					}
+				}
+
+			} catch (error) {
+				console.error("Error:", error);
+				alert("There was an error processing your request. Please try again.");
+			}
+		}
+
 	</script>
-	<% } %>
-
-	<% if (nocondentloginmessage && nocondentloginmessage.length>0) { %>
-	<script>
-		Swal.fire({
-			text: "<%= nocondentloginmessage %>",
-			icon: "info"
-		});
-	</script>
-	<% } %>
 
 
 
-
+	<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 	<script src="js/jquery.min.js"></script>
 	<script src="js/popper.js"></script>
 	<script src="js/bootstrap.min.js"></script>

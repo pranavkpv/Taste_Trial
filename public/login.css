@@ -8344,3 +8344,23 @@
        .eye-icon:hover {
           color: #000;
        }
+/* Styling for the error message */
+.error-message {
+  color: #dc3545; /* Red color for error */
+  font-size: 14px;
+  margin-top: 5px; /* Space between input and error message */
+  font-weight: bold;
+}
+
+/* Optionally, for input fields with errors, add a border color */
+input:invalid {
+  border-color: #dc3545;
+}
+
+/* Styling for the form groups to ensure space between the fields and error messages */
+.form-group {
+  margin-bottom: 1rem;
+}
+
+
+       

@@ -33,14 +33,6 @@ router.post("/create-order", async (req, res) => {
     }
 });
 
-router.post("/failedOrder",async (req,res)=>{
-    console.log("hai")
-    console.log(req.body)
-   try {
-    console.log(req.body)
-   } catch (error) {
-    console.log(error)
-   }
-})
+
 
 module.exports = router;

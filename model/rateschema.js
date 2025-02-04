@@ -28,10 +28,6 @@ const rateSchema=new mongoose.Schema({
    type:Number,
    required:true
   },
-  delivery_per:{
-   type:Number,
-   required:true
-  },
   images:{
     type:[String],
     required:true

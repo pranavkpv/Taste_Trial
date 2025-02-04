@@ -189,6 +189,7 @@
 </style>
 
 <%- include('partials/userheader') %>
+<%- include('partials/userheader') %>
 <nav
    style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='%236c757d'/%3E%3C/svg%3E&#34;); margin-top: 100;"
    aria-label="breadcrumb">
@@ -201,24 +202,26 @@
    <% rates.forEach(element => { %>
    <div class="product-card">
       <div class="product-image">
-         <span class="food-type veg"><% if (element.foodDetails[0].is_veg=="veg") { %>
-            Veg
-            <% } else { %>
-            Non-Veg
-            <% } %></span>
-         <button class="wishlist-btn" id="wishlistBtn">
-            <i class="far fa-heart"></i>
+         <span class="food-type <%= element.foodDetails[0].is_veg === 'veg' ? 'veg' : 'non-veg' %>">
+            <%= element.foodDetails[0].is_veg === 'veg' ? 'Veg' : 'Non-Veg' %>
+         </span>
+         <button class="wishlist-btn" data-rate-id="<%= element._id %>" data-user-id="<%= userId %>"
+            data-is-in-wishlist="<%= element.isInWishlist %>">
+            <i class="<%= element.isInWishlist ? 'fas' : 'far' %> fa-heart"
+               style="color: <%= element.isInWishlist ? '#ff4757' : '#666' %>;"></i>
          </button>
          <img src="<%= element.images[0] %>" alt="Food Item">
       </div>
+      <!-- Rest of your product card HTML remains the same -->
       <div class="product-details">
          <div class="hotel-name">
             <i class="fas fa-hotel"></i> <%= element.hotelDetails[0].hotelname %>
          </div>
          <h3 class="product-name"><%= element.foodDetails[0].foodname %>(<%= element.varientDetails[0].varientname %>)
          </h3>
-         <input type="hidden" value="<%= element._id %>" id="rateId">
-         <input type="hidden" value="<%= userId %>" id="userId">
+       
+
+
          <div class="rating">
             <div class="stars">
                <i class="fas fa-star"></i>
@@ -240,49 +243,135 @@
       </div>
       <div class="product-footer">
          <div class="price">₹ <%= element.rate %></div>
-         <button class="cart-btn">
+         <button class="cart-btn addTocart" data-rate-id="<%= element._id %>" data-hotel-id="<%=element.hotelDetails[0]._id %>"
+            data-food-id="<%= element.foodDetails[0]._id %> " data-varient-id="<%= element.varientDetails[0]._id %>">
             <i class="fas fa-shopping-cart"></i>
             Add to Cart
          </button>
       </div>
    </div>
    <% }) %>
-
 </div>
-</div>
-
 <%- include('partials/userfooter') %>
-
 
 <script>
    document.addEventListener('DOMContentLoaded', function () {
-     document.getElementById('wishlistBtn')
-   
-   });
+      const wishlistButtons = document.querySelectorAll('.wishlist-btn');
 
-   // Variant selection
-   document.querySelectorAll('.variant').forEach(variant => {
-      variant.addEventListener('click', function () {
-         this.parentElement.querySelectorAll('.variant').forEach(v => v.classList.remove('active'));
-         this.classList.add('active');
+      wishlistButtons.forEach(button => {
+         let isProcessing = false;
+
+         button.addEventListener('click', async function (e) {
+            e.preventDefault();
+
+            if (isProcessing) return;
+            isProcessing = true;
+
+            const rateid = this.getAttribute('data-rate-id');
+            const userid = this.getAttribute('data-user-id');
+            const isInWishlist = this.getAttribute('data-is-in-wishlist') === 'true';
+            const icon = this.querySelector('i');
+
+            try {
+               const url = isInWishlist ? '/user/removeWishData' : '/user/addToWishlist';
+               const response = await fetch(url, {
+                  method: 'POST',
+                  headers: {
+                     'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({ rateid, userid })
+               });
+
+               if (!response.ok) throw new Error('Network response was not ok');
+
+               const result = await response.json();
+
+               if (result.successWishlist || result.removeMessage) {
+                  // Toggle wishlist state
+                  const newWishlistState = !isInWishlist;
+                  this.setAttribute('data-is-in-wishlist', newWishlistState);
+
+                  // Update icon
+                  icon.className = newWishlistState ? 'fas fa-heart' : 'far fa-heart';
+                  icon.style.color = newWishlistState ? '#ff4757' : '#666';
+
+                  // Show success message
+                  Swal.fire({
+                     title: newWishlistState ? 'Added to Wishlist!' : 'Removed from Wishlist!',
+                     icon: 'success',
+                     position: 'top-end',
+                     toast: true,
+                     timer: 1500,
+                     showConfirmButton: false
+                  });
+               }
+            } catch (error) {
+               console.error('Error:', error);
+               Swal.fire({
+                  title: 'Error',
+                  text: 'Something went wrong!',
+                  icon: 'error',
+                  confirmButtonText: 'OK'
+               });
+            } finally {
+               isProcessing = false;
+            }
+         });
       });
+      const addTocartButton = document.querySelectorAll('.addTocart');
+      addTocartButton.forEach((button) => {
+         button.addEventListener('click', async function (e) {
+            e.preventDefault()
+            const rateId = this.getAttribute('data-rate-id');
+            const hotelid = this.getAttribute('data-hotel-id');
+            const foodid = this.getAttribute('data-food-id');
+            const varientid = this.getAttribute('data-varient-id');
+            try {
+               const response = await fetch('/user/AddToCart', {
+                  method: "POST",
+                  headers: {"Content-Type":"application/json"},
+                  body: JSON.stringify({
+                     rateId,hotelid,foodid,varientid,
+                     numberofstock: 1
+                  })
+               })
+               const data = await response.json()
+               if (data.exist) {
+                  Swal.fire({
+                     title: 'Exist',
+                     text: data.exist,
+                     icon: 'info',
+                     confirmButtonText: 'OK'
+                  });
+               }
+               if (data.stock) {
+                  Swal.fire({
+                     title: 'limit',
+                     text: data.stock,
+                     icon: 'info',
+                     confirmButtonText: 'OK'
+                  });
+               }
+               if (data.success) {
+                  Swal.fire({
+                     title: 'success',
+                     text: data.success,
+                     icon: 'success',
+                     confirmButtonText: 'OK'
+                  });
+               }
+            } catch (error) {
+               console.error('Error:', error);
+               Swal.fire({
+                  title: 'Error',
+                  text: 'Something went wrong!',
+                  icon: 'error',
+                  confirmButtonText: 'OK'
+               });
+            }
+         })
+      })
    });
-
-   // Add to cart animation
-   document.querySelectorAll('.cart-btn').forEach(btn => {
-      btn.addEventListener('click', function () {
-         this.style.transform = 'scale(0.95)';
-         setTimeout(() => {
-            this.style.transform = 'scale(1)';
-         }, 100);
-      });
-   });
-});
-
-
-
-
-
 </script>
 </body>
 

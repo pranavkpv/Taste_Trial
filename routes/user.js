@@ -15,6 +15,7 @@ const cartcontroller=require("../controller/user/cartcontroller")
 const wishlistcontroller=require("../controller/user/wishlistcontroller")
 const walletcontroller = require("../controller/user/walletController")
 const changePasswordController = require("../controller/user/changePassword")
+const failedController = require("../controller/user/failedOrder")
 
 // Route to start the Google OAuth login
 router.get('/auth/google', passport.authenticate('google', {
@@ -108,6 +109,7 @@ router.post('/orderSuccess',usercontroller.orderSuccess)
 //checkout
 router.get('/changeAccount',profilecontroller.changeAccount)
 router.post('/updateAction',profilecontroller.updateAction)
+router.get("/failedOrder",failedController.failedOrder)
 
 //order
 router.get('/order',profilecontroller.order)

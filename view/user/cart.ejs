@@ -404,7 +404,6 @@
       cancelButtonText: 'Cancel',
     }).then((result) => {
       if (result.isConfirmed) {
-        // Redirect or handle form submission here
         window.location.href = `/user/confirmorder?&cartIDS=${ cartIDS }&purchaseQty=${ purchaseQty }`;
       }
     });

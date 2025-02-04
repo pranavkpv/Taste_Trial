@@ -229,7 +229,9 @@
                       <span class="hotel-badge"><%= hotels.hotelname %></span>
                       <h5><%= foods.foodname %></h5>
                       <p class="mb-2">Variant: <%= varients.varientname %> | Quantity: <%= Quantity %></p>
+                      <% if (items[0].offer_per != 0) { %>
                       <span class="offer-badge"><%= items[0].offer_per %> OFF Applied</span>
+                      <% } %>
                   </div>
                   <div class="text-end">
                       <h5 class="mb-1">$<%= items[0].quantity*items[0].rate %></h5>
@@ -254,7 +256,7 @@
                   </div>
                   <div class="amount-row">
                       <span>Delivery Charges</span>
-                      <span>$<%= items[0].quantity*(items[0].rate*items[0].delivery_per/100) %></span>
+                      <span>$<%= orders.deliveryAmount %></span>
                   </div>
                   <div class="amount-row">
                       <span>Offer Discount</span>
@@ -262,9 +264,9 @@
                   </div>
                   <div class="amount-row total">
                       <span>Total Amount</span>
-                      <span>$<%= items[0].quantity*items[0].rate+items[0].quantity*(items[0].rate*items[0].delivery_per/100)+
+                      <span>$<%= items[0].quantity*(items[0].rate+orders.deliveryAmount+
                       items[0].quantity*(items[0].rate*items[0].packing_per/100)+ items[0].quantity*(items[0].rate*items[0].gst_per/100)-
-                      items[0].quantity*(items[0].rate*items[0].offer_per/100)
+                      items[0].quantity*(items[0].rate*items[0].offer_per/100))
                        %></span>
                   </div>
               </div>

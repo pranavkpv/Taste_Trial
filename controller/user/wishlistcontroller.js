@@ -107,6 +107,7 @@ const AddToCart = async(req,res)=>{
          return res.json({exist:"Product Already Exist In Cart"})
       }
       const rates=await rateschema.findOne({_id:req.body.rateId})
+      console.log(rates)
       if(rates.stock==0){
          return res.json({nostock:"No stock Available"})
       }

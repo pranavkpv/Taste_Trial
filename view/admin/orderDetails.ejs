@@ -1,56 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Order Detail</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f4f6f9;
+        }
+        .order-card {
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .status-badge {
+            font-size: 0.9rem;
+            padding: 0.4rem 0.8rem;
+        }
+        .order-timeline {
+            border-left: 2px solid #e0e0e0;
+            padding-left: 20px;
+        }
+        .timeline-item {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background-color: #007bff;
+            border-radius: 50%;
+            left: -41px;
+            top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid py-4">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="card order-card">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">
+                            <i class="bi bi-receipt me-2"></i>Order <%= orders._id %>
+                        </h4>
+                    </div>
+                    
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5 class="mb-3">
+                                    <i class="bi bi-basket me-2"></i>Order Summary
+                                </h5>
+                                <div class="d-flex mb-3">
+                                    <img src="<%= rates.images[0] %>" alt="Product" class="me-3 rounded">
+                                    <div>
+                                        <h6 class="mb-1"><%= foods.foodname %>(<%= orders.items[0].quantity %>)</h6>
+                                        <p class="text-muted mb-1">Variant: <%= varients.varientname %></p>
+                                        <p class="mb-1">
+                                            <strong>Price:</strong> $<%= rates.rate %>
+                                         
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <h5 class="mb-3">
+                                    <i class="bi bi-geo-alt me-2"></i>Delivery Details
+                                </h5>
+                                <address class="mb-0">
+                                    <strong><%= users.firstname %></strong><br>
+                                    <%= addresses.landmark %>,<%= addresses.city %><br>
+                                   <%= addresses.state %> <%= addresses.pin_code %><br>
+                                  
+                                    <i class="bi bi-telephone me-1"></i><%= addresses.mobile_no %>
+                                </address>
+                            </div>
+                        </div>
 
+                        <hr>
 
-<%- include('partials/admin') %>
-<link rel="stylesheet" href="/order.css">
-<div style="height:150px">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5 class="mb-3">
+                                    <i class="bi bi-cash-stack me-2"></i>Payment Details
+                                </h5>
+                                <table class="table table-borderless">
+                                    <tbody>
+                                        <tr>
+                                            <td>Subtotal: </td>
+                                            <td class="text-end">$<%= orders.items[0].quantity*orders.items[0].rate %></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Offer:</td>
+                                            <td class="text-end text-success">-$<%= orders.items[0].quantity*orders.items[0].rate*orders.items[0].offer_per/100 %></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Tax (<%= orders.items[0].gst_per %> %):</td>
+                                            <td class="text-end">$<%= orders.items[0].quantity*orders.items[0].rate*orders.items[0].gst_per/100 %></td>
+                                        </tr>
+                                        <tr>
+                                          <td>packing (<%= orders.items[0].packing_per %> %):</td>
+                                          <td class="text-end">$<%= orders.items[0].quantity*orders.items[0].rate*orders.items[0].packing_per/100 %></td>
+                                      </tr>
+                                        <tr>
+                                            <th>Total:</th>
+                                            <th class="text-end text-primary">$<%= orders.items[0].quantity*orders.items[0].rate+orders.items[0].quantity*orders.items[0].rate*orders.items[0].gst_per/100+
+                                            orders.items[0].quantity*orders.items[0].rate*orders.items[0].packing_per/100-orders.items[0].quantity*orders.items[0].rate*orders.items[0].offer_per/100  %></th>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    
+                </div>
+            </div>
+        </div>
+    </div>
 
-</div>
-<div class="order-details-container" style="margin-left: 396px;border: 1px solid #c3b9b9;padding: 47px;width: 850px;height: 562px;margin-top:-41px;box-shadow: -3px 2px 12px 0px #020202">
-   <!-- Order Summary Section -->
-   <div class="order-summary" >
-      <h4 class="section-title" >Order Summary</h4>
-      <div class="d-flex align-items-center mb-4">
-         <img src="<%= rates.images[0] %>" alt="Product Image" class="product-image">
-         <div class="ms-4" style="line-height: 7px;">
-            <h5> <%= foods.foodname %>(<%= varients.varientname %>) </h5>
-            <p><strong>Hotel Name:</strong><%= hotels.hotelname %></p>
-            <p><strong>Base rate:</strong> <%= rates.rate %> </p>
-            <p><strong>Gst Amount:</strong> <%= rates.rate*rates.gst_per/100 %> </p>
-            <p><strong>Delivery Charge:</strong> <%=rates.rate*rates.delivery_per/100%> </p>
-            <p><strong>Packing Charge:</strong><%= rates.rate*rates.packing_per/100 %> </p>
-            <% if (foods.offer > categories.offer) { %>
-               <p><strong>Offer : </strong><%= rates.rate*foods.offer/100 %></p>
-               <p><strong>Number:</strong><%= Quantity %></p>
-               <p class="text-danger"><strong>Total Amount:</strong><%=Quantity *(rates.rate+(rates.rate*rates.delivery_per/100)+(rates.rate*rates.gst_per/100)+(rates.rate*rates.packing_per/100)-(rates.rate*foods.offer/100)) %></p>
-             <% } else { %>
-               <p><strong>Offer : </strong><%= rates.rate*categories.offer/100 %></p>
-               <p><strong>Number:</strong><%= Quantity %></p>
-               <p class="text-danger"><strong>Total Amount:</strong><%=Quantity *(rates.rate+(rates.rate*rates.delivery_per/100)+(rates.rate*rates.gst_per/100)+(rates.rate*rates.packing_per/100)-(rates.rate*categories.offer/100)) %></p>
-              
-            <% } %>
-         </div>
-      </div>
-   </div>
-
-   <!-- User Address Section -->
-   <div class="user-address" style="line-height: 10px;">
-      <h4 class="section-title">Shipping Address</h4>
-      <p><strong>Name:</strong><%= users.firstname  %></p>
-      <p><strong>Email:</strong><%= users.email %> </p>
-      <p><strong>Phone:</strong> <%= addresses.mobile_no %> </p>
-      <p><strong>Address:</strong> 
-          <%=addresses.addresstype %>, 
-          <%= addresses.landmark %> ,
-          <%= addresses.city %>  ,
-          <%= addresses.state %>  ,
-          <%= addresses.pin_code %> 
-      </p>
-   </div>
-
-   <!-- Order Details -->
-   <div class="order-details mt-4">
-      <h4 class="section-title">Order Details</h4>
-      <p><strong>Order ID:</strong> #INV  <%=orders._id%> </p>
-      <p style="margin-top:-20px"><strong>Order Date:</strong>  <%= formattedDate %> </p>
-   </div>
-</div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

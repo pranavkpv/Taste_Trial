@@ -230,15 +230,14 @@
                   </strong><%= element.number*(element.rateDetails.rate*element.rateDetails.gst_per/100) %></p>
                <p><strong>Packing Charge :
                   </strong><%= element.number*(element.rateDetails.rate*element.rateDetails.packing_per/100) %></p>
-               <p><strong>Delivery Charge :
-                  </strong><%= element.number*(element.rateDetails.rate*element.rateDetails.delivery_per/100) %></p>
+               
                <% if (element.foodDetails[0].offer > 0 || element.categoryDetails[0].offer > 0) { %>
                <% if (element.foodDetails[0].offer > element.categoryDetails[0].offer){ %>
                <p><strong> Offer Amount :
                   </strong><%=element.number *element.rateDetails.rate*element.foodDetails[0].offer/100 %></p>
                <p class="fs-5">Final Amount
                   :<%= element.number*(element.rateDetails.rate+element.rateDetails.rate*element.rateDetails.gst_per/100+
-                 element.rateDetails.rate*element.rateDetails.packing_per/100+element.rateDetails.rate*element.rateDetails.delivery_per/100
+                 element.rateDetails.rate*element.rateDetails.packing_per/100
                  -  element.rateDetails.rate*element.foodDetails[0].offer/100) %>
                </p>
                <% } else { %>
@@ -246,13 +245,13 @@
                   </strong><%= element.number*element.rateDetails.rate*element.categoryDetails[0].offer/100 %></p>
                <p class="fs-5">Final Amount
                   :<%= element.number*(element.rateDetails.rate+element.rateDetails.rate*element.rateDetails.gst_per/100+
-                    element.rateDetails.rate*element.rateDetails.packing_per/100+element.rateDetails.rate*element.rateDetails.delivery_per/100
+                    element.rateDetails.rate*element.rateDetails.packing_per/100
                     - element.rateDetails.rate*element.categoryDetails[0].offer/100) %>
                   <% } %>
                   <% } else { %>
                <p class="fs-5">Final Amount
                   :<%= element.number*(element.rateDetails.rate+element.rateDetails.rate*element.rateDetails.gst_per/100+
-                 element.rateDetails.rate*element.rateDetails.packing_per/100+element.rateDetails.rate*element.rateDetails.delivery_per/100) %>
+                 element.rateDetails.rate*element.rateDetails.packing_per/100) %>
                </p>
                <% } %>
             </div>
@@ -268,16 +267,14 @@ datas.forEach(element => {
    var finalAmount = element.number * (
     element.rateDetails.rate +
     element.rateDetails.rate * element.rateDetails.gst_per / 100 +
-    element.rateDetails.rate * element.rateDetails.packing_per / 100 +
-    element.rateDetails.rate * element.rateDetails.delivery_per / 100 -
+    element.rateDetails.rate * element.rateDetails.packing_per / 100 -
     element.rateDetails.rate * element.foodDetails[0].offer / 100
   );
  }else{
    var finalAmount = element.number * (
     element.rateDetails.rate +
     element.rateDetails.rate * element.rateDetails.gst_per / 100 +
-    element.rateDetails.rate * element.rateDetails.packing_per / 100 +
-    element.rateDetails.rate * element.rateDetails.delivery_per / 100 -
+    element.rateDetails.rate * element.rateDetails.packing_per / 100 -
     element.rateDetails.rate * element.categoryDetails[0].offer / 100
    )
  }
@@ -346,29 +343,7 @@ datas.forEach(element => {
             <% } %>
 
          </form>
-         <div class="card shadow-sm mb-4">
-            <div class="card-header bg-primary text-white">
-               <h5>Select Delivery Address</h5>
-            </div>
-            <div class="card-body">
-               <form>
-                  <% addressess.forEach((element, index) => { %>
-                  <div class="form-check">
-                     <input class="form-check-input" type="radio" name="address" id="address<%= index %>"
-                        onchange="setAddress('<%= element._id %>')">
-                     <label class="form-check-label" for="address<%= index %>">
-                        <b><%= element.addresstype.toUpperCase() %> Address</b>, <%= element.landmark %>,
-                        <%= element.city %>,
-                        <%= element.state %>, PIN :<%= element.pin_code %>, MOB:<%= element.mobile_no %>,
-                        <span><%= element.alternative_no %></span>
-                     </label>
-                  </div>
-                  <% }) %>
-                  <p style="text-align: right;"><a href="/user/address">Add Address+</a></p>
-               </form>
-
-            </div>
-         </div>
+       
 
          <% if (couponsuccessmessage &&  couponsuccessmessage.length>0) { %>
          <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#removeCoupon"
@@ -376,14 +351,31 @@ datas.forEach(element => {
             onclick="removecoupon('<%= coupons._id %>')">Remove</button>
          <% } %>
 
-         <form action="/user/orderSuccess" method="POST" id="checkout_form">
-            <input type="hidden" id="addressId" name="addressId">
+         <form action="/user/orderSuccess" method="POST" id="checkout_form" >
+            <input type="text" value="<%= orderId %>" name="orderId">
+            <div class="card shadow-sm mt-5">
+               <div class="card-header bg-primary text-white">
+                  <h5>Select Delivery Address</h5>
+               </div>
+               
+            </div>
+            <div class="card-body">
+               <select name="addressSelect" id="addressSelect" class="form-control">
+                  <option value="">select</option>
+                  <% addressess.forEach(element => { %>
+                       <option value="<%= element._id %>"><b><%= element.addresstype %></b>:<%= element.locationDetails[0].location %>,<%= element.landmark %>,<%= element.city %>,<%= element.state %>,<%= element.pin_code %></option>
+                     <% }) %>
+               </select>
+               
+
+            </div>
+       
             <% datas.forEach(element => { %>
             <input type="hidden" value="<%= element._id %>" id=cartId name="cartId">
             <input type="hidden" value="<%= element.number %>" id="numberofproduct" name="numberofproduct">
             <% }) %>
             <!-- Hidden field to store the selected payment method -->
-            <input type="hidden" id="selectedPaymentMethod" name="selectedPaymentMethod" value="COD">
+            <input type="text" id="selectedPaymentMethod" name="selectedPaymentMethod" value="COD">
             <% if (couponsuccessmessage && couponsuccessmessage.length>0) { %>
             <input type="hidden" value="<%= coupons._id %>" name="couponId" id="couponId">
             <% } %>
@@ -522,7 +514,6 @@ datas.forEach(element => {
                      showConfirmButton: false,
                      timer: 2000
                   }).then(() => {
-                     // Submit the form after successful payment
                      const form = document.querySelector('#checkout_form');
                      document.getElementById('payment_id').value = response.razorpay_payment_id;
                      form.submit();
@@ -539,31 +530,19 @@ datas.forEach(element => {
             const rzp1 = new Razorpay(options);
             rzp1.on('payment.failed', async function (response) {
                try {
+                  document.getElementById('selectedPaymentMethod').value="failedRazorpay"
                   await Swal.fire({
                      title: "Payment Failed!",
                      text: "Your payment was unsuccessful. Placing the order with unpaid status.",
                      icon: "error",
                      showConfirmButton: false,
                      timer: 3000
-                  });
+                  }).then(()=>{
+                     const form = document.querySelector('#checkout_form');
+                     form.submit();
+               })
 
-                  rzp1.close();
-
-                  // Store the fetch response in a variable and await it
-                  const orderResponse = await fetch('/pay/failedOrder', {
-                     method: "POST",
-                     headers: { "Content-Type": "application/json" },
-                     body: JSON.stringify({
-                        status: 'unpaid',
-                        addressId: document.getElementById('addressId').value,
-                        cartId: document.getElementById('cartId').value,
-                        numberofproduct: document.getElementById('numberofproduct').value,
-                        selectedPaymentMethod: document.getElementById('selectedPaymentMethod').value,
-                        couponId: document.getElementById('couponId').value
-                     })
-                  });
-
-                  const orderData = await orderResponse.json();
+                
 
                   if (!orderData.success) {
                      throw new Error('Failed to create unpaid order');
@@ -591,7 +570,7 @@ datas.forEach(element => {
             text: "An error occurred. Please try again.",
             icon: "error",
             showConfirmButton: false,
-            timer: 2000
+            timer: 5000
          });
       }
    });
@@ -634,3 +613,13 @@ datas.forEach(element => {
    });
 </script>
 <% } %>
+
+
+<% if (failedMessage && failedMessage.length>0) { %>
+   <script>
+      Swal.fire({
+         text: "<%= failedMessage %>",
+         icon: "info"
+      });
+   </script>
+   <% } %>

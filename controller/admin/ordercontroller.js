@@ -71,6 +71,7 @@ const order = async (req, res) => {
 
       })
 
+
       res.render('admin/order', { orders, startIndex, page, selectedpage, searchedinvoice });
    } catch (error) {
       console.error("Error fetching orders:", error);
@@ -99,7 +100,7 @@ const orderDetails = async (req, res) => {
    try {
       const orders = await orderschema.findOne({ _id: new ObjectId(req.query.orderid) })
       const rates = await rateschema.findOne({ _id: new ObjectId(req.query.rateid) })
-      console.log(rates)
+   
       const foods = await foodschema.findOne({ _id: rates.food_id })
       const categories = await categoryschema.findOne({_id:foods.category_id})
       const varients = await varientschema.findOne({ _id: rates.varient_id })
@@ -108,13 +109,14 @@ const orderDetails = async (req, res) => {
       const date = orders.createdAt
       const formattedDate = date.toISOString().split('T')[0];
       const hotels=await hotelschema.findOne({_id:new ObjectId(rates.hotel_id)})
-      console.log(hotels)
+      
       let Quantity=0
       for(let i=0;i<orders.items.length;i++){
          if(orders.items[i].rate_id.toString()==new ObjectId(req.query.rateid)){
               Quantity=orders.items[i].quantity
          }
       }
+      console.log(orders)
       res.render('admin/orderDetails', { rates,hotels, foods, varients, users, addresses, formattedDate, orders,Quantity,categories })
 
    } catch (error) {

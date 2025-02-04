@@ -21,7 +21,6 @@ const orderSchema = new mongoose.Schema({
          rate:{type:Number,require:true},
          gst_per:{type:Number,required:true},
          packing_per:{type:Number,required:true},
-         delivery_per:{type:Number,required:true},
          offer_per:{type:Number,required:true}
       }
    ],
@@ -31,7 +30,7 @@ const orderSchema = new mongoose.Schema({
    },
    paymentmethod: {
       type: String,
-      enum: ["COD", "razorpay", "wallet"]
+      enum: ["COD", "razorpay", "wallet","failedRazorpay"]
    },
    couponId:{
       type: mongoose.Schema.Types.ObjectId,
@@ -44,6 +43,15 @@ const orderSchema = new mongoose.Schema({
    totalOffer:{
       type:Number,
       required:true
+   },   
+    deliveryAmount:{
+      type:Number,
+      required:true
+    },
+   paidStatus:{
+      type:String,
+      enum:["pending","completed","failed"],
+      default:"pending"
    }
 }, { timestamps: true })
 module.exports = mongoose.model("order", orderSchema)

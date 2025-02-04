@@ -33,6 +33,11 @@ const addressSchema=new mongoose.Schema({
       type:String,
       enum:["home","office","other"],
       required:true
+    },
+    location_id:{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'locations',
+      required:true
     }
     
 },{timestamps:true})

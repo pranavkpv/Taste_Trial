@@ -1,0 +1,179 @@
+<%- include('partials/admin') %>
+<link rel="stylesheet" href="/return.css">
+<div class="content">
+   <div class="d-flex justify-content-between align-items-center mb-4">
+      <h3 class="">Delivery Fee Management</h3>
+      <button class=" addItem" onclick="addItem()" data-bs-toggle="modal" data-bs-target="#addLocationModal"> + Add
+         Item</button>
+   </div>
+
+
+
+   <!-- Table -->
+   <div class="row search-bar">
+      <div class="col-md-6 ">
+         <div class="input-group">
+            <span class="input-group-text bg-secondary text-light"><i class="fas fa-search"></i></span>
+            <input type="text" id="searchInput" oninput="searchInvoice(this.value)" class="form-control"
+               placeholder="Search by Loaction..." value="">
+
+         </div>
+
+      </div>
+   </div>
+   <div class="table-responsive">
+      <table class="table table-bordered text-center">
+         <thead class="table-dark">
+            <tr>
+               <th scope="col">Sl No</th>
+               <th scope="col">Location Address</th>
+               <th scope="col">Delivery Charge</th>
+               <th scope="col">Actions</th>
+            </tr>
+         </thead>
+         <tbody>
+
+            <% locations.forEach((element,index) => { %>
+               <tr style="text-align: center;">
+                  <td>
+                     <p class="mt-4"><%= index+1 %></p>
+                  </td>
+                  <td>
+                     <p class="mt-4"><%= element.location %></p>
+                  </td>
+                  <td>
+                     <p class="mt-4"><%= element.deliveryCharge %></p>
+                  </td>
+                  <td class="action-icons">
+                     <a class="text-dark" href="" data-bs-toggle="modal" data-bs-target="#editCouponModal"
+                        onclick="editFun('')"><i class="bi bi-pencil-square"></i></a>
+                     <a class="text-dark" href="" data-bs-toggle="modal" data-bs-target="#DeleteCoupon"
+                        onclick="deleteFun('')"><i class="bi bi-trash3-fill"></i></a>
+                  </td>
+               </tr>
+            <% }) %>
+            
+
+         </tbody>
+      </table>
+      <div id="pagination" style="text-align: center; margin-bottom: 20px;">
+         <% for (let i = 1; i <= 1; i++) { %>
+         <button onclick="loadPage('<%= i %>')" class="btn btn-success">
+            <%= i %>
+         </button>
+         <% } %>
+      </div>
+   </div>
+</div>
+<!-- Delete Location -->
+<div class="modal fade" id="approveModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+   <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h1 class="modal-title fs-4" id="exampleModalLabel">Are You Sure ?</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+         </div>
+         <form action="/admin/approveReturn" method="post">
+            <div class="modal-body">
+               <p>Do You Want To Approve </p>
+            </div>
+            <input type="hidden" id="approvequantity" name="quantity">
+            <input type="hidden" id="approveorderId" name="orderId">
+            <input type="hidden" id="approverateId" name="rateId">
+            <div class="modal-footer">
+               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+               <button type="submit" class="btn btn-success">Approve</button>
+            </div>
+         </form>
+      </div>
+   </div>
+</div>
+
+<!-- Edit location -->
+
+<div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
+   <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h1 class="modal-title fs-4" id="exampleModalLabel">Are You Sure ?</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+         </div>
+         <form action="/admin/rejectReturn" method="post">
+            <div class="modal-body">
+               <p>Do You Want To Reject </p>
+            </div>
+            <input type="hidden" id="rejectquantity" name="quantity">
+            <input type="hidden" id="rejectorderId" name="orderId">
+            <input type="hidden" id="rejectrateId" name="rateId">
+            <div class="modal-footer">
+               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+               <button type="submit" class="btn btn-danger">Reject</button>
+            </div>
+         </form>
+      </div>
+   </div>
+</div>
+
+
+
+<!-- add location -->
+<div class="modal fade" id="addLocationModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+   <div class="modal-dialog modal-dialog-centered custom-modal-width">
+      <div class="modal-content">
+         <form>
+            <div class="modal-body">
+               <div class="mb-3">
+                  <h2>Add Location</h2>
+                  <label for="location" class="form-label">Enter Location</label>
+                  <input type="text" class="form-control" id="location" placeholder="Enter location" name="location">
+                  <p class="text-danger  error-message" id="locationhidden"></p>
+               </div>
+               <div class="mb-3">
+                  <label for="deliveryCharge" class="form-label">Enter Delivery Charge</label>
+                  <input type="number" class="form-control" id="deliveryCharge" min="0"
+                     placeholder="Enter deliveryCharge" name="deliveryCharge" value="0">
+                  <p class="text-danger d-none error-message" id="deliveryChargehidden">Please Enter Delivery Charge %!
+                  </p>
+               </div>
+            </div>
+            <div class="modal-footer">
+               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+               <button type="submit" id="addLocation" class="btn btn-success">Save</button>
+            </div>
+         </form>
+      </div>
+   </div>
+</div>
+<%- include('partials/footer') %>
+
+<script>
+   document.getElementById('addLocationModal').addEventListener('submit', async function (e) {
+      e.preventDefault()
+      const location = document.getElementById('location').value
+      const deliveryCharge = document.getElementById('deliveryCharge').value
+      const response = await fetch('/admin/addLocation', {
+         method: "POST",
+         headers: { "Content-Type": "application/json" },
+         body: JSON.stringify({ location: location, deliveryCharge, deliveryCharge })
+      })
+      const data = await response.json()
+      if (data.needLocation) {
+         const locationHidden = document.getElementById('locationhidden');
+         if (locationHidden) {
+            locationHidden.innerText = data.needLocation;
+         }
+      }
+      if (data.success) {
+         Swal.fire({
+            text: data.success,
+            icon: "success",
+            timer: 3000,
+         }).then(() => {
+            e.target.submit();
+         });
+      }
+   })
+</script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

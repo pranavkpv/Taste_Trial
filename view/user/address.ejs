@@ -180,11 +180,16 @@
             <div class="address-type-badge">
               <%= element.addresstype %>
             </div>
+          
             <div class="address-content">
               <div class="address-details">
                 <p class="mb-2">
                   <i class="fas fa-map-marker-alt me-2"></i>
                   <%= element.landmark %>, <%= element.city %>
+                </p>
+                <p class="mb-2">
+                  <i class="fas fa-map-marker-alt me-2"></i>
+                  <%= element.locationDetails[0].location %>
                 </p>
                 <p class="mb-2">
                   <i class="fas fa-location-dot me-2"></i>
@@ -207,7 +212,7 @@
 
               <div class="address-actions">
                 <button class="btn btn-edit" data-bs-toggle="modal" data-bs-target="#editAddressModal"
-                  onclick="editFun('<%=element._id %>','<%=element.city %>','<%=element.state %>','<%=element.pin_code %>','<%=element.landmark %>','<%=element.mobile_no %>','<%=element.alternative_no %>','<%=element.addresstype %>')">
+                  onclick="editFun('<%=element._id %>','<%=element.city %>','<%=element.state %>','<%=element.pin_code %>','<%=element.landmark %>','<%=element.mobile_no %>','<%=element.alternative_no %>','<%=element.addresstype %>','<%= element.locationDetails[0]._id %>')">
                   <i class="fas fa-edit me-2"></i>Edit
                 </button>
                 <button class="btn btn-delete" data-bs-toggle="modal" data-bs-target="#deleteAddressModal"
@@ -248,6 +253,15 @@
               <option value="home">Home</option>
               <option value="office">Office</option>
               <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="NearByLocation" class="form-label">Near By Location</label>
+            <select class="form-select" id="NearByLocation" name="locationId">
+              <option value="home">select</option>
+              <% locations.forEach(element => { %>
+               <option value="<%= element._id %>" id="location" name="locationId"><%= element.location %></option>
+              <% }) %>
             </select>
           </div>
           <div class="mb-3">
@@ -299,14 +313,25 @@
       </div>
       <div class="modal-body">
         <form action="/user/editAddress" method="post">
+          <input type="hidden" id="editid" name="editids">
+
           <div class="mb-3">
-            <input type="hidden" id="userid" name="userid" value="<%= userid %>">
-            <input type="hidden" id="editid" name="editid">
+         
             <label for="editaddressType" class="form-label">Address Type</label>
             <select class="form-select" id="editaddressType" name="addresstype">
               <option value="home">Home</option>
               <option value="office">Office</option>
               <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="mb-3">
+           
+            <input type="hidden" id="editid" name="editid">
+            <label for="editNearByLocation" class="form-label">Near By Location</label>
+            <select class="form-select" id="editNearByLocation" name="editNearByLocation">
+              <% locations.forEach(element => { %>
+                <option value="<%= element._id %>"><%= element.location %></option>
+              <% }) %>
             </select>
           </div>
           <div class="mb-3">
@@ -383,7 +408,7 @@
 
 
 <script>
-  function editFun(id, city, state, pin, landmark, mobile, alternative, type) {
+  function editFun(id, city, state, pin, landmark, mobile, alternative, type,location) {
     document.getElementById('editaddressType').value = type
     document.getElementById('editcity').value = city
     document.getElementById('editstate').value = state
@@ -392,6 +417,7 @@
     document.getElementById('editmobile').value = mobile
     document.getElementById('editalternativenumber').value = alternative
     document.getElementById('editid').value = id
+    document.getElementById('editNearByLocation').value=location
   }
   function deleteFun(id) {
     document.getElementById('deleteid').value = id

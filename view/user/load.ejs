@@ -362,7 +362,7 @@
                <button class="btn btn-primary btn-lg">Order Now</button>
             </div>
             <div class="col-lg-6">
-               <img src="/api/placeholder/600/400" alt="Hero Image" class="hero-img">
+               <img src="/uploads/load.jpg" alt="Hero Image" class="hero-img">
             </div>
          </div>
       </div>
@@ -374,17 +374,17 @@
          <h2 class="section-title">Popular Categories</h2>
          <div class="row">
             <!-- Top 10 Categories -->
-            <% for(let i=0; i<10; i++) { %>
+           <% categoryOrder.forEach(element => { %>
             <div class="col-md-3 col-sm-6">
                <div class="category-card">
                   <div class="category-icon">
                      <i class="fas fa-hamburger"></i>
                   </div>
-                  <h4>Category Name</h4>
-                  <p>100+ items</p>
+                  <h4><%= element.categoryname %></h4>
+                  <p><%= element.count %>+ items</p>
                </div>
             </div>
-            <% } %>
+           <% }) %>
          </div>
       </div>
    </section>
@@ -403,27 +403,22 @@
    <!-- Top Foods Section -->
    <section class="py-5" id="foods">
       <div class="container">
-         <h2 class="section-title">Top Rated Foods</h2>
+         <h2 class="section-title">Top 10 Foods</h2>
          <div class="row">
             <!-- Top 10 Foods -->
-            <% for(let i=0; i<10; i++) { %>
+           <% foodOrder.forEach(element => { %>
             <div class="col-md-3 col-sm-6">
                <div class="food-card">
                   <span class="top-badge">Top Rated</span>
-                  <img src="/api/placeholder/300/200" alt="Food" class="food-img">
+                  <img src="<%= element.images %>" alt="Food" class="food-img">
                   <div class="food-details">
-                     <h4 class="food-title">Food Name</h4>
+                     <h4 class="food-title"><%= element.foodname %></h4>
                      <div class="d-flex justify-content-between align-items-center">
-                        <span class="food-price">₹299</span>
-                        <div class="rating">
-                           <i class="fas fa-star"></i>
-                           <span>4.8</span>
-                        </div>
                      </div>
                   </div>
                </div>
             </div>
-            <% } %>
+           <% }) %>
          </div>
       </div>
    </section>
@@ -434,24 +429,20 @@
          <h2 class="section-title">Featured Hotels</h2>
          <div class="row">
             <!-- Top 10 Hotels -->
-            <% for(let i=0; i<10; i++) { %>
+           <% hotelOrder.forEach(element => { %>
             <div class="col-md-3 col-sm-6">
                <div class="hotel-card">
                   <span class="top-badge">Featured</span>
-                  <img src="/api/placeholder/300/200" alt="Hotel" class="hotel-img">
+                  <img src="<%= element.images %>" alt="Hotel" class="hotel-img">
                   <div class="hotel-details">
-                     <h4 class="hotel-title">Hotel Name</h4>
+                     <h4 class="hotel-title"><%= element.hotelname %></h4>
                      <div class="d-flex justify-content-between align-items-center">
-                        <span>Indian, Chinese</span>
-                        <div class="rating">
-                           <i class="fas fa-star"></i>
-                           <span>4.5</span>
-                        </div>
+                        <span><%= element.address %></span>
                      </div>
                   </div>
                </div>
             </div>
-            <% } %>
+           <% }) %>
          </div>
       </div>
    </section>

@@ -24,6 +24,7 @@ const wishlistSchema=require('./model/wishlistschema')
 const couponSchema=require('./model/couponschema')
 const paymentRoute=require('./routes/payment')
 const walletSchema=require('./model/walletSchema')
+const locationSchema=require('./model/locationSchema')
 require('dotenv').config(); // Load environment variables
 
 const Razorpay = require('razorpay');

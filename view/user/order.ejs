@@ -167,7 +167,7 @@
             <h2 class="text-center mb-0">Your Order History</h2>
             <p class="text-center mb-0 mt-2 text-white-50">Track and manage your orders</p>
          </div>
-
+        <button class="btn btn-info" onclick="failedOrder()">Failed Payment Order Details</button>
          <div class="orders-container">
             <% orders.forEach(element => { %>
             <div class="order-card">
@@ -181,10 +181,13 @@
                               <%= element.createdAtFormatted %>
                            </div>
                         </div>
-                        <div class="status-badge status-<%= element.items.status.toLowerCase() %>">
-                           <i class="fas fa-circle me-2"></i>
-                           <%= element.items.status %>
+                        <div>
+                           <div class="status-badge status-<%= element.items.status.toLowerCase() %>">
+                              <i class="fas fa-circle me-2"></i>
+                              <%= element.items.status %>
+                           </div>
                         </div>
+                        
                      </div>
                   </div>
 
@@ -273,4 +276,9 @@
    function pagination(selectedPage) {
       window.location.href = `/user/order?page=${ selectedPage }`
    }
+   function failedOrder(){
+      window.location.href="/user/failedOrder"
+   }
+
+ 
 </script>

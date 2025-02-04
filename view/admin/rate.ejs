@@ -39,7 +39,7 @@
           <td><%= element.rate %></td>
           <td class="action-icons">
             <a class="text-dark" href="" data-bs-toggle="modal" data-bs-target="#editrateModal"
-              onclick="editFun('<%= element.hotelDetails[0].hotelname %>','<%= element.foodDetails[0].foodname %>','<%= element.varientDetails[0].varientname %>','<%= element.rate %>','<%= element.gst_per %>','<%= element.delivery_per %>','<%= element.packing_per %>','<%= element.delivery_time %>','<%= element.images[0] %>','<%= element.images[1] %>','<%= element.images[2] %>','<%= element._id %>','<%= element.stock %>','<%= element.files[0] %>','<%= element.files[1] %>','<%= element.files[2] %>')"><i
+              onclick="editFun('<%= element.hotelDetails[0].hotelname %>','<%= element.foodDetails[0].foodname %>','<%= element.varientDetails[0].varientname %>','<%= element.rate %>','<%= element.gst_per %>','<%= element.packing_per %>','<%= element.delivery_time %>','<%= element.images[0] %>','<%= element.images[1] %>','<%= element.images[2] %>','<%= element._id %>','<%= element.stock %>','<%= element.files[0] %>','<%= element.files[1] %>','<%= element.files[2] %>')"><i
                 class="bi bi-pencil-square"></i></a>
             <a class="text-dark" href="" data-bs-toggle="modal" data-bs-target="#deleterateModal"
               onclick="deletefun('<%= element._id %>')"><i class="bi bi-trash3-fill"></i></a>
@@ -181,18 +181,9 @@
 
           <!-- Right Column -->
           <div class="col-md-6">
-            <div class="mb-3">
-              <label for="deliveryper" class="form-label">Delivery Percentage</label>
-              <input class="form-control" value="0" type="number" name="delivery_per" id="deliveryper"
-                placeholder="Enter delivery charge %">
-              <p class="text-danger d-none" id="deliveryperpop">Please Enter Delivery%!</p>
+           
 
-            </div>
-
-            <div class="mb-3">
-              <label for="deliverycharge" class="form-label">Delivery Charge</label>
-              <input class="form-control" value="0" type="number" name="deliverycharge" id="deliverycharge" readonly>
-            </div>
+            
 
             <div class="mb-3">
               <label for="packingper" class="form-label">Packing Charge %</label>
@@ -371,22 +362,8 @@
 
           </div>
 
-          <!-- Right Column -->
+
           <div class="col-md-6">
-            <div class="mb-3">
-              <label for="deliveryper" class="form-label">Delivery Percentage</label>
-              <input class="form-control" value="0" type="number" name="delivery_per" id="editdeliveryper"
-                placeholder="Enter delivery charge %">
-              <p class="text-danger d-none" id="editdeliveryperpop">Please Enter Delivery%!</p>
-
-            </div>
-
-            <div class="mb-3">
-              <label for="deliverycharge" class="form-label">Delivery Charge</label>
-              <input class="form-control" value="0" type="number" name="deliverycharge" id="editdeliveryamount"
-                readonly>
-            </div>
-
             <div class="mb-3">
               <label for="packingper" class="form-label">Packing Charge %</label>
               <input class="form-control" value="0" type="number" name="packing_per" id="editpackingper"
@@ -527,8 +504,7 @@
     const addgstperinput = document.getElementById('addgstperinput').value;
     const addgstperinputpop = document.getElementById('addgstperinputpop');
 
-    const deliveryper = document.getElementById('deliveryper').value;
-    const deliveryperpop = document.getElementById('deliveryperpop');
+   
 
     const packingper = document.getElementById('packingper').value;
     const packingperpop = document.getElementById('packingperpop');
@@ -578,13 +554,7 @@
       addgstperinputpop.classList.add('d-none');
     }
 
-    // Validate Delivery Percentage
-    if (!deliveryper || deliveryper < 0) {
-      deliveryperpop.classList.remove('d-none');
-      isValid = false;
-    } else {
-      deliveryperpop.classList.add('d-none');
-    }
+   
 
     // Validate Packing Percentage
     if (!packingper || packingper < 0) {
@@ -613,7 +583,6 @@
       { id: 'editvarientname', popId: 'editvarientnamepop', message: 'Please Select Varient Name!' },
       { id: 'editRateinput', popId: 'editratepop', message: 'Please Enter a Valid Rate!', validate: (value) => value !== "" },
       { id: 'editgstperinput', popId: 'editgstperinputpop', message: 'Please Enter a Valid GST Percentage!', validate: (value) => value !== "" },
-      { id: 'editdeliveryper', popId: 'editdeliveryperpop', message: 'Please Enter a Valid Delivery Percentage!', validate: (value) => value !== "" },
       { id: 'editpackingper', popId: 'editpackingperpop', message: 'Please Enter a Valid Packing Charge Percentage!', validate: (value) => value !== "" },
       { id: 'editdeliverytime', popId: 'editdeliverytimepop', message: 'Please Enter a Valid Delivery Time!', validate: (value) => value.trim() !== '' },
     ];
@@ -648,22 +617,22 @@
 
 
 
-  function editFun(hotelname, foodname, varientname, rate, gst, delivery, packing, time, firstimage, secondimage, thirdimage, id, stock, file1, file2, file3) {
+  function editFun(hotelname, foodname, varientname, rate, gst, packing, time, firstimage, secondimage, thirdimage, id, stock, file1, file2, file3) {
     document.getElementById('edithotel').value = hotelname
     document.getElementById('editfoodname').value = foodname
     document.getElementById('editvarientname').value = varientname
     document.getElementById('editRateinput').value = rate
     document.getElementById('editgstperinput').value = gst
-    document.getElementById('editdeliveryper').value = delivery
+   
     document.getElementById('editpackingper').value = packing
     document.getElementById('editdeliverytime').value = time
     document.getElementById('editstock').value = stock
     gstamount = rate * gst / 100
     document.getElementById('editgstamount').value = gstamount
-    deliveryamount = rate * delivery / 100
+
     packingamount = rate * packing / 100
-    totalrate = parseFloat(rate) + parseFloat(gstamount) + parseFloat(deliveryamount) + parseFloat(packingamount)
-    document.getElementById('editdeliveryamount').value = deliveryamount
+    totalrate = parseFloat(rate) + parseFloat(gstamount)  + parseFloat(packingamount)
+    
     document.getElementById('editpackingamount').value = packingamount
     document.getElementById('edittotalrate').value = totalrate
     document.getElementById('editpreviewImage1').src = firstimage
@@ -685,11 +654,7 @@
     document.getElementById("editgstamount").value = (rateInput * gstPercentage / 100)
   })
 
-  document.getElementById("editdeliveryper").addEventListener('change', function () {
-    const rateInput = parseFloat(document.getElementById("editRateinput").value)
-    const deliveryper = parseFloat(this.value)
-    document.getElementById("editdeliveryamount").value = (rateInput * deliveryper / 100)
-  })
+ 
   document.getElementById("editpackingper").addEventListener('change', function () {
     const rateInput = parseFloat(document.getElementById("editRateinput").value)
     const packingper = parseFloat(this.value)
@@ -698,38 +663,32 @@
   document.getElementById("editRateinput").addEventListener('change', function () {
     const rateInput = parseFloat(this.value)
     const gstamount = parseFloat(document.getElementById("editgstamount").value)
-    const deliveryamount = parseFloat(document.getElementById("editdeliveryamount").value)
+    
     const packingamount = parseFloat(document.getElementById("editpackingamount").value)
-    document.getElementById("edittotalrate").value = rateInput + gstamount + deliveryamount + packingamount
+    document.getElementById("edittotalrate").value = rateInput + gstamount  + packingamount
   })
   document.getElementById("editgstperinput").addEventListener('change', function () {
     const rateInput = parseFloat(document.getElementById("editRateinput").value)
     const gstamount = rateInput * parseFloat(this.value) / 100
-    const deliveryamount = parseFloat(document.getElementById("editdeliveryamount").value)
+   
     const packingamount = parseFloat(document.getElementById("editpackingamount").value)
-    document.getElementById("edittotalrate").value = rateInput + gstamount + deliveryamount + packingamount
+    document.getElementById("edittotalrate").value = rateInput + gstamount  + packingamount
   })
-  document.getElementById("editdeliveryper").addEventListener('change', function () {
-    const rateInput = parseFloat(document.getElementById("editRateinput").value)
-    const gstamount = parseFloat(document.getElementById("editgstamount").value)
-    const deliveryamount = rateInput * parseFloat(this.value) / 100
-    const packingamount = parseFloat(document.getElementById("editpackingamount").value)
-    document.getElementById("edittotalrate").value = rateInput + gstamount + deliveryamount + packingamount
-  })
+  
   document.getElementById("editpackingper").addEventListener('change', function () {
     const rateInput = parseFloat(document.getElementById("editRateinput").value)
     const gstamount = parseFloat(document.getElementById("editgstamount").value)
-    const deliveryamount = parseFloat(document.getElementById("editdeliveryamount").value)
+  
     const packingamount = rateInput * parseFloat(this.value) / 100
-    document.getElementById("edittotalrate").value = rateInput + gstamount + deliveryamount + packingamount
+    document.getElementById("edittotalrate").value = rateInput + gstamount  + packingamount
   })
   document.getElementById("editRateinput").addEventListener('change', function () {
     const rateInput = parseFloat(this.value)
     const gstPercentage = parseFloat(document.getElementById('editgstperinput').value)
-    const deliveryper = parseFloat(document.getElementById("editdeliveryper").value)
+  
     const packingper = parseFloat(document.getElementById("editpackingper").value)
     document.getElementById("editgstamount").value = rateInput * gstPercentage / 100
-    document.getElementById("editdeliveryamount").value = rateInput * deliveryper / 100
+  
     document.getElementById("editpackingamount").value = rateInput * packingper / 100
     document.getElementById('edittotalrate').value = rateInput + (rateInput * gstPercentage / 100) + (rateInput * deliveryper / 100) + (rateInput * packingper / 100)
 
@@ -800,11 +759,7 @@
     const gstPercentage = parseFloat(this.value)
     document.getElementById("addgstamntinput").value = (rateInput * gstPercentage / 100)
   })
-  document.getElementById("deliveryper").addEventListener('input', function () {
-    const rateInput = parseFloat(document.getElementById("addRateinput").value)
-    const deliveryper = parseFloat(this.value)
-    document.getElementById("deliverycharge").value = (rateInput * deliveryper / 100)
-  })
+ 
   document.getElementById("packingper").addEventListener('input', function () {
     const rateInput = parseFloat(document.getElementById("addRateinput").value)
     const packingper = parseFloat(this.value)
@@ -813,40 +768,31 @@
   document.getElementById("addRateinput").addEventListener('input', function () {
     const rateInput = parseFloat(this.value)
     const gstamount = parseFloat(document.getElementById("addgstamntinput").value)
-    const deliveryamount = parseFloat(document.getElementById("deliverycharge").value)
     const packingamount = parseFloat(document.getElementById("packingcharge").value)
-    document.getElementById("totalRate").value = rateInput + gstamount + deliveryamount + packingamount
+    document.getElementById("totalRate").value = rateInput + gstamount  + packingamount
   })
   document.getElementById("addgstperinput").addEventListener('input', function () {
     const rateInput = parseFloat(document.getElementById("addRateinput").value)
     const gstamount = rateInput * parseFloat(this.value) / 100
-    const deliveryamount = parseFloat(document.getElementById("deliverycharge").value)
+  
     const packingamount = parseFloat(document.getElementById("packingcharge").value)
-    document.getElementById("totalRate").value = rateInput + gstamount + deliveryamount + packingamount
+    document.getElementById("totalRate").value = rateInput + gstamount  + packingamount
   })
-  document.getElementById("deliveryper").addEventListener('input', function () {
-    const rateInput = parseFloat(document.getElementById("addRateinput").value)
-    const gstamount = parseFloat(document.getElementById("addgstamntinput").value)
-    const deliveryamount = rateInput * parseFloat(this.value) / 100
-    const packingamount = parseFloat(document.getElementById("packingcharge").value)
-    document.getElementById("totalRate").value = rateInput + gstamount + deliveryamount + packingamount
-  })
+ 
   document.getElementById("packingper").addEventListener('input', function () {
     const rateInput = parseFloat(document.getElementById("addRateinput").value)
     const gstamount = parseFloat(document.getElementById("addgstamntinput").value)
-    const deliveryamount = parseFloat(document.getElementById("deliverycharge").value)
+   
     const packingamount = rateInput * parseFloat(this.value) / 100
-    document.getElementById("totalRate").value = rateInput + gstamount + deliveryamount + packingamount
+    document.getElementById("totalRate").value = rateInput + gstamount  + packingamount
   })
   document.getElementById("addRateinput").addEventListener('input', function () {
     const rateInput = parseFloat(this.value)
     const gstPercentage = parseFloat(document.getElementById('addgstperinput').value)
-    const deliveryper = parseFloat(document.getElementById("deliveryper").value)
     const packingper = parseFloat(document.getElementById("packingper").value)
     document.getElementById("addgstamntinput").value = rateInput * gstPercentage / 100
-    document.getElementById("deliverycharge").value = rateInput * deliveryper / 100
     document.getElementById("packingcharge").value = rateInput * packingper / 100
-    document.getElementById('totalRate').value = rateInput + (rateInput * gstPercentage / 100) + (rateInput * deliveryper / 100) + (rateInput * packingper / 100)
+    document.getElementById('totalRate').value = rateInput + (rateInput * gstPercentage / 100)  + (rateInput * packingper / 100)
   })
 
 

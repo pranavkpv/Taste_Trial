@@ -86,6 +86,7 @@ const approveReturn = async (req, res) => {
          { $set: { 'items.$.status': "returned" } }
       )
       await orderschema.updateOne({_id:orderId},{$inc:{totalAmount:-minusAmount,totalOffer:-minusOffer}})
+      await orderschema.updateOne({_id:orderId},{$set:{paidStatus:"completed"}})
       const newWallet=new walletschema({
          desription:"Order Return",
          type:"Credit",

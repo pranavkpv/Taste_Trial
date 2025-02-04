@@ -42,19 +42,7 @@
                   <p><%= element.foodDetails[0].foodname %></p>
                </td>
                <td>
-                  <ul class="list-unstyled text-start m-auto mt-4" style="max-width: 200px;">
-                     <% if (element.foodDetails[0].offer > element.categoryDetails[0].offer) { %>
-                     <li><%= element.items.quantity*(element.rateDetails[0].rate + element.rateDetails[0].rate*element.rateDetails[0].gst_per/100 +
-                      element.rateDetails[0].rate * element.rateDetails[0].packing_per/100 +
-                      element.rateDetails[0].rate * element.rateDetails[0].delivery_per/100 -
-                      element.rateDetails[0].rate * element.foodDetails[0].offer/100) %></li>
-                     <% } else { %>
-                     <li><%= element.items.quantity*(element.rateDetails[0].rate + element.rateDetails[0].rate*element.rateDetails[0].gst_per/100 +
-                           element.rateDetails[0].rate * element.rateDetails[0].packing_per/100 +
-                           element.rateDetails[0].rate * element.rateDetails[0].delivery_per/100 -
-                           element.rateDetails[0].rate * element.categoryDetails[0].offer/100) %></li>
-                     <% } %>
-                  </ul>
+                  <p><%= element.items.quantity*(element.items.rate + element.items.rate* element.items.gst_per/100 + element.items.rate*element.items.packing_per/100 -element.items.rate*element.items.offer_per/100) %></p>
                </td>
           
                <td>

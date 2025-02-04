@@ -18,6 +18,7 @@ const crypto = require("crypto");
 const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const path = require('path');
+const orderschema = require('../../model/orderschema')
 
 
 
@@ -402,6 +403,9 @@ const review = (req, res) => {
 
 const confirmorder = async (req, res) => {
    try {
+
+      const orderId=req.query.orderId
+      console.log(req.query)
       const userid = req.session.user
       const cartIds = req.query.cartIDS.split(',')
       const quantity = req.query.purchaseQty.split(',')
@@ -409,18 +413,26 @@ const confirmorder = async (req, res) => {
          await cartschema.findByIdAndUpdate({ _id: cartIds[i] }, { number: quantity[i] })
       }
       cartIds.forEach(element => new ObjectId(element));
-      const addressess = await addressschema.find({ user_id: userid })
+      const addressess = await addressschema.aggregate([{$match:{ user_id: new ObjectId(userid) }},{
+         $lookup:{
+            from :"locations",
+            localField:"location_id",
+            foreignField:"_id",
+            as:"locationDetails"
+         }
+      }])
       const successmessage = req.flash('success')
       const couponsuccessmessage = req.flash('couponsuccess')
       const errormessage = req.flash('error')
       const couponCode = req.flash('couponCode')
+      const failedMessage = req.flash('failed')
       const couponCodestr = couponCode.toString()
       const coupons = await couponschema.findOne({ couponCode: couponCode })
       const users = await userschema.findOne({ _id: userid })
       const removeSuccess = req.flash('removeSuccess')
       const orders=await orderSchema.find({user_id:userid})
       const x = orders.map((element)=>element.couponId)
-      console.log(x)
+  
       const availCoupon=await couponschema.find({_id:{$nin:x}})
       const availCoupons=availCoupon.map((element)=>{
          const day=element.expiryDate.getDate()
@@ -428,7 +440,7 @@ const confirmorder = async (req, res) => {
          const year=element.expiryDate.getFullYear()
          return { ...element, expiryDates: `${day}-${month}-${year}` };
       })
-      console.log(availCoupons)
+
       const datas = await cartschema.aggregate([{ $match: { user_id: new ObjectId(userid), _id: { $in: cartIds.map(id => new ObjectId(id)) } } },
       { $lookup: { from: "rates", localField: "rate_id", foreignField: "_id", as: "rateDetails" } },
       { $unwind: { path: "$rateDetails", preserveNullAndEmptyArrays: true } },
@@ -437,7 +449,7 @@ const confirmorder = async (req, res) => {
       { $lookup: { from: "varients", localField: "rateDetails.varient_id", foreignField: "_id", as: "varientDetails" } },
       { $lookup: { from: "categories", localField: "foodDetails.category_id", foreignField: "_id", as: "categoryDetails" } }
       ])
-      res.render('user/confirmorder', {availCoupon,availCoupons, removeSuccess, coupons, couponCode, couponCodestr, users, userid, errormessage, cartIds, couponsuccessmessage, addressess, datas, successmessage, searchmessage: "", searcheditemname: "" });
+      res.render('user/confirmorder', {orderId,availCoupon,failedMessage,availCoupons, removeSuccess, coupons, couponCode, couponCodestr, users, userid, errormessage, cartIds, couponsuccessmessage, addressess, datas, successmessage, searchmessage: "", searcheditemname: "" });
 
    } catch (error) {
       console.log(error)
@@ -447,14 +459,54 @@ const confirmorder = async (req, res) => {
 
 const orderSuccess = async (req, res) => {
    try {
-      const { addressId, cartId, numberofproduct, selectedPaymentMethod, couponId } = req.body;
+      const { orderId,addressSelect, cartId, numberofproduct, selectedPaymentMethod, couponId } = req.body;
+    
       console.log(req.body)
       const userId = req.session.user;
 
+      const addresses=await addressschema.aggregate([{$match:{_id:new ObjectId(addressSelect)}},{
+         $lookup:{
+            from:"locations",
+            localField:"location_id",
+            foreignField:"_id",
+            as:"locationDetails"
+         }
+      }])
 
-      if (!addressId) {
+      if(orderId && selectedPaymentMethod=="COD"){
+         await orderschema.findByIdAndUpdate({_id:orderId},{
+            paymentmethod:selectedPaymentMethod,
+            paidStatus:"pending",
+            address_id:addressSelect
+         })
+         req.flash("success", "Order Placed Successfully");
+         return res.redirect(`/user/confirmorder?cartIDS=${ cartId }&purchaseQty=${ numberofproduct }`);
+
+      }
+      if(orderId && selectedPaymentMethod=="razorpay" || selectedPaymentMethod=="wallet"){
+         await orderschema.findByIdAndUpdate({_id:orderId},{
+            paymentmethod:selectedPaymentMethod,
+            paidStatus:"completed",
+            address_id:addressSelect
+         })
+         req.flash("success", "Order Placed Successfully");
+         return res.redirect(`/user/confirmorder?cartIDS=${ cartId }&purchaseQty=${ numberofproduct }`);
+      }
+      if(orderId && selectedPaymentMethod=="failedRazorpay"){
+         await orderschema.findByIdAndUpdate({_id:orderId},{
+            paymentmethod:selectedPaymentMethod,
+            paidStatus:"failed",
+            address_id:addressSelect
+         })
+         req.flash("success", "Order Placed Successfully");
+         return res.redirect(`/user/confirmorder?cartIDS=${ cartId }&purchaseQty=${ numberofproduct }`);
+      }
+  
+   
+      if (!addressSelect) {
          req.flash("error", "Must Add Address");
-         return res.redirect("/user/address");
+         return res.redirect(`/user/confirmorder?cartIDS=${ cartId }&purchaseQty=${ numberofproduct }`)
+
       }
 
       const cartIds = Array.isArray(cartId)
@@ -489,7 +541,6 @@ const orderSuccess = async (req, res) => {
                rate: cart.rateDetails[0].rate,
                gst_per: cart.rateDetails[0].gst_per,
                packing_per: cart.rateDetails[0].packing_per,
-               delivery_per: cart.rateDetails[0].delivery_per,
                offer_per: Math.max(food.offer, category.offer),
             };
          })
@@ -500,8 +551,7 @@ const orderSuccess = async (req, res) => {
             item.quantity *
             (item.rate +
                item.rate * (item.gst_per / 100) +
-               item.rate * (item.packing_per / 100) +
-               item.rate * (item.delivery_per / 100));
+               item.rate * (item.packing_per / 100) );
          return sum + itemTotal;
       }, 0);
 
@@ -516,12 +566,13 @@ const orderSuccess = async (req, res) => {
       }
       const newOrder = new orderSchema({
          user_id: userId,
-         address_id: addressId,
+         address_id:addressSelect ,
          paymentmethod: selectedPaymentMethod,
+         deliveryAmount:addresses[0].locationDetails[0].deliveryCharge,
          totalAmount,
          totalOffer,
          couponId,
-         items,
+         items
       });
       const wallets = await walletSchema.find({})
       const sumofcredit = wallets.reduce((sum, element) => {
@@ -550,7 +601,18 @@ const orderSuccess = async (req, res) => {
                userId: userId
             })
             await newWallet.save()
-            await newOrder.save();
+            const newOrders=new orderSchema({
+               user_id: userId,
+               address_id: addressSelect,
+               paymentmethod: selectedPaymentMethod,
+               deliveryAmount:addresses[0].locationDetails[0].deliveryCharge,
+               totalAmount,
+               totalOffer,
+               couponId,
+               items,
+               paidStatus:"completed"
+            });
+            await newOrders.save()
             await cartschema.deleteMany({ _id: { $in: cartIds } });
 
             const stockUpdates = items.map((item, index) => ({
@@ -563,10 +625,54 @@ const orderSuccess = async (req, res) => {
             await rateschema.bulkWrite(stockUpdates);
 
             req.flash("success", "Order Placed Successfully");
-            return res.redirect("/user/cart");
+            return res.redirect(`/user/confirmorder?cartIDS=${ cartId }&purchaseQty=${ numberofproduct }`);
+
          }
 
-      } else {
+      } else if(selectedPaymentMethod=="razorpay") {
+         const newOrders=new orderSchema({
+            user_id: userId,
+            address_id: addressSelect,
+            paymentmethod: selectedPaymentMethod,
+            deliveryAmount:addresses[0].locationDetails[0].deliveryCharge,
+            totalAmount,
+            totalOffer,
+            couponId,
+            items,
+            paidStatus:"completed"
+         });
+         await newOrders.save()
+         await cartschema.deleteMany({ _id: { $in: cartIds } });
+
+         const stockUpdates = items.map((item, index) => ({
+            updateOne: {
+               filter: { _id: item.rate_id },
+               update: { $inc: { stock: -numberofproduct[index] } },
+            },
+         }));
+
+         await rateschema.bulkWrite(stockUpdates);
+
+         req.flash("success", "Order Placed Successfully");
+         return res.redirect(`/user/confirmorder?cartIDS=${ cartId }&purchaseQty=${ numberofproduct }`);
+
+      }else if(selectedPaymentMethod=="failedRazorpay"){
+         const newOrders=new orderSchema({
+            user_id: userId,
+            address_id: addressSelect,
+            paymentmethod: selectedPaymentMethod,
+            deliveryAmount:addresses[0].locationDetails[0].deliveryCharge,
+            totalAmount,
+            totalOffer,
+            couponId,
+            items,
+            paidStatus:"failed"
+         });
+         await newOrders.save()
+         req.flash("failed", "Create The order with Failed Status");
+         return res.redirect(`/user/confirmorder?cartIDS=${ cartId }&purchaseQty=${ numberofproduct }`);
+
+      }else{
          await newOrder.save();
          await cartschema.deleteMany({ _id: { $in: cartIds } });
 
@@ -580,7 +686,8 @@ const orderSuccess = async (req, res) => {
          await rateschema.bulkWrite(stockUpdates);
 
          req.flash("success", "Order Placed Successfully");
-         return res.redirect("/user/cart");
+         return res.redirect(`/user/confirmorder?cartIDS=${ cartId }&purchaseQty=${ numberofproduct }`);
+
       }
 
    } catch (error) {
@@ -663,7 +770,10 @@ const downloadBill = async (req, res) => {
                 packingCharge: orders.reduce((sum, element) => 
                     sum += (element.items.quantity * element.items.rate * element.items.packing_per / 100), 0),
                 deliveryCharge: orders.reduce((sum, element) => 
-                    sum += (element.items.quantity * element.items.rate * element.items.delivery_per / 100), 0)
+                    sum += element.deliveryAmount, 0),
+                TotalOffer :orders.reduce((sum,element)=>
+                  sum += element.totalOffer,0)
+
             };
         };
 
@@ -763,11 +873,11 @@ const downloadBill = async (req, res) => {
                 const summaryY = y + 20;
                 drawRect(doc.page.width - 250, summaryY, 200, 150, COLORS.lightGray);
                 
-                const { gst, packingCharge, deliveryCharge } = charges;
+                const { gst, packingCharge, deliveryCharge,TotalOffer } = charges;
                 const totalAmount = orders.reduce((sum,element)=>{
                   return sum+=element.items.rate*element.items.quantity
                 },0) ;
-                const grandTotal = totalAmount + packingCharge + deliveryCharge + gst;
+                const grandTotal = totalAmount + packingCharge + deliveryCharge + gst - TotalOffer;
 
                 // Summary Details
                 doc.fontSize(10)
@@ -781,14 +891,17 @@ const downloadBill = async (req, res) => {
                    .text('Delivery Charge:', doc.page.width - 230, summaryY + 75)
                    .text(`${deliveryCharge}`, doc.page.width - 90, summaryY + 75)
                    .text('GST :', doc.page.width - 230, summaryY + 95)
-                   .text(`${gst}`, doc.page.width - 90, summaryY + 95);
+                   .text(`${gst}`, doc.page.width - 90, summaryY + 95)
+                   .text('Offer :', doc.page.width - 230, summaryY + 115)
+                   .text(`${TotalOffer}`, doc.page.width - 90, summaryY + 115);
+
 
                 // Grand Total
-                drawRect(doc.page.width - 250, summaryY + 120, 200, 30, COLORS.primary);
+                drawRect(doc.page.width - 250, summaryY + 135, 200, 30, COLORS.primary);
                 doc.fontSize(12)
                    .fillColor(COLORS.white)
-                   .text('Grand Total:', doc.page.width - 210, summaryY + 128)
-                   .text(`${grandTotal.toFixed(2)}`, doc.page.width - 90, summaryY + 128);
+                   .text('Grand Total:', doc.page.width - 210, summaryY + 150)
+                   .text(`${grandTotal.toFixed(2)}`, doc.page.width - 90, summaryY + 150);
 
                 // Footer
                 const footerY = doc.page.height - 100;
@@ -896,7 +1009,7 @@ const logout = async (req, res) => {
          if (err) {
             console.log("error destroying admin session", err)
          }
-         res.redirect('/user/login')
+         res.redirect('/user/load')
       })
    } catch (error) {
       console.log("error during user logout", error)

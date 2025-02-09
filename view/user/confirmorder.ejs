@@ -200,6 +200,7 @@
 </style>
 <%- include('partials/userheader') %>
 <div class="container " style="margin-top:100px">
+   <button class="btn btn-secondary mt-2" onclick="window.history.back()">back</button>
    <h2 class="text-center mb-4">Order Details </h2>
 
 
@@ -225,33 +226,33 @@
             </div>
             <div class="rateDetails">
                <h3 class="text-success">Rate Details</h3>
-               <p><strong>Base Rate : </strong><%= (element.number*element.rateDetails.rate)%></p>
+               <p><strong>Base Rate : </strong><%= (element.number*element.rateDetails.rate).toFixed(2) %></p>
                <p><strong>Gst Amount :
-                  </strong><%= element.number*(element.rateDetails.rate*element.rateDetails.gst_per/100) %></p>
+                  </strong><%= (element.number*(element.rateDetails.rate*element.rateDetails.gst_per/100)).toFixed(2) %></p>
                <p><strong>Packing Charge :
-                  </strong><%= element.number*(element.rateDetails.rate*element.rateDetails.packing_per/100) %></p>
-               
+                  </strong><%= (element.number*(element.rateDetails.rate*element.rateDetails.packing_per/100)).toFixed(2) %></p>
+
                <% if (element.foodDetails[0].offer > 0 || element.categoryDetails[0].offer > 0) { %>
                <% if (element.foodDetails[0].offer > element.categoryDetails[0].offer){ %>
                <p><strong> Offer Amount :
-                  </strong><%=element.number *element.rateDetails.rate*element.foodDetails[0].offer/100 %></p>
+                  </strong><%= (element.number *element.rateDetails.rate*element.foodDetails[0].offer/100).toFixed(2) %></p>
                <p class="fs-5">Final Amount
-                  :<%= element.number*(element.rateDetails.rate+element.rateDetails.rate*element.rateDetails.gst_per/100+
+                  :<%= (element.number*(element.rateDetails.rate+element.rateDetails.rate*element.rateDetails.gst_per/100+
                  element.rateDetails.rate*element.rateDetails.packing_per/100
-                 -  element.rateDetails.rate*element.foodDetails[0].offer/100) %>
+                 -  element.rateDetails.rate*element.foodDetails[0].offer/100)).toFixed(2) %>
                </p>
                <% } else { %>
                <p><strong> Offer Amount :
-                  </strong><%= element.number*element.rateDetails.rate*element.categoryDetails[0].offer/100 %></p>
+                  </strong><%= (element.number*element.rateDetails.rate*element.categoryDetails[0].offer/100).toFixed(2) %></p>
                <p class="fs-5">Final Amount
-                  :<%= element.number*(element.rateDetails.rate+element.rateDetails.rate*element.rateDetails.gst_per/100+
+                  :<%= (element.number*(element.rateDetails.rate+element.rateDetails.rate*element.rateDetails.gst_per/100+
                     element.rateDetails.rate*element.rateDetails.packing_per/100
-                    - element.rateDetails.rate*element.categoryDetails[0].offer/100) %>
+                    - element.rateDetails.rate*element.categoryDetails[0].offer/100)).toFixed(2) %>
                   <% } %>
                   <% } else { %>
                <p class="fs-5">Final Amount
-                  :<%= element.number*(element.rateDetails.rate+element.rateDetails.rate*element.rateDetails.gst_per/100+
-                 element.rateDetails.rate*element.rateDetails.packing_per/100) %>
+                  :<%= (element.number*(element.rateDetails.rate+element.rateDetails.rate*element.rateDetails.gst_per/100+
+                 element.rateDetails.rate*element.rateDetails.packing_per/100)).toFixed(2) %>
                </p>
                <% } %>
             </div>
@@ -335,15 +336,17 @@ datas.forEach(element => {
 
             </div>
             <% if (couponsuccessmessage && couponsuccessmessage.length>0) { %>
-            <div class="net-amount text-danger fs-5 ms-5" id="netAmount">Net Amount: $ <span
-                  id="withcoupon"><%= Math.round(totalSum - totalSum*coupons.discount_per/100) %></span></div>
+            <div class="net-amount text-success fs-5 " style="margin-left:800px">Coupon Amount: $ <span
+                  id="withcoupon"><%=  (totalSum*coupons.discount_per/100).toFixed(2) %></span></div>
+            <div class="net-amount text-danger fs-5" id="netAmount" style="margin-left:800px">Net Amount: $ <span
+                  id="withcoupon"><%= (totalSum - totalSum*coupons.discount_per/100).toFixed(2) %></span></div>
             <% } else { %>
             <div class="net-amount  text-danger fs-5 ms-5" id="netAmount">Net Amount: $ <span
-                  id="withoutCoupon"><%= Math.round(totalSum)  %></span></div>
+                  id="withoutCoupon"><%= (totalSum).toFixed(2)  %></span></div>
             <% } %>
 
          </form>
-       
+
 
          <% if (couponsuccessmessage &&  couponsuccessmessage.length>0) { %>
          <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#removeCoupon"
@@ -351,25 +354,37 @@ datas.forEach(element => {
             onclick="removecoupon('<%= coupons._id %>')">Remove</button>
          <% } %>
 
-         <form action="/user/orderSuccess" method="POST" id="checkout_form" >
-            <input type="text" value="<%= orderId %>" name="orderId">
+         <form action="/user/orderSuccess" method="POST" id="checkout_form">
+            <input type="hidden" value="<%= orderId %>" name="orderId">
             <div class="card shadow-sm mt-5">
                <div class="card-header bg-primary text-white">
                   <h5>Select Delivery Address</h5>
                </div>
-               
+
             </div>
             <div class="card-body">
                <select name="addressSelect" id="addressSelect" class="form-control">
-                  <option value="">select</option>
+                  <option value="" class="d-none">select</option>
+                  <% if (addressess.length === 0) { %>
+                  <option value="">Select Address</option>
+                  <% } else { %>
                   <% addressess.forEach(element => { %>
-                       <option value="<%= element._id %>"><b><%= element.addresstype %></b>:<%= element.locationDetails[0].location %>,<%= element.landmark %>,<%= element.city %>,<%= element.state %>,<%= element.pin_code %></option>
-                     <% }) %>
+                  <option value="<%= element._id %>">
+                     <b><%= element.addresstype %></b>:
+                     <%= element.locationDetails.length > 0 ? element.locationDetails[0].location : "N/A" %>,
+                     <%= element.landmark %>,
+                     <%= element.city %>,
+                     <%= element.state %>,
+                     <%= element.pin_code %>
+                  </option>
+                  <% }) %>
+                  <% } %>
+
                </select>
-               
+
 
             </div>
-       
+
             <% datas.forEach(element => { %>
             <input type="hidden" value="<%= element._id %>" id=cartId name="cartId">
             <input type="hidden" value="<%= element.number %>" id="numberofproduct" name="numberofproduct">
@@ -530,25 +545,25 @@ datas.forEach(element => {
             const rzp1 = new Razorpay(options);
             rzp1.on('payment.failed', async function (response) {
                try {
-                  document.getElementById('selectedPaymentMethod').value="failedRazorpay"
+                  document.getElementById('selectedPaymentMethod').value = "failedRazorpay"
                   await Swal.fire({
                      title: "Payment Failed!",
                      text: "Your payment was unsuccessful. Placing the order with unpaid status.",
                      icon: "error",
                      showConfirmButton: false,
                      timer: 3000
-                  }).then(()=>{
+                  }).then(() => {
                      const form = document.querySelector('#checkout_form');
                      form.submit();
-               })
+                  })
 
-                
+
 
                   if (!orderData.success) {
                      throw new Error('Failed to create unpaid order');
                   }
 
-                
+
 
                } catch (error) {
                   console.error('Failed order creation error:', error);
@@ -574,6 +589,11 @@ datas.forEach(element => {
          });
       }
    });
+
+
+
+
+
    //----------------------------------------------- 
 
 
@@ -616,10 +636,26 @@ datas.forEach(element => {
 
 
 <% if (failedMessage && failedMessage.length>0) { %>
-   <script>
-      Swal.fire({
-         text: "<%= failedMessage %>",
-         icon: "info"
-      });
-   </script>
-   <% } %>
+<script>
+   Swal.fire({
+      text: "<%= failedMessage %>",
+      icon: "info"
+   });
+</script>
+<% } %>
+
+
+<% if (Addresserror && Addresserror.length > 0) { %>
+<script>
+  Swal.fire({
+  title: "Add Address",
+  showDenyButton: true,
+  icon:"warning",
+  confirmButtonText: "Do you Want To Add the Address",
+}).then((result) => {
+  if (result.isConfirmed) {
+   window.location.href=`/user/address`
+  } 
+});
+</script>
+<% } %>

@@ -1,7 +1,7 @@
 const userschema = require('../../model/usershema')
 const usermanagement = async (req, res) => {
    try {
-      const {status}=req.query
+      const status=req.query.status
       const searcheduser = req.query.user || ''; // Get the search query
       const selectedpage = Number(req.query.pagenumber) || 1; // Get the page number
       const limit = 5; // Number of categories per page
@@ -11,21 +11,24 @@ const usermanagement = async (req, res) => {
       const searchFilter = searcheduser
          ? { firstname: { $regex: searcheduser, $options: 'i' } }
          : {};
+      
+      let statusFilter={}
+      if(status=="Blocked" ){
+         statusFilter={is_blocked:true}
+      }else if(status =="Unblocked"){
+         statusFilter={is_blocked:false}
+      }else{
+         statusFilter={}
+      }
+
+      const totalFilter = {...searchFilter,...statusFilter}
+      
 
       // Get filtered data count
-      const totaldata = await userschema.countDocuments(searchFilter);
+      const totaldata = await userschema.countDocuments(totalFilter);
       const page = Math.ceil(totaldata / limit);
 
-      // Get filtered and paginated data
-      let users = await userschema.find(searchFilter).skip(skip).limit(limit);
-      if(req.query.status==='block'){
-         var userData=users.filter(element=>element.is_blocked===true)
-      }else if(req.query.status==='unblock'){
-         var userData=users.filter(element=>element.is_blocked===false)
-      }else {
-         var userData=users
-      }
-      console.log(userData)
+      let userData = await userschema.find({...totalFilter}).skip(skip).limit(limit);
       const startIndex=skip+1
       const successmessage = req.flash('success')
       const errormessage = req.flash('error')

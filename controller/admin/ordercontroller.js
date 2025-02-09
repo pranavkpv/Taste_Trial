@@ -7,6 +7,8 @@ const addressschema = require('../../model/addressschema')
 const categoryschema = require('../../model/categoryschema')
 const hotelschema = require('../../model/hotelschema')
 const { ObjectId } = require('mongodb');
+const couponschema =require('../../model/couponschema')
+const locationSchema = require('../../model/locationSchema')
 
 const order = async (req, res) => {
    try {
@@ -14,14 +16,23 @@ const order = async (req, res) => {
       const selectedpage = Number(req.query.pagenumber) || 1; // Get the page number
       const limit = 5; // Number of categories per page
       const skip = (selectedpage - 1) * limit; // Calculate the skip value
+      const selectedStatus=req.query.status
 
       // Search filter
       const searchFilter = searchedinvoice
-         ? { title: { $regex: searchedinvoice, $options: 'i' }, _id: req.query.orderid }
+         ? { _id: { $regex: searchedinvoice, $options: 'i' }, _id: req.query.orderid }
          : {};
+      
+   
+         let selectedStatusFilter = {};
+         if (selectedStatus && selectedStatus !== "All") {
+            selectedStatusFilter = { "items.status": selectedStatus };
+         }
+
+      const totalFilter={...searchFilter,...selectedStatusFilter}
 
       // Get filtered data count
-      const totaldata = await orderschema.countDocuments(searchFilter);
+      const totaldata = await orderschema.countDocuments(totalFilter);
       const page = Math.ceil(totaldata / limit);
 
       // Get filtered and paginated data
@@ -58,8 +69,15 @@ const order = async (req, res) => {
                foreignField:"_id",
                as:"categoryDetails"
             }
+         },{
+            $lookup:{
+               from:"coupons",
+               localField:"couponId",
+               foreignField:"_id",
+               as:"couponDetails"
+            }
          }
-         ,{$match:{"items.status":{$ne:"waiting for approval"}}}, { $sort: { createdAt: -1 } },
+         ,{$match:{"items.status":{$ne:"waiting for approval"},paidStatus:{$ne:"failed"},...totalFilter}}, { $sort: { createdAt: -1 } },
          {$skip:skip},{$limit:limit}
       ]);
 
@@ -71,8 +89,10 @@ const order = async (req, res) => {
 
       })
 
+      
 
-      res.render('admin/order', { orders, startIndex, page, selectedpage, searchedinvoice });
+
+      res.render('admin/order', { orders, startIndex, page, selectedpage, searchedinvoice,selectedStatus });
    } catch (error) {
       console.error("Error fetching orders:", error);
       res.status(500).send("Server Error");
@@ -84,6 +104,16 @@ const updateStatus = async (req, res) => {
    try {
       const { orderId, itemId, newStatus } = req.body;
       console.log(req.body)
+      const orders=await orderschema.findOne({_id:orderId})
+
+      if(newStatus == "delivered" && orders.items.length == 1){
+         await orderschema.updateOne(
+            { _id: orderId, 'items._id': itemId },
+            { $set: { 'items.$.status': newStatus} }
+         );
+         await orderschema.updateOne({_id:orderId},{$set:{paidStatus:"completed"}})
+         return res.json({ success: true });
+      }
       await orderschema.updateOne(
          { _id: orderId, 'items._id': itemId },
          { $set: { 'items.$.status': newStatus } }
@@ -98,26 +128,24 @@ const updateStatus = async (req, res) => {
 
 const orderDetails = async (req, res) => {
    try {
-      const orders = await orderschema.findOne({ _id: new ObjectId(req.query.orderid) })
-      const rates = await rateschema.findOne({ _id: new ObjectId(req.query.rateid) })
-   
-      const foods = await foodschema.findOne({ _id: rates.food_id })
-      const categories = await categoryschema.findOne({_id:foods.category_id})
-      const varients = await varientschema.findOne({ _id: rates.varient_id })
-      const users = await userschema.findOne({ _id: new ObjectId(req.query.userid) })
-      const addresses = await addressschema.findOne({ _id: orders.address_id })
-      const date = orders.createdAt
-      const formattedDate = date.toISOString().split('T')[0];
-      const hotels=await hotelschema.findOne({_id:new ObjectId(rates.hotel_id)})
-      
-      let Quantity=0
-      for(let i=0;i<orders.items.length;i++){
-         if(orders.items[i].rate_id.toString()==new ObjectId(req.query.rateid)){
-              Quantity=orders.items[i].quantity
-         }
-      }
+      const {orderid,rateid}=req.query
+      const orders = await orderschema.findOne({_id:orderid})
       console.log(orders)
-      res.render('admin/orderDetails', { rates,hotels, foods, varients, users, addresses, formattedDate, orders,Quantity,categories })
+      const rates = await rateschema.findOne({_id:rateid})
+      const foods = await foodschema.findOne({_id:rates.food_id})
+      const varients = await varientschema.findOne({_id:rates.varient_id})
+      const users = await userschema.findOne({_id:orders.user_id})
+      const addresses = await addressschema.findOne({_id:orders.address_id})
+      const selectedData = orders.items.filter((element)=>{
+        return  element.rate_id=rateid
+      })
+      const coupons = await couponschema.findOne({_id:orders.couponId})
+      console.log(coupons)
+      const locations = await locationSchema.findOne({_id:addresses.location_id})
+     
+      res.render('admin/orderDetails',{orders,rates,foods,varients,users,addresses,selectedData,coupons,locations})
+      
+   
 
    } catch (error) {
       console.log(error)

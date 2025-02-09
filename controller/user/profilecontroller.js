@@ -12,7 +12,7 @@ const orderschema = require('../../model/orderschema')
 const categoryschema = require('../../model/categoryschema')
 const couponschema = require('../../model/couponschema')
 const walletschema = require('../../model/walletSchema')
-const locationSchema=require('../../model/locationSchema')
+const locationSchema = require('../../model/locationSchema')
 const ObjectId = mongoose.Types.ObjectId;
 
 const dashboard = async (req, res) => {
@@ -28,17 +28,18 @@ const address = async (req, res) => {
    try {
       const successmessage = req.flash('success')
       const userid = req.session.user
-      const locations=await locationSchema.find()
-      const addressess = await addressSchema.aggregate([{$match:{ user_id: new ObjectId(userid) }},
-         {$lookup:{
-            from:"locations",
-            localField:"location_id",
-            foreignField:"_id",
-            as:"locationDetails"
-         }}
+      const locations = await locationSchema.find()
+      const addressess = await addressSchema.aggregate([{ $match: { user_id: new ObjectId(userid) } },
+      {
+         $lookup: {
+            from: "locations",
+            localField: "location_id",
+            foreignField: "_id",
+            as: "locationDetails"
+         }
+      }
       ])
-      console.log(addressess)
-      res.render('user/address', { userid, successmessage,locations, addressess, searchmessage: "", searcheditemname: "" })
+      res.render('user/address', { userid, successmessage, locations, addressess, searchmessage: "", searcheditemname: "" })
    } catch (error) {
       console.log(error)
    }
@@ -47,7 +48,7 @@ const address = async (req, res) => {
 const addAddress = async (req, res) => {
    try {
 
-      const { userid, addresstype,locationId, city, state, pincode, landmark, mobilenumber, alternativenumber } = req.body
+      const { userid, addresstype, locationId, city, state, pincode, landmark, mobilenumber, alternativenumber } = req.body
       const newaddress = new addressSchema({
          user_id: userid,
          city,
@@ -57,7 +58,7 @@ const addAddress = async (req, res) => {
          mobile_no: mobilenumber,
          alternative_no: alternativenumber,
          addresstype,
-         location_id:locationId
+         location_id: locationId
       })
 
       await newaddress.save()
@@ -72,22 +73,27 @@ const addAddress = async (req, res) => {
 
 const editAddress = async (req, res) => {
    try {
-      const userid=req.session.user
-      const { editids, addresstype,editNearByLocation, city, state, pincode, landmark, mobilenumber, alternativenumber } = req.body
-      console.log(req.body)
+
+      const userid = req.session.user
+      const { editids, addresstype, editNearByLocation, city, state, pin, landmark, mobile, alternative } = req.body
+      if(!city || !state || !pin || !landmark || !mobile || !alternative ){
+        return res.json({need:"Must Required All Fields"})
+      }
+   
+
       await addressSchema.findByIdAndUpdate({ _id: editids }, {
-         user_id:userid,
+         user_id: userid,
          city,
          state,
-         pin_code: pincode,
+         pin_code: pin,
          landmark,
-         mobile_no: mobilenumber,
-         alternative_no: alternativenumber,
+         mobile_no: mobile,
+         alternative_no: alternative,
          addresstype,
          location_id: new ObjectId(editNearByLocation)
       })
-      req.flash('success', 'Address Edited Successfully')
-      res.redirect(`/user/address/`)
+      res.json({success: 'Address Edited Successfully'})
+
    } catch (error) {
       console.log(error)
    }
@@ -119,15 +125,32 @@ const changeAccount = async (req, res) => {
 
 const updateAction = async (req, res) => {
    try {
-      const { fname, lname, phone, email, userid } = req.body
+      const userId=req.session.user
+     const {firstName,lastName,phoneNumber,email}=req.body
+     console.log(req.body)
+      if(!firstName || firstName==""){
+         return res.json({nofirstName:"This field is required"})
+      }
+      if(!lastName || lastName==""){
+         return res.json({nolastName:"This field is required"})
+      }
+      if(!phoneNumber || phoneNumber==""){
+         return res.json({noPhone:"This field is required"})
+      }
+      if(!email || email==""){
+         return res.json({noEmail:"This field is required"})
+      }
+      const existEmail=await userschema.findOne({_id:{$ne:userId},email:email})
+      if(existEmail){
+         return res.json({existUser:"User Already Exist"})
+      }
       await userschema.updateOne({ email: email }, {
-         firstname: fname,
-         lastname: lname,
-         phonenumber: phone,
+         firstname: firstName,
+         lastname: lastName,
+         phonenumber: phoneNumber,
          email: email
       })
-      req.flash('success', "Updated Successfully")
-      res.redirect(`/user/changeAccount`)
+       res.json({success:"SuccessFully Addedd the Account"})
    } catch (error) {
       console.log(error)
    }
@@ -172,7 +195,6 @@ const order = async (req, res) => {
       const orderss = await orderschema.aggregate([{ $match: { user_id: new ObjectId(userid) } }, { $unwind: "$items" }])
       const page = Math.ceil(orderss.length / limit)
 
-
       // Render the orders page
       res.render('user/order', { userid, orders, selectedPage, successmessage, searchmessage: "", searcheditemname: "", page });
    } catch (error) {
@@ -184,61 +206,112 @@ const order = async (req, res) => {
 
 const orderCancel = async (req, res) => {
    try {
-
       const userId = req.session.user
       const numQty = parseInt(req.body.qty);
       const rates = await rateschema.findOne({ _id: req.body.rateId })
       const orders = await orderschema.findOne({ _id: req.body.orderid })
       const x = await orderschema.findOne({ _id: req.body.orderid })
       const result = x.items.filter(val => val.rate_id == req.body.rateId)
+
       const minusAmount = result[0].quantity * (result[0].rate + result[0].rate * result[0].gst_per / 100 +
-         result[0].rate * result[0].packing_per / 100 + result[0].rate * result[0].delivery_per / 100)
+         result[0].rate * result[0].packing_per / 100)
       const minusOffer = result[0].quantity * result[0].rate * result[0].offer_per / 100
+
       if (orders.paymentmethod == "razorpay" || orders.paymentmethod == "wallet") {
-         await rateschema.findByIdAndUpdate({ _id: req.body.rateId }, { $inc: { stock: numQty } });
-         await rateschema.findByIdAndUpdate({ _id: req.body.rateId }, { $inc: { stock: numQty } });
-         await orderschema.updateOne(
-            {
-               _id: req.body.orderid,
-               "items.rate_id": req.body.rateId,  // Search for the matching rate_id inside the items array
-               "items.status": { $in: ["processing", "packing", "onTheWay"] }
-            },
-            {
-               $set: {
-                  "items.$.status": "cancelled"  // Use $ to target the matching element
+         if (orders.items.length == 1) {
+            await rateschema.findByIdAndUpdate({ _id: req.body.rateId }, { $inc: { stock: numQty } });
+            await orderschema.updateOne(
+               {
+                  _id: req.body.orderid,
+                  "items.rate_id": req.body.rateId
+               },
+               {
+                  $set: {
+                     "items.$.status": "cancelled"
+                  }
                }
-            }
-         );
-         await orderschema.updateOne({ _id: req.body.orderid }, { $inc: { totalAmount: -minusAmount, totalOffer: -minusOffer } })
+            );
+
+            await orderschema.findByIdAndUpdate({ _id: req.body.orderid }, { $inc: { totalAmount: -minusAmount, totalOffer: -minusOffer } })
+            await orderschema.findByIdAndUpdate({ _id: req.body.orderid }, { deliveryAmount: 0 })
+            const newWallet = new walletschema({
+               desription: "Order Cancel",
+               type: "Credit",
+               amount: minusAmount - minusOffer,
+               userId: userId
+            })
+            await newWallet.save()
+            req.flash('success', "The order was cancelled successfully");
+            return res.redirect('/user/order');
+
+         } else {
+            await rateschema.findByIdAndUpdate({ _id: req.body.rateId }, { $inc: { stock: numQty } });
+            await orderschema.updateOne(
+               {
+                  _id: req.body.orderid,
+                  "items.rate_id": req.body.rateId
+               },
+               {
+                  $set: {
+                     "items.$.status": "cancelled"
+                  }
+               }
+            );
+
+            await orderschema.findByIdAndUpdate({ _id: req.body.orderid }, { $inc: { totalAmount: -minusAmount, totalOffer: -minusOffer } })
 
 
-         const newWallet = new walletschema({
-            desription: "Order Cancel",
-            type: "Credit",
-            amount: minusAmount - minusOffer,
-            userId: userId
-         })
-         await newWallet.save()
-         req.flash('success', "The order was cancelled successfully.");
-         res.redirect('/user/order');
+            const newWallet = new walletschema({
+               desription: "Order Cancel",
+               type: "Credit",
+               amount: minusAmount - minusOffer,
+               userId: userId
+            })
+            await newWallet.save()
+            req.flash('success', "The order was cancelled successfully");
+            return res.redirect('/user/order');
+         }
+
       } else {
-         await rateschema.findByIdAndUpdate({ _id: req.body.rateId }, { $inc: { stock: numQty } });
-         await orderschema.updateOne(
-            {
-               _id: req.body.orderid,
-               "items.rate_id": req.body.rateId,  // Search for the matching rate_id inside the items array
-               "items.status": { $in: ["processing", "packing", "onTheWay"] }
-            },
-            {
-               $set: {
-                  "items.$.status": "cancelled"  // Use $ to target the matching element
+         if (orders.items.length == 1) {
+            await rateschema.findByIdAndUpdate({ _id: req.body.rateId }, { $inc: { stock: numQty } });
+            await orderschema.updateOne(
+               {
+                  _id: req.body.orderid,
+                  "items.rate_id": req.body.rateId
+               },
+               {
+                  $set: {
+                     "items.$.status": "cancelled"
+                  }
                }
-            }
-         );
-         await orderschema.updateOne({ _id: req.body.orderid }, { $inc: { totalAmount: -minusAmount, totalOffer: -minusOffer } })
+            );
+            await orderschema.updateOne({ _id: req.body.orderid }, { $inc: { totalAmount: -minusAmount, totalOffer: -minusOffer } })
+            await orderschema.updateOne({ _id: req.body.orderid }, {deliveryAmount:0})
 
-         req.flash('success', "The order was cancelled successfully.");
-         res.redirect('/user/order');
+
+            req.flash('success', "The order was cancelled successfully.");
+            return res.redirect('/user/order');
+         } else {
+            await rateschema.findByIdAndUpdate({ _id: req.body.rateId }, { $inc: { stock: numQty } });
+            await orderschema.updateOne(
+               {
+                  _id: req.body.orderid,
+                  "items.rate_id": req.body.rateId
+               },
+               {
+                  $set: {
+                     "items.$.status": "cancelled"
+                  }
+               }
+            );
+            await orderschema.updateOne({ _id: req.body.orderid }, { $inc: { totalAmount: -minusAmount, totalOffer: -minusOffer } })
+
+            req.flash('success', "The order was cancelled successfully.");
+            return res.redirect('/user/order');
+         }
+
+
       }
 
    } catch (error) {

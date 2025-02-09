@@ -124,6 +124,8 @@ router.post('/removeCoupon',usercontroller.removeCoupon)
 router.get('/wallethistory',walletcontroller.wallet)
 router.get('/download-invoice',usercontroller.downloadBill)
 
+
+
 router.get('/logout',usercontroller.logout)
 
 module.exports=router

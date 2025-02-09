@@ -1,5 +1,6 @@
 <%- include('partials/admin') %>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+   integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
 
 
@@ -19,9 +20,25 @@
             <span class="input-group-text bg-secondary text-light"><i class="fas fa-search"></i></span>
             <input type="text" id="searchInput" oninput="searchInvoice(this.value)" class="form-control"
                placeholder="Search by Invoice Number..." value="">
-
          </div>
-
+      </div>
+      <div class="col-md-6">
+         <div class="input-group">
+            <select name="" id="status" class="form-control" onchange="status()">
+               <option value=""><% if (selectedStatus ) { %>
+                  <%= selectedStatus %>
+                  <% } else { %>
+                  select
+                  <% } %></option>
+               <option value="cancelled">Cancelled</option>
+               <option value="delivered">Delivered</option>
+               <option value="processing">Processing</option>
+               <option value="packing">Packing</option>
+               <option value="onTheWay">onTheWay</option>
+               <option value="returned">returned</option>
+               <option value="All">All</option>
+            </select>
+         </div>
       </div>
    </div>
    <div class="table-responsive">
@@ -46,9 +63,17 @@
                <td><img src="<%= element.rateDetails[0].images[0] %>" alt=""><br>
                   <p><%= element.foodDetails[0].foodname %></p>
                </td>
+               <% if (element.couponDetails.length > 0) { %>
                <td>
-                 <%= element.items.quantity * (element.items.rate+element.items.rate*element.items.gst_per/100+element.items.rate*element.items.packing_per/100+element.items.rate*element.items.offer_per/100) %>
+                  <%= (element.items.quantity * (element.items.rate+element.items.rate*element.items.gst_per/100+element.items.rate*element.items.packing_per/100-element.items.rate*element.items.offer_per/100)-
+               element.items.quantity * (element.items.rate+element.items.rate*element.items.gst_per/100+element.items.rate*element.items.packing_per/100-element.items.rate*element.items.offer_per/100)*element.couponDetails[0].discount_per/100).toFixed(2) %>
                </td>
+               <% } else { %>
+               <td>
+                  <%= (element.items.quantity * (element.items.rate+element.items.rate*element.items.gst_per/100+element.items.rate*element.items.packing_per/100-element.items.rate*element.items.offer_per/100)).toFixed(2) %>
+               </td>
+               <% } %>
+
 
                <td>
                   <div class="dropdown">
@@ -64,12 +89,11 @@
                           btn-danger
                           <% } else { %>
                            btn-danger
-                     <% } %>" type="button" data-bs-toggle="dropdown"
-                        aria-expanded="false">
+                     <% } %>" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <%= element.items.status %>
                      </button>
 
-                     
+
                      <% if (element.items.status === "cancelled" || element.items.status === "delivered" || element.items.status === "waiting for approval" || element.items.status === "returned") { %>
                      <!-- Dropdown hidden for 'cancelled' and 'delivered' -->
                      <ul class="dropdown-menu d-none">
@@ -106,7 +130,6 @@
                   <form action="/admin/orderDetails">
                      <input type="hidden" value="<%= element._id %>" name="orderid">
                      <input type="hidden" value="<%= element.items.rate_id %>" name="rateid">
-                     <input type="hidden" value="<%= element.userDetails[0]._id %>" name="userid">
                      <button type="submit" class="btn btn-primary">View</button>
                   </form>
                </td>
@@ -129,7 +152,8 @@
 
 <%- include('partials/footer') %>
 <!-- Bootstrap JS Bundle (Includes Popper.js) -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Zj0jHA9aU3xw8pZTGrt/5ZxnAq8X+ZdkrRek+6hsoTL9P1c2rNphthY9gLh7z81C" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+   integrity="sha384-Zj0jHA9aU3xw8pZTGrt/5ZxnAq8X+ZdkrRek+6hsoTL9P1c2rNphthY9gLh7z81C" crossorigin="anonymous"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
@@ -174,13 +198,22 @@
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(() => {
          const currentPage = 1; // Reset to the first page for a new search
-         window.location.href = `/admin/order?pagenumber=${ currentPage }&invoice=${ encodeURIComponent(value) }`;
+         const statusValue = document.getElementById('status').value || '';
+         window.location.href = `/admin/order?pagenumber=${ currentPage }&invoice=${ encodeURIComponent(value) }&status=${ statusValue }`;
       }, 700); // Adjust delay (in milliseconds) as needed
    }
 
    function loadPage(pageNumber) {
       const searchValue = document.getElementById('searchInput').value || '';
-      window.location.href = `/admin/order?pagenumber=${ pageNumber }&invoice=${ encodeURIComponent(searchValue) }`;
+      const statusValue = document.getElementById('status').value || '';
+      window.location.href = `/admin/order?pagenumber=${ pageNumber }&invoice=${ encodeURIComponent(searchValue) }&status=${ statusValue }`;
+   }
+
+   function status() {
+      const currentPage = 1;
+      const searchValue = document.getElementById('searchInput').value || '';
+      const statusValue = document.getElementById('status').value || '';
+      window.location.href = `/admin/order?pagenumber=${ currentPage }&invoice=${ encodeURIComponent(searchValue) }&status=${ statusValue }`
    }
 
 </script>

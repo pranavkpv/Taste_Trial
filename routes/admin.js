@@ -15,6 +15,7 @@ const couponcontroller=require("../controller/admin/couponcontroller")
 const reportController=require("../controller/admin/reportController")
 const dashboardController=require("../controller/admin/dashboardController")
 const deliveryController=require("../controller/admin/deliveryController")
+const adminAuth = require("../middleware/adminauth")
 
 
 router.get("/login",admincontroller.login)
@@ -98,6 +99,8 @@ router.get("/salesReport",reportController.salesReport)
 
 router.get('/delivery',deliveryController.delivery)
 router.post('/addLocation',deliveryController.addLocation)
+router.post('/editLocation',deliveryController.editLocation)
+router.post('/deleteLocation',deliveryController.deleteLocation)
 
 
 

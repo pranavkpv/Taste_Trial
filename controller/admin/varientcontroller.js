@@ -1,5 +1,6 @@
 const foodschema = require("../../model/foodschema")
 const varientschema = require("../../model/varientschema")
+const { ObjectId }=require('mongodb')
 
 const varient = async (req, res) => {
    try {
@@ -8,14 +9,20 @@ const varient = async (req, res) => {
       const selectedpage = Number(req.query.pagenumber) || 1; // Get the page number
       const limit = 5; // Number of categories per page
       const skip = (selectedpage - 1) * limit; // Calculate the skip value
+      
 
       // Search filter
       const searchFilter = searchedvarientname
          ? { varientname: { $regex: searchedvarientname, $options: 'i' } }
          : {};
+      
+      const foodnameFilter = selectedfoodname 
+      ? {food_id: new ObjectId(selectedfoodname)} :{};
+
+      const totalFilter = {...searchFilter,...foodnameFilter}
 
       // Get filtered data count
-      const totaldata = await varientschema.countDocuments(searchFilter);
+      const totaldata = await varientschema.countDocuments(totalFilter);
       const page = Math.ceil(totaldata / limit);
       const startIndex=skip+1
 
@@ -35,7 +42,7 @@ const varient = async (req, res) => {
          }
          
       },{
-         $match:searchFilter
+         $match:{...totalFilter}
       },{$skip:skip},{$limit:limit}])
 
       if(selectedfoodname && selectedfoodname != "both"){

@@ -4,150 +4,155 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <style>
   :root {
-      --primary-color: #4361ee;
-      --secondary-color: #3f37c9;
-      --success-color: #4cc9f0;
-      --warning-color: #f72585;
-      --card-shadow: rgba(17, 12, 46, 0.15) 0px 48px 100px 0px;
+    --primary-color: #4361ee;
+    --secondary-color: #3f37c9;
+    --success-color: #4cc9f0;
+    --warning-color: #f72585;
+    --card-shadow: rgba(17, 12, 46, 0.15) 0px 48px 100px 0px;
   }
 
   body {
-      background-color: #f8f9fa;
+    background-color: #f8f9fa;
   }
 
   .content-header {
-      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-      color: white;
-      padding: 2.5rem 2rem;
-      border-radius: 15px;
-      margin-bottom: 2rem;
-      box-shadow: var(--card-shadow);
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    padding: 2.5rem 2rem;
+    border-radius: 15px;
+    margin-bottom: 2rem;
+    box-shadow: var(--card-shadow);
   }
 
   .content-header p {
-      color: rgba(255, 255, 255, 0.8);
-      margin-bottom: 0;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 0;
   }
 
   .address-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 1.5rem;
-      margin-bottom: 2rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
   }
 
   .address-item {
-      background: white;
-      border-radius: 15px;
-      border: none;
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
+    background: white;
+    border-radius: 15px;
+    border: none;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
   }
 
   .address-item:hover {
-      transform: translateY(-5px);
-      box-shadow: var(--card-shadow);
+    transform: translateY(-5px);
+    box-shadow: var(--card-shadow);
   }
 
   .address-type-badge {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-      background: var(--success-color);
-      color: white;
-      padding: 0.3rem 1rem;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      font-weight: 500;
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: var(--success-color);
+    color: white;
+    padding: 0.3rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
   }
 
   .address-content {
-      padding: 1.5rem;
+    padding: 1.5rem;
   }
 
   .address-details {
-      margin: 1rem 0;
-      color: #6c757d;
+    margin: 1rem 0;
+    color: #6c757d;
   }
 
   .contact-info {
-      display: flex;
-      gap: 1rem;
-      margin-bottom: 1rem;
-      color: #495057;
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    color: #495057;
   }
 
   .phone-number {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
   }
 
   .phone-number i {
-      color: var(--primary-color);
+    color: var(--primary-color);
   }
 
   .alt-phone {
-      color: var(--warning-color);
+    color: var(--warning-color);
   }
 
   .address-actions {
-      display: flex;
-      gap: 0.5rem;
+    display: flex;
+    gap: 0.5rem;
   }
 
   .btn-edit,
   .btn-delete {
-      flex: 1;
-      border-radius: 8px;
-      padding: 0.5rem 1rem;
-      font-weight: 500;
-      transition: all 0.3s ease;
+    flex: 1;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
   }
 
   .btn-edit {
-      background-color: #f8f9fa;
-      color: var(--primary-color);
-      border: 1px solid var(--primary-color);
+    background-color: #f8f9fa;
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
   }
 
   .btn-edit:hover {
-      background-color: var(--primary-color);
-      color: white;
+    background-color: var(--primary-color);
+    color: white;
   }
 
   .btn-delete {
-      background-color: #fff5f5;
-      color: var(--warning-color);
-      border: 1px solid var(--warning-color);
+    background-color: #fff5f5;
+    color: var(--warning-color);
+    border: 1px solid var(--warning-color);
   }
 
   .btn-delete:hover {
-      background-color: var(--warning-color);
-      color: white;
+    background-color: var(--warning-color);
+    color: white;
   }
 
   .add-address-btn {
-      background: var(--primary-color);
-      color: white;
-      border-radius: 10px;
-      padding: 0.75rem 2rem;
-      font-weight: 500;
-      border: none;
-      transition: all 0.3s ease;
+    background: var(--primary-color);
+    color: white;
+    border-radius: 10px;
+    padding: 0.75rem 2rem;
+    font-weight: 500;
+    border: none;
+    transition: all 0.3s ease;
   }
 
   .add-address-btn:hover {
-      background: var(--secondary-color);
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+    background: var(--secondary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
   }
 
   .empty-state {
-      text-align: center;
-      padding: 3rem;
-      color: #6c757d;
+    text-align: center;
+    padding: 3rem;
+    color: #6c757d;
+  }
+
+  .nav-links a.address {
+    background: #34495e;
+    border-left: 3px solid #3498db;
   }
 </style>
 <%- include('partials/userheader') %>
@@ -180,7 +185,7 @@
             <div class="address-type-badge">
               <%= element.addresstype %>
             </div>
-          
+
             <div class="address-content">
               <div class="address-details">
                 <p class="mb-2">
@@ -260,7 +265,7 @@
             <select class="form-select" id="NearByLocation" name="locationId">
               <option value="home">select</option>
               <% locations.forEach(element => { %>
-               <option value="<%= element._id %>" id="location" name="locationId"><%= element.location %></option>
+              <option value="<%= element._id %>" id="location" name="locationId"><%= element.location %></option>
               <% }) %>
             </select>
           </div>
@@ -312,57 +317,57 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form action="/user/editAddress" method="post">
-          <input type="hidden" id="editid" name="editids">
+        <form id="editForm">
+          <input type="hidden" id="editid" >
 
           <div class="mb-3">
-         
+
             <label for="editaddressType" class="form-label">Address Type</label>
-            <select class="form-select" id="editaddressType" name="addresstype">
+            <select class="form-select" id="editaddressType" >
               <option value="home">Home</option>
               <option value="office">Office</option>
               <option value="other">Other</option>
             </select>
           </div>
           <div class="mb-3">
-           
+
             <input type="hidden" id="editid" name="editid">
             <label for="editNearByLocation" class="form-label">Near By Location</label>
-            <select class="form-select" id="editNearByLocation" name="editNearByLocation">
+            <select class="form-select" id="editNearByLocation" >
               <% locations.forEach(element => { %>
-                <option value="<%= element._id %>"><%= element.location %></option>
+              <option value="<%= element._id %>"><%= element.location %></option>
               <% }) %>
             </select>
           </div>
           <div class="mb-3">
             <label for="editcity" class="form-label">City</label>
-            <input type="text" class="form-control" id="editcity" placeholder="Enter your city" name="city">
+            <input type="text" class="form-control" id="editcity" placeholder="Enter your city" >
             <p class="text-danger d-none">Enter your city</p>
           </div>
           <div class="mb-3">
             <label for="editstate" class="form-label">State</label>
-            <input type="text" class="form-control" id="editstate" placeholder="Enter your state" name="state">
+            <input type="text" class="form-control" id="editstate" placeholder="Enter your state" >
             <p class="text-danger d-none">Enter your state</p>
           </div>
           <div class="mb-3">
             <label for="editpincode" class="form-label">PIN CODE</label>
-            <input type="text" class="form-control" id="editpincode" placeholder="Enter your pincode" name="pincode">
+            <input type="text" class="form-control" id="editpincode" placeholder="Enter your pincode" >
           </div>
           <div class="mb-3">
             <label for="editlandmark" class="form-label">Land Mark</label>
-            <input type="text" class="form-control" id="editlandmark" placeholder="Enter your landmark" name="landmark">
+            <input type="text" class="form-control" id="editlandmark" placeholder="Enter your landmark" >
             <p class="text-danger d-none">Enter your Landmark</p>
           </div>
           <div class="mb-3">
             <label for="editmobile" class="form-label">Mobile Number</label>
             <input type="text" class="form-control" id="editmobile" placeholder="Enter your mobile number"
-              name="mobilenumber">
+             >
             <p class="text-danger d-none">Enter your Mobile Number</p>
           </div>
           <div class="mb-3">
             <label for="editalternativenumber" class="form-label">Alternative Number</label>
             <input type="text" class="form-control" id="editalternativenumber"
-              placeholder="Enter your alternative number" name="alternativenumber">
+              placeholder="Enter your alternative number">
           </div>
           <button type="submit" class="btn btn-primary w-100">Edit Address</button>
         </form>
@@ -408,7 +413,7 @@
 
 
 <script>
-  function editFun(id, city, state, pin, landmark, mobile, alternative, type,location) {
+  function editFun(id, city, state, pin, landmark, mobile, alternative, type, location) {
     document.getElementById('editaddressType').value = type
     document.getElementById('editcity').value = city
     document.getElementById('editstate').value = state
@@ -417,7 +422,7 @@
     document.getElementById('editmobile').value = mobile
     document.getElementById('editalternativenumber').value = alternative
     document.getElementById('editid').value = id
-    document.getElementById('editNearByLocation').value=location
+    document.getElementById('editNearByLocation').value = location
   }
   function deleteFun(id) {
     document.getElementById('deleteid').value = id
@@ -479,5 +484,56 @@
 
     return isValid; // Return true only if all fields are valid
   }
+
+
+
+  document.getElementById('editForm').addEventListener('submit', async function (e) {
+    e.preventDefault()
+    const editids = document.getElementById('editid').value.trim()
+    const city = document.getElementById('editcity').value.trim();
+    const state = document.getElementById('editstate').value.trim();
+    const pin = document.getElementById('editpincode').value.trim();
+    const landmark = document.getElementById('editlandmark').value.trim();
+    const mobile = document.getElementById('editmobile').value.trim();
+    const alternative = document.getElementById('editalternativenumber').value.trim();
+    const addresstype = document.getElementById('editaddressType').value.trim()
+    const editNearByLocation = document.getElementById('editNearByLocation').value.trim()
+    const response = await fetch('/user/editAddress', {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ editids, addresstype, editNearByLocation, city, state, pin, landmark, mobile, alternative })
+    })
+    const data = await response.json()
+    console.log(data)
+    if (data.need) {
+      Swal.fire({
+        title: "required",
+        text:data.need,
+        icon: "warning",
+        draggable: true
+      });
+    }
+
+    if(data.success){
+      Swal.fire({
+        title: "success",
+        text:data.success,
+        icon: "success",
+        draggable: true
+      }).then(()=>{
+        e.target.submit()
+      })
+     
+    }
+
+  })
+
+
+
+
+
+
+
+
 
 </script>

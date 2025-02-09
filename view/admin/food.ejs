@@ -26,9 +26,9 @@
         <option value="" class="d-none"><% if (category && category!="all") { %>
          <%= selectedCategory.categoryname %> 
          <% } else { %>
-          All    
+          All Category   
         <% } %></option>
-        <option value="all">All</option>
+        <option value="all">All Category  </option>
         <% categories.forEach(element => { %>
          <option value="<%= element._id %>"><%= element.categoryname %></option>
         <% }) %>

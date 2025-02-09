@@ -13,7 +13,7 @@
       <div class="input-group">
         <span class="input-group-text bg-secondary text-light"><i class="fas fa-search"></i></span>
         <input type="text" id="searchInput" oninput="searchCoupon(this.value)" class="form-control"
-          placeholder="Search by Category..." value="">
+          placeholder="Search by Couponcode..." value="<%= searchedCoupon %>">
 
       </div>
 
@@ -36,7 +36,7 @@
         <!-- loop of category data -->
         <% formattedCoupons.forEach((element,index) => { %>
         <tr>
-          <td class="tableindex"><%= index+1 %></td>
+          <td class="tableindex"><%= selectedIndex+index %></td>
           <td class="tabledata"><%= element.couponCode %></td>
           <td class="tablediscount"><%= element.discount_per %></td>
           <td class="tablexpDate"><%= element.expiryDate %></td>
@@ -52,6 +52,15 @@
         <!-- /close the loop -->
       </tbody>
     </table>
+   <div class="pagination d-flex" style="justify-content: center;">
+    <% for( let i = 1; i <= totalPage; i++ ) { %>
+      <button class="btn <% if (i==selectedPage) { %>
+       btn-danger
+       <% } else { %>
+        btn-success
+      <% } %>" onclick="selectedPage('<%= i %>')"><%= i %></button>
+    <% } %>
+   </div>
 
   </div>
 
@@ -195,6 +204,22 @@
     });
   </script>
   <% } %>
+
+  <script>
+    let bounceTimer
+    function searchCoupon(value){
+     clearTimeout(bounceTimer);
+     bounceTimer = setTimeout(()=>{
+      const currentPage=1
+      window.location.href=`/admin/coupon?coupon=${encodeURIComponent(value)}&page=${currentPage}`
+     },700)
+    }
+
+    function selectedPage(page){
+      const value=document.getElementById('searchInput').value
+      window.location.href=`/admin/coupon?coupon=${encodeURIComponent(value)}&page=${page}`
+    }
+  </script>
 
 
 

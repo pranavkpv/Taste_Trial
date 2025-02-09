@@ -27,9 +27,9 @@
         <option value="" class="d-none"><% if (selectedfoodname && selectedfoodname!="both") { %>
           <%= foodss.foodname %>
           <% } else { %>
-           All
+           All Food
         <% } %></option>
-        <option value="both">All</option>
+        <option value="both">All Food</option>
         <% foods.forEach(element => { %>
          <option value="<%= element._id %>"><%= element.foodname %></option>
         <% }) %>
@@ -243,7 +243,7 @@ function searchVarient(value) {
 }
 
 function loadPage(pageNumber) {
-  const selectFood=document.getElementById('selectFood').value
+  const selectFood=document.getElementById('selectFood').value || ''
    const searchValue = document.getElementById('searchInput').value || '';
    window.location.href = `/admin/varient?pagenumber=${pageNumber}&varient=${encodeURIComponent(searchValue)}&food=${selectFood}`;
 }
@@ -252,7 +252,7 @@ function selectFood(){
     const currentPage = 1; 
    const searchValue = document.getElementById('searchInput').value || '';
     const selectFood=document.getElementById("selectFood").value;
-    window.location.href = `/admin/varient?pagenumber=${pageNumber}&varient=${encodeURIComponent(searchValue)}&food=${selectFood}`
+    window.location.href = `/admin/varient?pagenumber=${currentPage}&varient=${searchValue}&food=${selectFood}`
   }
 
 

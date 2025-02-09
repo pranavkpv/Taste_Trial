@@ -80,22 +80,44 @@ const approveReturn = async (req, res) => {
       const x = await orderschema.findOne({ _id: orderId })
       const result = x.items.filter(val => val.rate_id == rateId)
       const minusAmount = result[0].quantity * (result[0].rate + result[0].rate * result[0].gst_per / 100 +
-      result[0].rate * result[0].packing_per / 100 + result[0].rate * result[0].delivery_per / 100 )
+      result[0].rate * result[0].packing_per / 100 + result[0].rate  )
       const minusOffer=result[0].quantity*result[0].rate * result[0].offer_per / 100
-      await orderschema.updateOne({ _id: orderId, "items.rate_id": rateId },
-         { $set: { 'items.$.status': "returned" } }
-      )
-      await orderschema.updateOne({_id:orderId},{$inc:{totalAmount:-minusAmount,totalOffer:-minusOffer}})
-      await orderschema.updateOne({_id:orderId},{$set:{paidStatus:"completed"}})
-      const newWallet=new walletschema({
-         desription:"Order Return",
-         type:"Credit",
-         amount:minusAmount-minusOffer,
-         userId:x.user_id
-      })
-      await newWallet.save()
-      req.flash('success', "Approved SuccessFully")
-      res.redirect('/admin/returndata')
+
+      if(x.items.length==1){
+
+         await orderschema.updateOne({ _id: orderId, "items.rate_id": rateId },
+            { $set: { 'items.$.status': "returned" } }
+         )
+         await orderschema.updateOne({_id:orderId},{$inc:{totalAmount:-minusAmount,totalOffer:-minusOffer}})
+         await orderschema.updateOne({_id:orderId},{$set:{paidStatus:"completed"}})
+         await orderschema.findByIdAndUpdate({_id:orderId},{deliveryAmount:0})
+
+         const newWallet=new walletschema({
+            desription:"Order Return",
+            type:"Credit",
+            amount:minusAmount-minusOffer,
+            userId:x.user_id
+         })
+         await newWallet.save()
+         req.flash('success', "Approved SuccessFully")
+         res.redirect('/admin/returndata')
+      }else{
+         await orderschema.updateOne({ _id: orderId, "items.rate_id": rateId },
+            { $set: { 'items.$.status': "returned" } }
+         )
+         await orderschema.updateOne({_id:orderId},{$inc:{totalAmount:-minusAmount,totalOffer:-minusOffer}})
+         await orderschema.updateOne({_id:orderId},{$set:{paidStatus:"completed"}})
+         const newWallet=new walletschema({
+            desription:"Order Return",
+            type:"Credit",
+            amount:minusAmount-minusOffer,
+            userId:x.user_id
+         })
+         await newWallet.save()
+         req.flash('success', "Approved SuccessFully")
+         res.redirect('/admin/returndata')
+      }
+      
    } catch (error) {
       console.log(error)
    }

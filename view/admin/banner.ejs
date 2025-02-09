@@ -294,9 +294,9 @@ document.querySelectorAll(".isblocked").forEach((statusElement, index) => {
 function searchBanner(value) {
    clearTimeout(debounceTimer);
    debounceTimer = setTimeout(() => {
-      const currentPage = 1; // Reset to the first page for a new search
+      const currentPage = 1; 
       window.location.href = `/admin/banner?pagenumber=${currentPage}&banner=${encodeURIComponent(value)}`;
-   }, 700); // Adjust delay (in milliseconds) as needed
+   }, 700); 
 }
 
 function loadPage(pageNumber) {

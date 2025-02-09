@@ -208,7 +208,7 @@
          <button class="wishlist-btn" data-rate-id="<%= element._id %>" data-user-id="<%= userId %>"
             data-is-in-wishlist="<%= element.isInWishlist %>">
             <i class="<%= element.isInWishlist ? 'fas' : 'far' %> fa-heart"
-               style="color: <%= element.isInWishlist ? '#ff4757' : '#666' %>;"></i>
+               style="color: '<%= element.isInWishlist ? '#ff4757' : '#666' %>;"></i>
          </button>
          <img src="<%= element.images[0] %>" alt="Food Item">
       </div>
@@ -219,32 +219,35 @@
          </div>
          <h3 class="product-name"><%= element.foodDetails[0].foodname %>(<%= element.varientDetails[0].varientname %>)
          </h3>
-       
-
-
-         <div class="rating">
-            <div class="stars">
-               <i class="fas fa-star"></i>
-               <i class="fas fa-star"></i>
-               <i class="fas fa-star"></i>
-               <i class="fas fa-star"></i>
-               <i class="fas fa-star-half-alt"></i>
-            </div>
-            <span class="review-count">(245 reviews)</span>
-         </div>
          <div class="duration">
             <i class="far fa-clock"></i>
-            <span>25-30 mins</span>
+            <span><%= element.foodDetails[0].duration_time %> mins</span>
          </div>
-         <div class="variants">
-            <span class="variant active">Full</span>
-            <span class="variant">Half</span>
+
+
+
+         <% if (element.CategoryDetails[0].offer >0 || element.foodDetails[0].offer >0) { %>
+         <% if (element.CategoryDetails[0].offer > element.foodDetails[0].offer) { %>
+         <div class="Offer">
+            <span class="offer bg-success p-2 text-white"
+               style="border-radius: 20px;"><%= element.CategoryDetails[0].offer %> % Offer</span>
          </div>
+         <% } else { %>
+         <div class="Offer">
+            <span class="offer bg-success p-2 text-white"
+               style="border-radius: 20px;"><%= element.foodDetails[0].offer %> % Offer</span>
+         </div>
+         <% } %>
+         <% } %>
+
+
+
       </div>
       <div class="product-footer">
          <div class="price">₹ <%= element.rate %></div>
-         <button class="cart-btn addTocart" data-rate-id="<%= element._id %>" data-hotel-id="<%=element.hotelDetails[0]._id %>"
-            data-food-id="<%= element.foodDetails[0]._id %> " data-varient-id="<%= element.varientDetails[0]._id %>">
+         <button class="cart-btn addTocart" data-rate-id="<%= element._id %>"
+            data-hotel-id="<%=element.hotelDetails[0]._id %>" data-food-id="<%= element.foodDetails[0]._id %> "
+            data-varient-id="<%= element.varientDetails[0]._id %>">
             <i class="fas fa-shopping-cart"></i>
             Add to Cart
          </button>
@@ -255,6 +258,17 @@
 <%- include('partials/userfooter') %>
 
 <script>
+   let debounceTimer;
+
+   function searchItem(value) {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+         window.location.href = `/user/category?product=${ encodeURIComponent(value) }`;
+      }, 700);
+   }
+
+
+
    document.addEventListener('DOMContentLoaded', function () {
       const wishlistButtons = document.querySelectorAll('.wishlist-btn');
 
@@ -329,9 +343,9 @@
             try {
                const response = await fetch('/user/AddToCart', {
                   method: "POST",
-                  headers: {"Content-Type":"application/json"},
+                  headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({
-                     rateId,hotelid,foodid,varientid,
+                     rateId, hotelid, foodid, varientid,
                      numberofstock: 1
                   })
                })

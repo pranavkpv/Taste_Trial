@@ -4,6 +4,9 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <style>
+    body{
+        overflow-x: hidden;
+    }
     .wallet-history {
         background: #ffffff;
         border-radius: 15px;
@@ -127,6 +130,10 @@
     tbody tr {
         animation: fadeIn 0.3s ease-out forwards;
     }
+    .nav-links a.wallet {
+      background: #34495e;
+      border-left: 3px solid #3498db;
+  }
     </style>
 <%- include('partials/userheader') %>
 <div class="row">

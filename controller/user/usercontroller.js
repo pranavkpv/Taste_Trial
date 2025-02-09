@@ -19,6 +19,7 @@ const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const path = require('path');
 const orderschema = require('../../model/orderschema')
+const locationSchema = require('../../model/locationSchema')
 
 
 
@@ -421,6 +422,7 @@ const confirmorder = async (req, res) => {
             as:"locationDetails"
          }
       }])
+      const Addresserror = req.flash('Addresserror')
       const successmessage = req.flash('success')
       const couponsuccessmessage = req.flash('couponsuccess')
       const errormessage = req.flash('error')
@@ -449,7 +451,7 @@ const confirmorder = async (req, res) => {
       { $lookup: { from: "varients", localField: "rateDetails.varient_id", foreignField: "_id", as: "varientDetails" } },
       { $lookup: { from: "categories", localField: "foodDetails.category_id", foreignField: "_id", as: "categoryDetails" } }
       ])
-      res.render('user/confirmorder', {orderId,availCoupon,failedMessage,availCoupons, removeSuccess, coupons, couponCode, couponCodestr, users, userid, errormessage, cartIds, couponsuccessmessage, addressess, datas, successmessage, searchmessage: "", searcheditemname: "" });
+      res.render('user/confirmorder', {Addresserror,orderId,availCoupon,failedMessage,availCoupons, removeSuccess, coupons, couponCode, couponCodestr, users, userid, errormessage, cartIds, couponsuccessmessage, addressess, datas, successmessage, searchmessage: "", searcheditemname: "" });
 
    } catch (error) {
       console.log(error)
@@ -457,11 +459,22 @@ const confirmorder = async (req, res) => {
 }
 
 
+
+
+
+
+
 const orderSuccess = async (req, res) => {
    try {
       const { orderId,addressSelect, cartId, numberofproduct, selectedPaymentMethod, couponId } = req.body;
-    
+      if (!addressSelect && addressSelect=="") {
+         
+         req.flash("Addresserror", "Must Add Address");
+         return res.redirect(`/user/confirmorder?cartIDS=${ cartId }&purchaseQty=${ numberofproduct }`)
+      }
       console.log(req.body)
+    
+
       const userId = req.session.user;
 
       const addresses=await addressschema.aggregate([{$match:{_id:new ObjectId(addressSelect)}},{
@@ -472,6 +485,7 @@ const orderSuccess = async (req, res) => {
             as:"locationDetails"
          }
       }])
+      console.log(addresses)
 
       if(orderId && selectedPaymentMethod=="COD"){
          await orderschema.findByIdAndUpdate({_id:orderId},{
@@ -483,7 +497,17 @@ const orderSuccess = async (req, res) => {
          return res.redirect(`/user/confirmorder?cartIDS=${ cartId }&purchaseQty=${ numberofproduct }`);
 
       }
-      if(orderId && selectedPaymentMethod=="razorpay" || selectedPaymentMethod=="wallet"){
+      if(orderId && selectedPaymentMethod=="razorpay"){
+         await orderschema.findByIdAndUpdate({_id:orderId},{
+            paymentmethod:selectedPaymentMethod,
+            paidStatus:"completed",
+            address_id:addressSelect
+         })
+         req.flash("success", "Order Placed Successfully");
+         return res.redirect(`/user/confirmorder?cartIDS=${ cartId }&purchaseQty=${ numberofproduct }`);
+      }
+
+      if(orderId && selectedPaymentMethod=="wallet"){
          await orderschema.findByIdAndUpdate({_id:orderId},{
             paymentmethod:selectedPaymentMethod,
             paidStatus:"completed",
@@ -503,11 +527,7 @@ const orderSuccess = async (req, res) => {
       }
   
    
-      if (!addressSelect) {
-         req.flash("error", "Must Add Address");
-         return res.redirect(`/user/confirmorder?cartIDS=${ cartId }&purchaseQty=${ numberofproduct }`)
-
-      }
+   
 
       const cartIds = Array.isArray(cartId)
          ? cartId.map((item) => new ObjectId(item))
@@ -518,10 +538,7 @@ const orderSuccess = async (req, res) => {
          { $lookup: { from: "rates", localField: "rate_id", foreignField: "_id", as: "rateDetails" } },
       ]);
 
-      if (!carts || carts.length === 0) {
-         req.flash("error", "No cart items found.");
-         return res.redirect("/user/cart");
-      }
+ 
 
       const items = await Promise.all(
          carts.map(async (cart) => {
@@ -564,6 +581,7 @@ const orderSuccess = async (req, res) => {
          req.flash('error',"Above 100 Rs Cach On Delivery is not Possible")
          return res.redirect(`/user/confirmorder?cartIDS=${ cartId }&purchaseQty=${ numberofproduct }`)
       }
+   
       const newOrder = new orderSchema({
          user_id: userId,
          address_id:addressSelect ,
@@ -574,6 +592,7 @@ const orderSuccess = async (req, res) => {
          couponId,
          items
       });
+     
       const wallets = await walletSchema.find({})
       const sumofcredit = wallets.reduce((sum, element) => {
          if (element.type == "Credit") {
@@ -589,11 +608,13 @@ const orderSuccess = async (req, res) => {
       }, 0)
       const totalBalanceAmount = sumofcredit - sumofDebit
       if (selectedPaymentMethod == "wallet") {
+    
          if (totalAmount - totalOffer > totalBalanceAmount) {
             req.flash('error', `Available Balalnce is ${ totalBalanceAmount }`)
             return res.redirect(`/user/confirmorder?cartIDS=${ cartId }&purchaseQty=${ numberofproduct }`);
 
          } else {
+       
             const newWallet = new walletSchema({
                desription: "Order Payment",
                type: "Debit",
@@ -650,10 +671,12 @@ const orderSuccess = async (req, res) => {
                update: { $inc: { stock: -numberofproduct[index] } },
             },
          }));
-
+         const address=await addressschema.findOne({_id:addressSelect})
+         const location = await locationSchema.findOne({_id:address.location_id})
+         const deliveryCharge=location.deliveryCharge
          await rateschema.bulkWrite(stockUpdates);
 
-         req.flash("success", "Order Placed Successfully");
+         req.flash("success", `Order Placed Successfully Your DeliveryCharge Extra Added is ${deliveryCharge}`);
          return res.redirect(`/user/confirmorder?cartIDS=${ cartId }&purchaseQty=${ numberofproduct }`);
 
       }else if(selectedPaymentMethod=="failedRazorpay"){
@@ -684,8 +707,12 @@ const orderSuccess = async (req, res) => {
          }));
 
          await rateschema.bulkWrite(stockUpdates);
+         const address=await addressschema.findOne({_id:addressSelect})
+         const location = await locationSchema.findOne({_id:address.location_id})
+         const deliveryCharge=location.deliveryCharge
+         await rateschema.bulkWrite(stockUpdates);
 
-         req.flash("success", "Order Placed Successfully");
+         req.flash("success", `Order Placed Successfully Your DeliveryCharge Extra Added is ${deliveryCharge}`);
          return res.redirect(`/user/confirmorder?cartIDS=${ cartId }&purchaseQty=${ numberofproduct }`);
 
       }
@@ -761,8 +788,7 @@ const downloadBill = async (req, res) => {
             return res.status(404).json({ error: "Order not found" });
         }
 
-        // Calculate charges
-        console.log(orders)
+  
         const calculateCharges = (orders) => {
             return {
                 gst: orders.reduce((sum, element) => 

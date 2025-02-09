@@ -2,6 +2,7 @@ const categoryschema = require('../../model/categoryschema')
 const orderschema = require('../../model/orderschema')
 const userload = async (req, res) => {
    try {
+      const foodname=req.query.search
       const categoryOrder = await orderschema.aggregate([{
          $lookup: {
             from: "rates",
@@ -32,27 +33,51 @@ const userload = async (req, res) => {
       ])
 
 
-      const foodOrder = await orderschema.aggregate([{
-         $lookup: {
-            from: "rates",
-            localField: "items.rate_id",
-            foreignField: "_id",
-            as: "rateDetails"
-         }
-      }, {
-         $lookup: {
-            from: "foods",
-            localField: "rateDetails.food_id",
-            foreignField: "_id",
-            as: "foodDetails"
-         }
-      }, { $unwind: "$foodDetails" },
-      {
-         $group: { _id: "$foodDetails._id", foodname: { $first: "$foodDetails.foodname" }, images: { $first: "$foodDetails.image" }, count: { $sum: 1 } }
-      }, {
-         $sort: { count: -1 }
-      }, { $limit: 10 }
-      ])
+      if(foodname){
+         var foodOrder = await orderschema.aggregate([{
+            $lookup: {
+               from: "rates",
+               localField: "items.rate_id",
+               foreignField: "_id",
+               as: "rateDetails"
+            }
+         }, {
+            $lookup: {
+               from: "foods",
+               localField: "rateDetails.food_id",
+               foreignField: "_id",
+               as: "foodDetails"
+            }
+         }, { $unwind: "$foodDetails" },{$match:{"foodDetails.foodname" :{$regex:foodname,$options:"i"} }},
+         {
+            $group: { _id: "$foodDetails._id", foodname: { $first: "$foodDetails.foodname" }, images: { $first: "$foodDetails.image" }, count: { $sum: 1 } }
+         }, {
+            $sort: { count: -1 }
+         }, { $limit: 10 }
+         ])
+      }else{
+         var foodOrder = await orderschema.aggregate([{
+            $lookup: {
+               from: "rates",
+               localField: "items.rate_id",
+               foreignField: "_id",
+               as: "rateDetails"
+            }
+         }, {
+            $lookup: {
+               from: "foods",
+               localField: "rateDetails.food_id",
+               foreignField: "_id",
+               as: "foodDetails"
+            }
+         }, { $unwind: "$foodDetails" },
+         {
+            $group: { _id: "$foodDetails._id", foodname: { $first: "$foodDetails.foodname" }, images: { $first: "$foodDetails.image" }, count: { $sum: 1 } }
+         }, {
+            $sort: { count: -1 }
+         }, { $limit: 10 }
+         ])
+      }
 
 
       const hotelOrder = await orderschema.aggregate([{

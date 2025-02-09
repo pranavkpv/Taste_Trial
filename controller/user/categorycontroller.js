@@ -3,7 +3,12 @@ const wishlistschema=require('../../model/wishlistschema')
 
 const category = async (req, res) => {
    try {
+    const searcheditemname=req.query.product || ""
        const userId = req.session.user;
+       const searchFilter = searcheditemname
+         ? { foodname: { $regex: searcheditemname, $options: "i" } }
+         : {};
+
        const rates = await rateschema.aggregate([
            {
                $lookup: {
@@ -28,8 +33,16 @@ const category = async (req, res) => {
                    foreignField: "_id",
                    as: "varientDetails"
                }
-           }
+           },{
+            $lookup:{
+                from:"categories",
+                localField:"foodDetails.category_id",
+                foreignField:"_id",
+                as:"CategoryDetails"
+            }
+           },{$match:{"foodDetails.foodname":{ $regex: searcheditemname, $options: "i" }}}
        ]);
+   
 
        // Check wishlist status for each product
        for (const rate of rates) {
@@ -39,11 +52,11 @@ const category = async (req, res) => {
            });
            rate.isInWishlist = !!wishlistItem; // Convert to boolean
        }
-
+      console.log(rates)
        res.render('user/category', {
            rates,
-           searchmessage: "",
-           searcheditemname: "",
+           searchmessage: "foodname",
+           searcheditemname,
            userId
        });
    } catch (error) {

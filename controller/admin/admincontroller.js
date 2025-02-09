@@ -2,6 +2,7 @@
 const adminschema = require("../../model/adminschema")
 const orderschema = require("../../model/orderschema")
 const userschema = require("../../model/usershema")
+const session = require('express-session')
 
 
 
@@ -23,6 +24,7 @@ const validLogin = async (req, res) => {
         error.push("Password is Wrong")
       }
       else{
+         req.session.admin=true
          error.push("Login success")
        }
       if(error.length>0){

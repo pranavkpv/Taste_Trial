@@ -16,10 +16,14 @@
     </div>
     <div class="col-md-6">
       <select name="" id="statusFilter" class="form-control w-50" onchange="filter()">
-        <option value="<%= status %>" style="display:none;"><%= status === 'block' ? 'Blocked' : status === 'unblock' ? 'Unblocked' : 'All User' %></option>
-        <option value="block">Blocked</option>
-        <option value="unblock">Unblocked</option>
-        <option value="all">All User</option>
+        <option value="" class="d-none"><% if (status) { %>
+         <%= status %>
+         <% } else { %>
+          select
+        <% } %></option>
+        <option value="Blocked">Blocked</option>
+        <option value="Unblocked">Unblocked</option>
+        <option value="All">All User</option>
       </select>
     </div>
     
@@ -144,9 +148,9 @@
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => {
     let status = document.getElementById("statusFilter").value;
-      const currentPage = 1; // Reset to the first page for a new search
+      const currentPage = 1;
       window.location.href = `/admin/usermanagement?pagenumber=${ currentPage }&user=${ encodeURIComponent(value) }&status=${status}`;
-    }, 700); // Adjust delay (in milliseconds) as needed
+    }, 700);
   }
 
   function loadPage(pageNumber) {

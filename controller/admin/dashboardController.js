@@ -194,49 +194,59 @@ const dashboard = async (req, res) => {
 
       const orderHotel = await orderschema.aggregate([
          { $unwind: "$items" },
-         { $addFields: { month: { $month: "$createdAt" }, year: { $year: "$createdAt" } } },
-         {
-           $match: { 
-             "items.status": { $nin: ["returned", "cancelled"] }, 
-             createdAt: { $gt: wantfromDate, $lt: wanttoDate },
-             month: parseInt(month),  // Corrected reference to the month field
-             year: parseInt(year)     // Corrected reference to the year field
-           }
+         { 
+            $addFields: { 
+               month: { $month: "$createdAt" }, 
+               year: { $year: "$createdAt" } 
+            } 
+         },
+         { 
+            $match: {
+               $expr: {
+                  $and: [
+                     { $eq: ["$month", { $month: wantfromDate }] },
+                     { $eq: ["$year", { $year: wantfromDate }] }
+                  ]
+               },
+               "items.status": { $nin: ["returned", "cancelled"] },
+               createdAt: { $gt: wantfromDate, $lt: wanttoDate }
+            }
          },
          {
-           $lookup: {
-             from: "rates",
-             localField: "items.rate_id",
-             foreignField: "_id",
-             as: "rateDetails"
-           }
+            $lookup: {
+               from: "rates",
+               localField: "items.rate_id",
+               foreignField: "_id",
+               as: "rateDetails"
+            }
          },
          {
-           $lookup: {
-             from: "hotels",
-             localField: "rateDetails.hotel_id",
-             foreignField: "_id",
-             as: "hotelDetails"
-           }
-         },
+            $lookup:{
+               from:"hotels",
+               localField:"rateDetails.hotel_id",
+               foreignField:"_id",
+               as:"hotelDetails"
+            }
+         },{$unwind:"$hotelDetails"},
          {
-           $group: { 
-             _id: "$hotelDetails.hotelname", 
-             countofEachhotel: { $sum: "$items.quantity" }
-           }
+            $group: {
+               _id: "$hotelDetails.hotelname",
+               countofEachhotel: { $sum: "$items.quantity" }
+            }
          },
          { $limit: 10 }
-       ]);
+      ]);
+      
        
 
-
+ 
 
 
       const arrayOforder = orderProduct.map((element) => {
          return element.countofEachfood
       })
       const arratOfproduct = orderProduct.map((element) => {
-         return element._id[0]
+         return element._id
       })
 
       const arraycategoryCount = orderCategory.map((element) => {
@@ -244,14 +254,14 @@ const dashboard = async (req, res) => {
       })
 
       const arrayofCategory = orderCategory.map((element) => {
-         return element._id[0]
+         return element._id
       })
 
       const arrayorderHotel = orderHotel.map((element) => {
          return element.countofEachhotel
       })
       const arrayOfHotel = orderHotel.map((element) => {
-         return element._id[0]
+         return element._id
       })
 
       const usersCount = await userschema.countDocuments({createdAt:{$gt:wantfromDate,$lt:wanttoDate}})
@@ -267,27 +277,20 @@ const dashboard = async (req, res) => {
       }, 0)
 
 
-      const statusOrders=await orderschema.aggregate([{
+   
+      const countofPending=await orderschema.aggregate([{
          $unwind:"$items"
-      }])
-      let pendingCount=0
-      let deliveredCount=0
-      let returnedCount=0
-      for(let i=0;i<statusOrders.length;i++){
-         if(statusOrders[i].items.status=="pending"){
-            pendingCount++
-         }
+      },{
+         $group:{_id:"$items.status",countOfeach:{$sum:1}}
       }
-      for(let i=0;i<statusOrders.length;i++){
-         if(statusOrders[i].items.status=="delivered"){
-            deliveredCount++
-         }
-      }
-      for(let i=0;i<statusOrders.length;i++){
-         if(statusOrders[i].items.status=="returned"){
-            returnedCount++
-         }
-      }
+   ])
+   const pendingCount=countofPending.filter((element)=>element._id="processing").reduce((sum,element)=>{return sum+=element.countOfeach},0)
+   const deliveredCount=countofPending.filter((element)=>element._id="delivered").reduce((sum,element)=>{return sum+=element.countOfeach},0)
+   const returnedCount=countofPending.filter((element)=>element._id="returned").reduce((sum,element)=>{return sum+=element.countOfeach},0)
+
+
+
+   console.log(countofPending)
 
 
 

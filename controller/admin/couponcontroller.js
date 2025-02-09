@@ -1,8 +1,10 @@
 const couponschema = require('../../model/couponschema')
 const coupon = async (req, res) => {
    try {
-      const coupons = await couponschema.find()
-
+      const searchedCoupon=req.query.coupon || "";
+      const selectedPage=req.query.page || 1;
+      const skip=(selectedPage-1)*6
+      const coupons = await couponschema.find({couponCode:{$regex:searchedCoupon,$options:"i"}}).skip(skip).limit(6)
       const formattedCoupons = coupons.map((element) => {
          return {
             ...element.toObject(), // Convert Mongoose document to plain object if necessary
@@ -13,11 +15,18 @@ const coupon = async (req, res) => {
             }),
          };
       });
-      console.log(formattedCoupons)
+      let count=[]
+      if(searchedCoupon){
+         count=await couponschema.find({couponCode:{$regex:searchedCoupon,$options:"i"}})
+      }else{
+         count=await couponschema.find()
+      }
+      const selectedIndex=skip+1
+      const totalPage=Math.ceil(count.length/6)
       const existmessage=req.flash('exist')
       const successmessage = req.flash('success')
       const editExistmessage = req.flash('editExist')
-      res.render('admin/coupon', { successmessage, formattedCoupons,existmessage,editExistmessage })
+      res.render('admin/coupon', { successmessage, formattedCoupons,existmessage,selectedPage,editExistmessage,searchedCoupon,totalPage ,selectedIndex})
    } catch (error) {
       console.log(error)
    }

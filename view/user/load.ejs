@@ -645,6 +645,16 @@
       </script>
       <% } %>
 
+
+      <% if (notExist && notExist.length>0) { %>
+         <script>
+            Swal.fire({
+               title: "<%= notExist %>",
+               icon: "error"
+            });
+         </script>
+         <% } %>
+
    <script>
       // Scroll to Top Button
       const scrollTop = document.querySelector('.scroll-top');

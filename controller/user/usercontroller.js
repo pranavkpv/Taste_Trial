@@ -20,6 +20,7 @@ const fs = require('fs');
 const path = require('path');
 const orderschema = require('../../model/orderschema')
 const locationSchema = require('../../model/locationSchema')
+const bcrypt = require('bcrypt')
 
 
 
@@ -37,27 +38,39 @@ const razorpayInstance = new Razorpay({
 const validuser = async (req, res) => {
    try {
       const { email, password } = req.body;
-      const existUser = await userschema.findOne({ email, password, is_blocked: false })
-      console.log(existUser)
+
+      // Input Validation
       if (!email || email.trim() === "" ) {
-         return res.json({ messageEmail: "Email is required"});
+         return res.json({ messageEmail: "Email is required" });
       }
-      if( !password || password.trim() === ""){
-         return res.json({ messagePassword: "Password is required" })
+      if (!password || password.trim() === "") {
+         return res.json({ messagePassword: "Password is required" });
       }
-     
+
+      // Find User in Database
+      const existUser = await userschema.findOne({ email, is_blocked: false });
+
       if (!existUser) {
-         return res.json({ existMessage: "Email or Password is Wrong" });
+         return res.json({ existMessage: "Email is Wrong" });
       }
-      else {
-         return res.json({ successMessage: "Login SuccessFully" });
+
+      // Compare Passwords (Use `await` instead of callback)
+      const match = await bcrypt.compare(password, existUser.password);
+
+      if (!match) {
+         return res.json({ existMessage: "Password is Wrong" });
       }
+
+      // Success Response
+      req.session.user=existUser._id;
+      return res.json({ successMessage: "Login Successfully" });
 
    } catch (error) {
       console.error(error);
       res.status(500).json({ message: "An error occurred while processing your request." });
    }
 };
+
 
 
 
@@ -146,10 +159,10 @@ const adduser = async (req, res) => {
          firstname:firstName,
          lastname:lastName,
          phonenumber,
-         password,
-         Otp
+         password:password,
+         Otp:Otp
       }
-      console.log(req.session.userData)
+
       res.json({ redirect: "/user/verifyOTP" });
    } catch (error) {
       console.log(error);
@@ -198,17 +211,22 @@ const verifyOTP = (req, res) => {
 
 const verifyOTPpost = async (req, res) => {
    try {
+      console.log(req.session.userData)
       const { otp } = req.body;
       if(!otp && otp.trim()===""){
          return res.json({error:"please enter OTP"})
       }
-      if (req.session.userData.Otp == otp) {   
+
+      if (req.session.userData.Otp == otp) {  
+         console.log("hai") 
+         const salt = await bcrypt.genSalt(10);
+         const hashedPassword = await bcrypt.hash(req.session.userData.password,salt)
          const newUser = new userschema({
             firstname: req.session.userData.firstname,
             lastname: req.session.userData.lastname,
             phonenumber: req.session.userData.phonenumber,
             email: req.session.userData.email,
-            password: req.session.userData.password,
+            password: hashedPassword,
          });
    
          await newUser.save();

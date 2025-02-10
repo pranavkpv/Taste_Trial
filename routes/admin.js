@@ -22,13 +22,13 @@ router.get("/login",admincontroller.login)
 router.post("/login",admincontroller.validLogin)
 
 
-router.get("/dashboard",dashboardController.dashboard)
-router.get("/usermanagement",usermanagecontroller.usermanagement)
+router.get("/dashboard",adminAuth.adminLog,dashboardController.dashboard)
+router.get("/usermanagement",adminAuth.adminLog,usermanagecontroller.usermanagement)
 router.post("/blockUser",usermanagecontroller.blockUser)
 router.post("/unblockUser",usermanagecontroller.unblockUser)
 
 
-router.get("/food",foodcontroller.food)
+router.get("/food",adminAuth.adminLog,foodcontroller.food)
 router.post("/addFood", upload.single('image'),foodcontroller.addFood)
 router.post("/editFood",upload.single('image'),foodcontroller.editFood)
 router.post("/hidefood",foodcontroller.blockFood)
@@ -38,7 +38,7 @@ router.post("/deletefood",foodcontroller.deleteFood)
 
 
 
-router.get("/hotel",hotelcontroller.hotel)
+router.get("/hotel",adminAuth.adminLog,hotelcontroller.hotel)
 router.post("/addHotel",upload.single('image'),hotelcontroller.addHotel)
 router.post("/editHotel",upload.single('image'),hotelcontroller.editHotel)
 router.post("/hideHotel",hotelcontroller.blockHotel)
@@ -47,7 +47,7 @@ router.post("/deleteHotel",hotelcontroller.deleteHotel)
 
 
 
-router.get("/category",categorycontroller.category)
+router.get("/category",adminAuth.adminLog,categorycontroller.category)
 router.post("/addcategory", upload.single('image'), categorycontroller.addcategory);
 router.post("/editcategory", upload.single('image'),categorycontroller.editcategory)
 router.post("/hidecategory",categorycontroller.hidecategory)
@@ -55,7 +55,7 @@ router.post("/unhidecategory",categorycontroller.unhidecategory)
 router.post("/deletecategory",categorycontroller.deletecategory)
 
 
-router.get("/banner",bannercontroller.banner)
+router.get("/banner",adminAuth.adminLog,bannercontroller.banner)
 router.post('/addbanner', upload.single('image'),bannercontroller.addbanner);
 router.post('/editbanner',upload.single('image'),bannercontroller.editbanner);
 router.post('/hidebanner',bannercontroller.blockbanner);
@@ -63,7 +63,7 @@ router.post('/unhidebanner',bannercontroller.unblockbanner)
 router.post('/deletebanner',bannercontroller.deletebanner)
 
 
-router.get("/varient",varientcontroller.varient)
+router.get("/varient",adminAuth.adminLog,varientcontroller.varient)
 router.post("/addvarient",varientcontroller.addvarient)
 router.post("/editvarient",varientcontroller.editvarient)
 router.post("/blockvarient",varientcontroller.blockvarient)
@@ -73,31 +73,31 @@ router.post("/deletevarient",varientcontroller.deletevarient)
 
 
 
-router.get("/rate",ratecontroller.rate)
+router.get("/rate",adminAuth.adminLog,ratecontroller.rate)
 router.post("/addrate",upload.array('images',3),ratecontroller.addrate)
 router.post("/editRate",upload.array('images',3),ratecontroller.editrate)
 router.post("/deleterate",ratecontroller.deleterate)
 
 
 
-router.get("/order",ordercontroller.order)
+router.get("/order",adminAuth.adminLog,ordercontroller.order)
 router.post("/updateStatus",ordercontroller.updateStatus)
 router.get("/orderDetails",ordercontroller.orderDetails)
 
-router.get("/returndata",returncontroller.returndata)
+router.get("/returndata",adminAuth.adminLog,returncontroller.returndata)
 router.post("/approveReturn",returncontroller.approveReturn)
 router.post("/rejectReturn",returncontroller.rejectReturn)
 
 
-router.get("/coupon",couponcontroller.coupon)
+router.get("/coupon",adminAuth.adminLog,couponcontroller.coupon)
 router.post("/addcoupon",couponcontroller.addcoupon)
 router.post("/editCoupon",couponcontroller.editCoupon)
 router.post('/deleteCoupon',couponcontroller.deleteCoupon)
 
 
-router.get("/salesReport",reportController.salesReport)
+router.get("/salesReport",adminAuth.adminLog,reportController.salesReport)
 
-router.get('/delivery',deliveryController.delivery)
+router.get('/delivery',adminAuth.adminLog,deliveryController.delivery)
 router.post('/addLocation',deliveryController.addLocation)
 router.post('/editLocation',deliveryController.editLocation)
 router.post('/deleteLocation',deliveryController.deleteLocation)

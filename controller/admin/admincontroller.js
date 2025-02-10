@@ -37,9 +37,10 @@ const validLogin = async (req, res) => {
    }
 };
 const login = (req, res) => {
+   const noAdmin=req.flash('noAdmin')
    const loginvalidmessage = req.flash('loginError'); // Retrieve the message
    const nocondentloginmessage = req.flash('nocondentlogin')
-   res.render("admin/login", { loginvalidmessage, nocondentloginmessage });
+   res.render("admin/login", { loginvalidmessage, nocondentloginmessage,noAdmin });
 };
 
 

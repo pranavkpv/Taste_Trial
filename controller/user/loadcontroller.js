@@ -2,6 +2,7 @@ const categoryschema = require('../../model/categoryschema')
 const orderschema = require('../../model/orderschema')
 const userload = async (req, res) => {
    try {
+      const notExist =req.flash('notExist')
       const foodname=req.query.search
       const categoryOrder = await orderschema.aggregate([{
          $lookup: {
@@ -104,7 +105,7 @@ const userload = async (req, res) => {
 
 
       const successsavemessage = req.flash('successsavemessage')
-      res.render('user/load', { successsavemessage, categoryOrder, foodOrder,hotelOrder });
+      res.render('user/load', { successsavemessage, categoryOrder, foodOrder,hotelOrder,notExist });
    } catch (error) {
       console.log("Error:", error);
       res.status(500).json({ message: "Internal server error" });

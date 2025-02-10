@@ -17,6 +17,7 @@ const walletcontroller = require("../controller/user/walletController")
 const changePasswordController = require("../controller/user/changePassword")
 const failedController = require("../controller/user/failedOrder")
 
+
 // Route to start the Google OAuth login
 router.get('/auth/google', passport.authenticate('google', {
    scope: ['profile', 'email']
@@ -62,28 +63,28 @@ router.post('/verifypost',usercontroller.verifypost)
 router.get('/confirmpassword',usercontroller.confirmpassword)
 router.post('/confirmPassword',usercontroller.confirmPassword)
 //profile
-router.get('/dashboard',profilecontroller.dashboard)
+router.get('/dashboard',userauth.noUser,profilecontroller.dashboard)
 
 // review
 router.get('/review',usercontroller.review)
 
 //address
-router.get('/address',profilecontroller.address)
+router.get('/address',userauth.noUser,profilecontroller.address)
 router.post('/addAddress',profilecontroller.addAddress)
 router.post('/editAddress',profilecontroller.editAddress)
 router.post('/deleteAddress',profilecontroller.deleteAddress)
 
 //AddTocart
-router.post('/productcart',userproductDetailController.productcart)
+router.post('/productcart',userauth.noUser,userproductDetailController.productcart)
 
 
 //cart
-router.get('/cart',cartcontroller.cart)
+router.get('/cart',userauth.noUser,cartcontroller.cart)
 router.post('/removeCart',cartcontroller.removeCart)
 
 //wishlist
-router.get('/wishlist',wishlistcontroller.wishlist)
-router.post('/addToWishlist',wishlistcontroller.addToWishlist)
+router.get('/wishlist',userauth.noUser,wishlistcontroller.wishlist)
+router.post('/addToWishlist',userauth.noUser,wishlistcontroller.addToWishlist)
 router.post('/removeWishlist',wishlistcontroller.removeWishlist)
 router.post('/removeWishData',wishlistcontroller.removeWishData)
 router.post('/AddToCart',wishlistcontroller.AddToCart)
@@ -92,10 +93,10 @@ router.post('/AddToCart',wishlistcontroller.AddToCart)
 
 
 //wallet
-router.get('/wallet',usercontroller.wallet)
+router.get('/wallet',userauth.noUser,usercontroller.wallet)
 
 //change account
-router.get('/changepassword',changePasswordController.change)
+router.get('/changepassword',userauth.noUser,changePasswordController.change)
 router.post('/changepassword',changePasswordController.changepassword)
 
 //product Detail
@@ -107,22 +108,22 @@ router.post('/orderSuccess',usercontroller.orderSuccess)
 
 
 //checkout
-router.get('/changeAccount',profilecontroller.changeAccount)
+router.get('/changeAccount',userauth.noUser,profilecontroller.changeAccount)
 router.post('/updateAction',profilecontroller.updateAction)
 router.get("/failedOrder",failedController.failedOrder)
 
 //order
-router.get('/order',profilecontroller.order)
+router.get('/order',userauth.noUser,profilecontroller.order)
 router.post('/orderCancel',profilecontroller.orderCancel)
 router.post('/orderReturn',profilecontroller.orderReturn)
-router.get('/orderDetails',profilecontroller.orderDetails)
+router.get('/orderDetails',userauth.noUser,profilecontroller.orderDetails)
 
 router.post('/applyCoupon',usercontroller.applyCoupon)
 router.post('/removeCoupon',usercontroller.removeCoupon)
 
 
-router.get('/wallethistory',walletcontroller.wallet)
-router.get('/download-invoice',usercontroller.downloadBill)
+router.get('/wallethistory',userauth.noUser,walletcontroller.wallet)
+router.get('/download-invoice',userauth.noUser,usercontroller.downloadBill)
 
 
 

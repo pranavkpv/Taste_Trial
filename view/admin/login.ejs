@@ -51,8 +51,19 @@
 		</div>
 	</section>
 
-	
 
+	<% if (noAdmin && noAdmin.length >0) { %>
+	<script>
+		Swal.fire({
+			title: "<%= noAdmin %>",
+			icon: "error",
+			draggable: true,
+			confirmButtonText: "OK"
+		})
+	</script>
+
+
+	<% } %>
 
 
 

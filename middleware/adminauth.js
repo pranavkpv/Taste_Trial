@@ -1,10 +1,11 @@
 const session=require('express-session')
 
-const adminLog=(req,res)=>{
+const adminLog=(req,res,next)=>{
    try {
       if(req.session.admin){
-         res.render('admin/dashboard')
+         next()
       }else{
+         req.flash('noAdmin',"Please login to continue")
          res.redirect('/admin/login')
       }
    } catch (error) {

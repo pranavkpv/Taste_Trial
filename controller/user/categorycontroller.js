@@ -52,7 +52,7 @@ const category = async (req, res) => {
            });
            rate.isInWishlist = !!wishlistItem; // Convert to boolean
        }
-      console.log(rates)
+      
        res.render('user/category', {
            rates,
            searchmessage: "foodname",

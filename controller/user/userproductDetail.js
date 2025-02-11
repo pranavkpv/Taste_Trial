@@ -45,8 +45,11 @@ const productDetail = async (req, res) => {
 
 const productcart = async (req, res) => {
    try {
-      
+    
       const userid = req.session.user;
+      if(!userid){
+         return res.json({error:"Please Login To Continue"})
+      }
       const carts = await cartSchema.find({ user_id: userid });
       const rates = await rateschema.findOne({ _id: req.body.rateid });
 
@@ -77,6 +80,7 @@ const productcart = async (req, res) => {
       
    } catch (error) {
       console.error(error);
+      return res.json({error:"Something Went Wrong"})
    }
 };
 

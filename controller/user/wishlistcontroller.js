@@ -5,9 +5,7 @@ const { ObjectId } = require('mongodb');
 
 const addToWishlist = async (req, res) => {
    try {
-      console.log("hai")
-      console.log(req.body)
-      console.log(req.session.user)
+   
     
          const newWishlist = new wishlistschema({
             rate_id: req.body.rateid,
@@ -25,7 +23,7 @@ const addToWishlist = async (req, res) => {
 const wishlist = async (req, res) => {
    try {
       const userid = req.session.user
-      const limit=3
+      const limit=6
       const selectedPage=req.query.page || 1
       const skip= (selectedPage-1)*limit
       const wishlistData = await wishlistschema.aggregate([{$lookup:{
@@ -62,12 +60,13 @@ const wishlist = async (req, res) => {
                as:"hotelDetails"
             }
           },{$match:{user_id:new ObjectId(userid)}},{$skip:skip},{$limit:limit}])
-          const count=wishlistData.length
-          const page=Math.ceil(count/limit)
+          const wishlistCount=await wishlistschema.countDocuments({user_id:userid})
+    
+          const page=Math.ceil(wishlistCount/limit)
       const successmessage=req.flash('success')
       const carts=await cartschema.find({user_id:userid})
-      console.log(carts)
-      res.render('user/wishlist', { userid,page,selectedPage,carts, searchmessage: "", searcheditemname: "",wishlistData,successmessage })
+
+      res.render('user/wishlist', { userid,page,wishlistCount,selectedPage,carts, searchmessage: "", searcheditemname: "",wishlistData,successmessage })
    } catch (error) {
       console.log(error)
    }
@@ -99,10 +98,10 @@ const removeWishData= async(req,res)=>{
 
 const AddToCart = async(req,res)=>{
    try {
-      console.log("Haiiiiii")
+
       console.log(req.body)
       const userId=req.session.user
-      const carts=await cartschema.findOne({rate_id:req.body.rateId})
+      const carts=await cartschema.findOne({user_id:userId,rate_id:req.body.rateId})
       if(carts){
          return res.json({exist:"Product Already Exist In Cart"})
       }

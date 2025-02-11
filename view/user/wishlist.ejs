@@ -72,9 +72,10 @@
   .object-fit-cover {
     object-fit: cover;
   }
+
   .nav-links a.wishlist {
-      background: #34495e;
-      border-left: 3px solid #3498db;
+    background: #34495e;
+    border-left: 3px solid #3498db;
   }
 </style>
 
@@ -84,130 +85,153 @@
     <%- include('partials/profileside') %>
   </div>
 
-  <!-- Wishlist Container -->
   <div class="col-md-10">
-    <div class="bg-light" style="margin-top: 85px;">
-      <div class="row justify-content-center">
-        <div class="col-md-10">
-          <!-- Wishlist Header -->
-          <div class="text-center mb-5">
-            <h1 class="display-4 fw-bold text-primary">My Wishlist</h1>
-            <p class="lead text-muted">Discover and save your favorite culinary delights</p>
-            <div class="wishlist-stats mt-3">
-              <span class="badge bg-primary rounded-pill px-3 py-2 me-2">
-                <%= wishlistData.length %> Items
-              </span>
-            </div>
+    <div class="bg-white shadow-sm rounded-3" style="margin-top: 72px;">
+      <!-- Professional Header Section -->
+      <div class="border-bottom p-4">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h2 class="mb-1">My Wishlist</h2>
+            <p class="text-muted mb-0">Manage your favorite items</p>
           </div>
+          <span class="badge bg-primary rounded-pill px-3 py-2">
+            <%= wishlistCount %> Items
+          </span>
+        </div>
+      </div>
 
-          <!-- Wishlist Grid -->
-          <div class="row g-4">
-            <% if ( wishlistData.length ==0) { %>
-            <div class="col-12 text-center py-5">
-              <div class="empty-state">
-                <i class="bi bi-heart text-muted" style="font-size: 4rem;"></i>
-                <h3 class="mt-4">Your Wishlist is Empty</h3>
-                <p class="text-muted">Start exploring our menu to add your favorite items!</p>
-                <a href="/menu" class="btn btn-primary mt-3">Browse Menu</a>
+      <!-- Content Section -->
+      <div class="p-4">
+        <% if (!wishlistData || wishlistData.length === 0) { %>
+          <!-- Elegant Empty State -->
+          <div class="text-center py-5">
+            <div class="empty-state-container">
+              <div class="mb-4">
+                <div class="empty-state-icon bg-light rounded-circle p-4 d-inline-block mb-3">
+                  <i class="bi bi-heart text-primary" style="font-size: 3rem;"></i>
+                </div>
+                <h4 class="mb-3">Your Wishlist is Empty</h4>
+                <p class="text-muted mb-4 max-w-md mx-auto">Explore our menu and save your favorite dishes. Your culinary journey starts here!</p>
+                <a href="/menu" class="btn btn-primary px-4 py-2">
+                  <i class="bi bi-grid me-2"></i>Browse Menu
+                </a>
               </div>
             </div>
-            <% } else { %>
-              <% wishlistData.forEach(items => { %>
-                <div class="col-md-4 mb-4">
-                  <div class="card h-100 border-0 shadow-sm hover-lift">
-                    <!-- Image Container -->
-                    <div class="position-relative">
-                      <img src="<%= items.rateDetails[0].images[0] %>" class="card-img-top object-fit-cover"
-                        alt="<%= items.foodDetails[0].foodname %>" style="height: 250px;">
-                      <span class="position-absolute top-0 end-0 m-2 badge bg-primary">
+          </div>
+        <% } else { %>
+          <!-- Grid Layout for Items -->
+          <div class="row g-4">
+            <% wishlistData.forEach(items => { %>
+              <div class="col-lg-4 col-md-6">
+                <div class="card h-100 border-0 shadow-sm hover-lift transition-all">
+                  <!-- Image Section -->
+                  <div class="position-relative">
+                    <img src="<%= items.rateDetails[0].images[0] %>" 
+                         class="card-img-top object-fit-cover" 
+                         alt="<%= items.foodDetails[0].foodname %>" 
+                         style="height: 220px;">
+                    <div class="position-absolute top-0 start-0 w-100 p-3">
+                      <span class="badge bg-primary">
                         <%= items.categoryDetails[0].categoryname %>
                       </span>
-    
                     </div>
-    
-                    <!-- Card Content -->
-                    <div class="card-body">
-                      <div class="d-flex justify-content-between align-items-start mb-3">
-                        <h5 class="card-title mb-0 fw-bold">
-                          <%= items.foodDetails[0].foodname %>
-                        </h5>
-                        <span class="price h5 text-primary mb-0">
-                          $<%= items.rateDetails[0].rate.toFixed(2) %>
-                        </span>
+                  </div>
+
+                  <!-- Content Section -->
+                  <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                      <h5 class="card-title mb-0 fw-bold text-dark">
+                        <%= items.foodDetails[0].foodname %>
+                      </h5>
+                      <span class="badge bg-light text-primary px-3 py-2 rounded-pill fw-bold">
+                        $<%= items.rateDetails[0].rate.toFixed(2) %>
+                      </span>
+                    </div>
+
+                    <div class="mb-4">
+                      <div class="d-flex align-items-center mb-2">
+                        <i class="bi bi-shop me-2 text-muted"></i>
+                        <span class="text-muted"><%= items.hotelDetails[0].hotelname %></span>
                       </div>
-    
-                      <div class="mb-3">
-                        <small class="text-muted">
-                          <i class="bi bi-shop me-1"></i>
-                          <%= items.hotelDetails[0].hotelname %>
-                        </small>
-                        <br>
-                        <small class="text-muted">
-                          <i class="bi bi-tag me-1"></i>
-                          <%= items.varientDetails[0].varientname %>
-                        </small>
+                      <div class="d-flex align-items-center">
+                        <i class="bi bi-tag me-2 text-muted"></i>
+                        <span class="text-muted"><%= items.varientDetails[0].varientname %></span>
                       </div>
-    
-                      <!-- Action Buttons -->
-                      <div class="d-flex gap-2 mt-auto">
-                        <% let k = 0; %> <!-- Declare `k` at the top -->
-                        <% carts.forEach(element => { %>
-                          <% if (element.rate_id.toString() === items.rateDetails[0]._id.toString()) { k++; } %>
-                        <% }) %>
-                        
-                        <button class="btn btn-outline-primary flex-grow-1" onclick="addToCart('<%= items._id %>')">
-                          <i class="bi bi-cart-plus me-1"></i>
-                          <%= k === 0 ? "Add To Cart" : "Already Added to Cart" %>
-                        </button>
-                        
-                        <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#removewishlist"
-                          onclick="removefun('<%= items._id %>')">
-                          <i class="bi bi-trash"></i>
-                        </button>
-                      </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex gap-2">
+                      <% const isInCart = carts.some(element => 
+                        element.rate_id.toString() === items.rateDetails[0]._id.toString()
+                      ); %>
+                      
+                      <button class="btn <%= isInCart ? 'btn-success' : 'btn-primary' %> flex-grow-1" 
+                              onclick="addToCart('<%= items.rateDetails[0]._id %>')"
+                              <%= isInCart ? 'disabled' : '' %>>
+                        <i class="bi <%= isInCart ? 'bi-cart-check' : 'bi-cart-plus' %> me-2"></i>
+                        <%= isInCart ? "Added to Cart" : "Add to Cart" %>
+                      </button>
+
+                      <button class="btn btn-outline-danger" 
+                              data-bs-toggle="modal" 
+                              data-bs-target="#removewishlist"
+                              onclick="removefun('<%= items._id %>')">
+                        <i class="bi bi-trash"></i>
+                      </button>
                     </div>
                   </div>
                 </div>
-                <% }) %>
-            <% } %>
+              </div>
+            <% }) %>
           </div>
 
-          <!-- Pagination -->
-          <div class="d-flex justify-content-center gap-2 mt-5">
-            <% for(let i = 1; i <= page; i++) { %>
-            <button class="btn <%= selectedPage === i ? 'btn-primary' : 'btn-outline-primary' %>"
-              onclick="pagination('<%= i %>')">
-              <%= i %>
-            </button>
-            <% } %>
-          </div>
-        </div>
+          <!-- Professional Pagination -->
+          <% if (page > 1) { %>
+            <div class="d-flex justify-content-center mt-5">
+              <nav aria-label="Page navigation">
+                <ul class="pagination">
+                  <% for(let i = 1; i <= page; i++) { %>
+                     
+                      <button class="page-link <% if (i==selectedPage) { %>
+                       bg-primary text-white
+                      <% } %>" onclick="pagination('<%= i %>')"><%= i %></button>
+             
+                 
+                  <% } %>
+                </ul>
+              </nav>
+            </div>
+          <% } %>
+        <% } %>
       </div>
     </div>
   </div>
 </div>
 
-
-<!-- Remove Item Modal -->
+<!-- Enhanced Remove Modal -->
+<% if (wishlistData && wishlistData.length > 0) { %>
 <div class="modal fade" id="removewishlist" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
+    <div class="modal-content border-0">
       <form action="/user/removeWishlist" method="post">
         <input type="hidden" id="removeid" name="removeid">
         <input type="hidden" id="rateId" value="<%= wishlistData[0].rateDetails[0]._id %>">
-        <div class="modal-body text-center p-4">
-          <i class="bi bi-exclamation-circle text-warning display-4 mb-3"></i>
-          <h5>Remove from Wishlist?</h5>
-          <p class="text-muted">Are you sure you want to remove this item from your wishlist?</p>
-        </div>
-        <div class="modal-footer border-top-0">
-          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
-          <button type="submit" class="btn btn-danger">Remove Item</button>
+        <div class="modal-body text-center p-5">
+          <div class="mb-4">
+            <i class="bi bi-exclamation-circle text-warning" style="font-size: 3rem;"></i>
+          </div>
+          <h4 class="mb-3">Remove from Wishlist?</h4>
+          <p class="text-muted mb-4">This item will be removed from your wishlist. You can add it back anytime.</p>
+          <div class="d-flex gap-2 justify-content-center">
+            <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-danger px-4">Remove</button>
+          </div>
         </div>
       </form>
     </div>
   </div>
 </div>
+<% } %>
 
 
 
@@ -225,12 +249,11 @@
     window.location.href = `/user/wishlist?page=${ selectedpage }`
   }
 
-  async function addToCart() {
-    const rateId = document.getElementById('rateId').value
+  async function addToCart(id) {
     const response = await fetch('/user/AddToCart', {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ rateId: rateId })
+      body: JSON.stringify({ rateId: id })
     })
     const data = await response.json()
     if (data.exist) {
@@ -240,19 +263,21 @@
         draggable: true
       });
     }
-    if(data.nostock){
+    if (data.nostock) {
       Swal.fire({
         title: data.nostock,
         icon: "info",
         draggable: true
       });
     }
-    if(data.success){
+    if (data.success) {
       Swal.fire({
         title: data.success,
         icon: "success",
         draggable: true
-      });
+      }).then(()=>{
+        window.location.reload()
+      })
     }
   }
 </script>

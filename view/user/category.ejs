@@ -186,6 +186,9 @@
       color: white;
       border-color: var(--primary-color);
    }
+   .offerbox{
+      border-radius: 20px;
+   }
 </style>
 
 <%- include('partials/userheader') %>
@@ -207,8 +210,8 @@
          </span>
          <button class="wishlist-btn" data-rate-id="<%= element._id %>" data-user-id="<%= userId %>"
             data-is-in-wishlist="<%= element.isInWishlist %>">
-            <i class="<%= element.isInWishlist ? 'fas' : 'far' %> fa-heart"
-               style="color: '<%= element.isInWishlist ? '#ff4757' : '#666' %>;"></i>
+            <i class="<%= element.isInWishlist ? 'fas' : 'far' %> fa-heart "
+               style="color: '<%= element.isInWishlist ? '#ff4757' : '#666' %>';"></i>
          </button>
          <img src="<%= element.images[0] %>" alt="Food Item">
       </div>
@@ -229,13 +232,11 @@
          <% if (element.CategoryDetails[0].offer >0 || element.foodDetails[0].offer >0) { %>
          <% if (element.CategoryDetails[0].offer > element.foodDetails[0].offer) { %>
          <div class="Offer">
-            <span class="offer bg-success p-2 text-white"
-               style="border-radius: 20px;"><%= element.CategoryDetails[0].offer %> % Offer</span>
+            <span class="offerbox bg-success p-2 text-white" ><%= element.CategoryDetails[0].offer %> % Offer</span>
          </div>
          <% } else { %>
          <div class="Offer">
-            <span class="offer bg-success p-2 text-white"
-               style="border-radius: 20px;"><%= element.foodDetails[0].offer %> % Offer</span>
+            <span class="offerbox bg-success p-2 text-white"><%= element.foodDetails[0].offer %> % Offer</span>
          </div>
          <% } %>
          <% } %>
@@ -257,136 +258,135 @@
 </div>
 <%- include('partials/userfooter') %>
 
+
+
 <script>
-   let debounceTimer;
+     let debounceTimer;
 
-   function searchItem(value) {
-      clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(() => {
-         window.location.href = `/user/category?product=${ encodeURIComponent(value) }`;
-      }, 700);
-   }
+function searchItem(value) {
+   clearTimeout(debounceTimer);
+   debounceTimer = setTimeout(() => {
+      window.location.href = `/user/category?product=${ encodeURIComponent(value) }`;
+   }, 700);
+}
 
 
 
-   document.addEventListener('DOMContentLoaded', function () {
-      const wishlistButtons = document.querySelectorAll('.wishlist-btn');
+document.addEventListener('DOMContentLoaded', function () {
+   const wishlistButtons = document.querySelectorAll('.wishlist-btn');
 
-      wishlistButtons.forEach(button => {
-         let isProcessing = false;
+   wishlistButtons.forEach(button => {
+      let isProcessing = false;
 
-         button.addEventListener('click', async function (e) {
-            e.preventDefault();
+      button.addEventListener('click', async function (e) {
+         e.preventDefault();
 
-            if (isProcessing) return;
-            isProcessing = true;
+         if (isProcessing) return;
+         isProcessing = true;
 
-            const rateid = this.getAttribute('data-rate-id');
-            const userid = this.getAttribute('data-user-id');
-            const isInWishlist = this.getAttribute('data-is-in-wishlist') === 'true';
-            const icon = this.querySelector('i');
+         const rateid = this.getAttribute('data-rate-id');
+         const userid = this.getAttribute('data-user-id');
+         const isInWishlist = this.getAttribute('data-is-in-wishlist') === 'true';
+         const icon = this.querySelector('i');
 
-            try {
-               const url = isInWishlist ? '/user/removeWishData' : '/user/addToWishlist';
-               const response = await fetch(url, {
-                  method: 'POST',
-                  headers: {
-                     'Content-Type': 'application/json'
-                  },
-                  body: JSON.stringify({ rateid, userid })
-               });
+         try {
+            const url = isInWishlist ? '/user/removeWishData' : '/user/addToWishlist';
+            const response = await fetch(url, {
+               method: 'POST',
+               headers: {
+                  'Content-Type': 'application/json'
+               },
+               body: JSON.stringify({ rateid, userid })
+            });
 
-               if (!response.ok) throw new Error('Network response was not ok');
+            if (!response.ok) throw new Error('Network response was not ok');
 
-               const result = await response.json();
+            const result = await response.json();
 
-               if (result.successWishlist || result.removeMessage) {
-                  // Toggle wishlist state
-                  const newWishlistState = !isInWishlist;
-                  this.setAttribute('data-is-in-wishlist', newWishlistState);
+            if (result.successWishlist || result.removeMessage) {
+               // Toggle wishlist state
+               const newWishlistState = !isInWishlist;
+               this.setAttribute('data-is-in-wishlist', newWishlistState);
 
-                  // Update icon
-                  icon.className = newWishlistState ? 'fas fa-heart' : 'far fa-heart';
-                  icon.style.color = newWishlistState ? '#ff4757' : '#666';
+               // Update icon
+               icon.className = newWishlistState ? 'fas fa-heart' : 'far fa-heart';
+               icon.style.color = newWishlistState ? '#ff4757' : '#666';
 
-                  // Show success message
-                  Swal.fire({
-                     title: newWishlistState ? 'Added to Wishlist!' : 'Removed from Wishlist!',
-                     icon: 'success',
-                     position: 'top-end',
-                     toast: true,
-                     timer: 1500,
-                     showConfirmButton: false
-                  });
-               }
-            } catch (error) {
-               console.error('Error:', error);
+               // Show success message
                Swal.fire({
-                  title: 'Error',
-                  text: 'Something went wrong!',
-                  icon: 'error',
-                  confirmButtonText: 'OK'
+                  title: newWishlistState ? 'Added to Wishlist!' : 'Removed from Wishlist!',
+                  icon: 'success',
+                  position: 'top-end',
+                  toast: true,
+                  timer: 1500,
+                  showConfirmButton: false
                });
-            } finally {
-               isProcessing = false;
             }
-         });
+         } catch (error) {
+            console.error('Error:', error);
+            Swal.fire({
+               title: 'Error',
+               text: 'Something went wrong!',
+               icon: 'error',
+               confirmButtonText: 'OK'
+            });
+         } finally {
+            isProcessing = false;
+         }
       });
-      const addTocartButton = document.querySelectorAll('.addTocart');
-      addTocartButton.forEach((button) => {
-         button.addEventListener('click', async function (e) {
-            e.preventDefault()
-            const rateId = this.getAttribute('data-rate-id');
-            const hotelid = this.getAttribute('data-hotel-id');
-            const foodid = this.getAttribute('data-food-id');
-            const varientid = this.getAttribute('data-varient-id');
-            try {
-               const response = await fetch('/user/AddToCart', {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({
-                     rateId, hotelid, foodid, varientid,
-                     numberofstock: 1
-                  })
+   });
+   const addTocartButton = document.querySelectorAll('.addTocart');
+   addTocartButton.forEach((button) => {
+      button.addEventListener('click', async function (e) {
+         e.preventDefault()
+         const rateId = this.getAttribute('data-rate-id');
+         const hotelid = this.getAttribute('data-hotel-id');
+         const foodid = this.getAttribute('data-food-id');
+         const varientid = this.getAttribute('data-varient-id');
+         try {
+            const response = await fetch('/user/AddToCart', {
+               method: "POST",
+               headers: { "Content-Type": "application/json" },
+               body: JSON.stringify({
+                  rateId, hotelid, foodid, varientid,
+                  numberofstock: 1
                })
-               const data = await response.json()
-               if (data.exist) {
-                  Swal.fire({
-                     title: 'Exist',
-                     text: data.exist,
-                     icon: 'info',
-                     confirmButtonText: 'OK'
-                  });
-               }
-               if (data.stock) {
-                  Swal.fire({
-                     title: 'limit',
-                     text: data.stock,
-                     icon: 'info',
-                     confirmButtonText: 'OK'
-                  });
-               }
-               if (data.success) {
-                  Swal.fire({
-                     title: 'success',
-                     text: data.success,
-                     icon: 'success',
-                     confirmButtonText: 'OK'
-                  });
-               }
-            } catch (error) {
-               console.error('Error:', error);
+            })
+            const data = await response.json()
+            if (data.exist) {
                Swal.fire({
-                  title: 'Error',
-                  text: 'Something went wrong!',
-                  icon: 'error',
+                  title: 'Exist',
+                  text: data.exist,
+                  icon: 'info',
                   confirmButtonText: 'OK'
                });
             }
-         })
+            if (data.stock) {
+               Swal.fire({
+                  title: 'limit',
+                  text: data.stock,
+                  icon: 'info',
+                  confirmButtonText: 'OK'
+               });
+            }
+            if (data.success) {
+               Swal.fire({
+                  title: 'success',
+                  text: data.success,
+                  icon: 'success',
+                  confirmButtonText: 'OK'
+               });
+            }
+         } catch (error) {
+            console.error('Error:', error);
+            Swal.fire({
+               title: 'Error',
+               text: 'Something went wrong!',
+               icon: 'error',
+               confirmButtonText: 'OK'
+            });
+         }
       })
-   });
+   })
+});
 </script>
-</body>
-
-</html>

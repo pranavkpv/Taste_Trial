@@ -85,9 +85,9 @@ router.post('/removeCart',cartcontroller.removeCart)
 //wishlist
 router.get('/wishlist',userauth.noUser,wishlistcontroller.wishlist)
 router.post('/addToWishlist',userauth.noUser,wishlistcontroller.addToWishlist)
-router.post('/removeWishlist',wishlistcontroller.removeWishlist)
-router.post('/removeWishData',wishlistcontroller.removeWishData)
-router.post('/AddToCart',wishlistcontroller.AddToCart)
+router.post('/removeWishlist',userauth.noUser,wishlistcontroller.removeWishlist)
+router.post('/removeWishData',userauth.noUser,wishlistcontroller.removeWishData)
+router.post('/AddToCart',userauth.noUser,wishlistcontroller.AddToCart)
 
 
 

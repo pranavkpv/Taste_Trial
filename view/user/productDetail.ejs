@@ -368,7 +368,7 @@
       <div class="price-container">
         <span class="current-price">₹<%= rates.rate %></span>
         <% if (foods.offer > 0 || categories.offer > 0) { %>
-        <span class="original-price">₹<%= rates.rate %></span>
+        <span class="original-price">₹<%= rates.rate-rates.rate*Math.max(foods.offer, categories.offer)/100 %></span>
         <span class="discount-badge"><%= Math.max(foods.offer, categories.offer) %>% OFF</span>
         <% } %>
       </div>
@@ -387,11 +387,10 @@
 
       <div class="action-buttons">
         <button class="btn btn-primary" id="addToCart">Add to Cart</button>
-        <button class="btn text-dark btn-wishlist" id="wishlistButton" style="border-color: red;">
+        <button class="btn text-dark btn-wishlist" id="wishlistButton" style="border-color: red;width:650px">
           Add to Wishlist
         </button>
-        
-        <button class="btn btn-secondary btn-order">Order Now</button>
+      
       </div>
 
       <div class="delivery-info">
@@ -405,49 +404,8 @@
     </div>
   </div>
 
-  <!-- Reviews Section -->
-  <div class="reviews-section">
-    <div class="reviews-header">
-      <h2>Customer Reviews</h2>
-      <div class="rating-summary">
-        <span class="average-rating">4.8</span>
-        <div class="rating-stars">★★★★★</div>
-        <span>(128 reviews)</span>
-      </div>
-    </div>
 
-    <div class="reviews-list">
-      <div class="review-card">
-        <div class="review-header">
-          <span class="reviewer-name">Rahul M.</span>
-          <span class="review-date">2 days ago</span>
-        </div>
-        <div class="review-stars">★★★★★</div>
-        <p class="review-text">Absolutely delicious! The biriyani was perfectly spiced and the chicken was tender.
-          Portion size was generous. Will definitely order again!</p>
-      </div>
-
-      <div class="review-card">
-        <div class="review-header">
-          <span class="reviewer-name">Priya S.</span>
-          <span class="review-date">1 week ago</span>
-        </div>
-        <div class="review-stars">★★★★☆</div>
-        <p class="review-text">Great taste and authentic flavor. Delivery was quick and packaging was good. Would
-          recommend!</p>
-      </div>
-
-      <div class="review-card">
-        <div class="review-header">
-          <span class="reviewer-name">Ahmed K.</span>
-          <span class="review-date">2 weeks ago</span>
-        </div>
-        <div class="review-stars">★★★★★</div>
-        <p class="review-text">One of the best biryanis I've had in a while. The aroma and taste are amazing. Fast
-          delivery too!</p>
-      </div>
-    </div>
-  </div>
+  
 </div>
 
 
@@ -516,6 +474,13 @@
       Swal.fire({
         title: givendata.success,
         icon: "success",
+        draggable: true
+      });
+    }
+    if(givendata.error){
+      Swal.fire({
+        title: givendata.error,
+        icon: "error",
         draggable: true
       });
     }

@@ -158,15 +158,15 @@
         </li>
 
         <!-- Danger Zone -->
-        <li class="danger-zone">
+        <!-- <li class="danger-zone" data-bs-toggle="modal" data-bs-target="#deleteAccount">
             <a href="#" class="deletesccount">
                 <i class="fas fa-user-times"></i>
                 <span>Delete Account</span>
             </a>
-        </li>
+        </li> -->
 
         <!-- Logout Button -->
-        <li class="logout-btn">
+        <li class="logout-btn"  data-bs-toggle="modal" data-bs-target="#centeredModal">
             <a href="#">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>Logout</span>
@@ -178,5 +178,74 @@
     </ul>
 </div>
 
+<div class="modal fade" id="centeredModal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-body">
+          Do You Want To Logout
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button"  class="btn btn-danger"   onclick="logoutfun()" >Yes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="modal fade" id="deleteAccount" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-body">
+          Do You Want To Delete the Account ?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button"  class="btn btn-danger" id="deleteButton">Yes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  document.getElementById('deleteButton').addEventListener('click', async function() {
+  try {
+    const response = await fetch('/user/deleteAccount', {
+      method: "POST",
+      headers: { "Content-Type": "application/json" }
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to delete account.");
+    }
+
+    const data = await response.json();
+    
+    if (data.success) {
+      Swal.fire({
+        title: 'Success',
+        text: data.success,
+        icon: 'success',
+        confirmButtonText: 'OK'
+      }).then(() => {
+        window.location.href = '/user/logout';
+      });
+    } else {
+      throw new Error("Deletion failed.");
+    }
+
+  } catch (error) {
+    Swal.fire({
+      title: 'Error',
+      text: error.message || "Something went wrong!",
+      icon: 'error',
+      confirmButtonText: 'OK'
+    });
+    console.error(error);
+  }
+});
+
+</script>
 

@@ -1,236 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Taste Trial-Admin</title>
+  <link rel="stylesheet" href="/adminpartial.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css"
+    rel="stylesheet">
 
 
-<script>
-    const PDFDocument = require('pdfkit');
-const fs = require('fs');
-const path = require('path');
-const ObjectId = require('mongoose').Types.ObjectId;
-
-const COLORS = {
-    primary: '#2563eb',    
-    secondary: '#475569',  
-    accent: '#f97316',     
-    text: '#1e293b',      
-    lightGray: '#e2e8f0',
-    white: '#ffffff'
-};
-
-const downloadBill = async (req, res) => {
-    try {
-        const orderId = req.query.orderId;
-        if (!orderId) {
-            return res.status(400).json({ error: "Order ID is required" });
-        }
-
-        const orders = await orderSchema.aggregate([
-            { $match: { _id: new ObjectId(orderId) } },
-            { $unwind: { path: "$items", preserveNullAndEmptyArrays: true } },
-            { 
-                $lookup: {
-                    from: "rates",
-                    localField: "items.rate_id",
-                    foreignField: "_id",
-                    as: "rateDetails"
-                }
-            },
-            { 
-                $lookup: {
-                    from: "foods",
-                    localField: "rateDetails.food_id",
-                    foreignField: "_id",
-                    as: "foodDetails"
-                }
-            },
-            { 
-                $lookup: {
-                    from: "users",
-                    localField: "user_id",
-                    foreignField: "_id",
-                    as: "userDetails"
-                }
-            },
-            {
-                $lookup: {
-                    from: "hotels",
-                    localField: "rateDetails.hotel_id",
-                    foreignField: "_id",
-                    as: "hotelDetails"
-                }
-            }
-        ]);
-
-        if (!orders || orders.length === 0) {
-            return res.status(404).json({ error: "Order not found" });
-        }
-
-        const calculateCharges = (orders) => {
-            return {
-                gst: orders.reduce((sum, element) => 
-                    sum += (element.items.quantity * element.items.rate * element.items.gst_per / 100), 0),
-                packingCharge: orders.reduce((sum, element) => 
-                    sum += (element.items.quantity * element.items.rate * element.items.packing_per / 100), 0),
-                deliveryCharge: orders.reduce((sum, element) => 
-                    sum += (element.items.quantity * element.items.rate * element.items.delivery_per / 100), 0)
-            };
-        };
-
-        const generatePDF = async (orders, charges) => {
-            const order = orders[0];
-            const invoicePath = path.join(__dirname, `../invoices/invoice-${orderId}.pdf`);
-            // Set a fixed page size with autofit
-            const doc = new PDFDocument({ 
-                margin: 50,
-                size: 'A4',
-                autoFirstPage: true
-            });
-            const stream = fs.createWriteStream(invoicePath);
-
-            return new Promise((resolve, reject) => {
-                doc.pipe(stream);
-
-                const drawRect = (x, y, w, h, color) => {
-                    doc.rect(x, y, w, h).fill(color);
-                };
-
-                // Header Section (reduced height)
-                drawRect(0, 0, doc.page.width, 120, COLORS.primary);
-                
-                doc.fontSize(30)
-                   .fillColor(COLORS.white)
-                   .text('Taste Trial', 50, 40, { align: 'center' })
-                   .fontSize(12)
-                   .text('Delicious Food Delivered', 50, 80, { align: 'center' });
-
-                // Order Information Box (moved up)
-                drawRect(50, 140, doc.page.width - 100, 80, COLORS.lightGray);
-                
-                doc.fontSize(12)
-                   .fillColor(COLORS.text)
-                   .text('INVOICE DETAILS', 70, 150)
-                   .fontSize(10)
-                   .text(`Order ID: ${order._id}`, 70, 170)
-                   .text(`Date: ${new Date(order.createdAt).toLocaleString()}`, 70, 185)
-                   .fontSize(12)
-                   .text('CUSTOMER DETAILS', doc.page.width - 250, 150)
-                   .fontSize(10)
-                   .text(`${order.userDetails[0].firstname} ${order.userDetails[0].lastname}`, 
-                         doc.page.width - 250, 170);
-
-                // Table Header (moved up)
-                const tableY = 240;
-                drawRect(50, tableY, doc.page.width - 100, 30, COLORS.primary);
-                
-                doc.fillColor(COLORS.white)
-                   .fontSize(10);
-
-                const columns = [
-                    { x: 60, width: 30, text: "No." },
-                    { x: 100, width: 120, text: "Hotel" },
-                    { x: 230, width: 120, text: "Item" },
-                    { x: 360, width: 50, text: "Qty" },
-                    { x: 420, width: 70, text: "Rate" },
-                    { x: 500, width: 70, text: "Total" }
-                ];
-
-                columns.forEach(col => {
-                    doc.text(col.text, col.x, tableY + 10, { 
-                        width: col.width, 
-                        align: col.text === "No." ? "center" : "left" 
-                    });
-                });
-
-                // Items (with dynamic positioning)
-                let y = tableY + 40;
-                orders.forEach((item, index) => {
-                    const food = item.foodDetails[0];
-                    const rate = item.rateDetails[0];
-                    const hotel = item.hotelDetails[0];
-                    const itemTotal = rate.rate * item.items.quantity;
-
-                    if (index % 2 === 0) {
-                        drawRect(50, y - 5, doc.page.width - 100, 25, '#f8fafc');
-                    }
-
-                    doc.fillColor(COLORS.text)
-                       .fontSize(9)
-                       .text(`${index + 1}`, 60, y, { width: 30, align: 'center' })
-                       .text(hotel.hotelname, 100, y, { width: 120 })
-                       .text(food.foodname, 230, y, { width: 120 })
-                       .text(item.items.quantity.toString(), 360, y, { width: 50 })
-                       .text(`${rate.rate}`, 420, y, { width: 70 })
-                       .text(`${itemTotal}`, 500, y, { width: 70 });
-
-                    y += 25;
-                });
-                // Summary Box (with dynamic positioning)
-                const summaryY = y + 20;
-                const summaryHeight = 150;
-                drawRect(doc.page.width - 250, summaryY, 200, summaryHeight, COLORS.lightGray);
-                
-                const { gst, packingCharge, deliveryCharge } = charges;
-                const totalAmount = orders[0].totalAmount;
-                const grandTotal = totalAmount + packingCharge + deliveryCharge + gst;
-
-                doc.fontSize(10)
-                   .fillColor(COLORS.text)
-                   .text('Order Summary', doc.page.width - 230, summaryY + 10)
-                   .fontSize(9)
-                   .text('Subtotal:', doc.page.width - 230, summaryY + 35)
-                   .text(`${totalAmount}`, doc.page.width - 90, summaryY + 35)
-                   .text('Packing Charge:', doc.page.width - 230, summaryY + 55)
-                   .text(`${packingCharge}`, doc.page.width - 90, summaryY + 55)
-                   .text('Delivery Charge:', doc.page.width - 230, summaryY + 75)
-                   .text(`${deliveryCharge}`, doc.page.width - 90, summaryY + 75)
-                   .text('GST :', doc.page.width - 230, summaryY + 95)
-                   .text(`${gst}`, doc.page.width - 90, summaryY + 95);
-
-                // Grand Total
-                drawRect(doc.page.width - 250, summaryY + 120, 200, 30, COLORS.primary);
-                doc.fontSize(12)
-                   .fillColor(COLORS.white)
-                   .text('Grand Total:', doc.page.width - 230, summaryY + 128)
-                   .text(`${grandTotal.toFixed(2)}`, doc.page.width - 90, summaryY + 128);
-
-
-                // Footer (positioned relative to content)
-                const footerY = Math.max(summaryY + summaryHeight + 20, doc.page.height - 80);
-                const footerHeight = 60;
-                drawRect(0, footerY, doc.page.width, footerHeight, COLORS.secondary);
-                
-                doc.fontSize(10)
-                   .fillColor(COLORS.white)
-                   .text('Thank you for your order!', 50, footerY + 15, { align: 'center' })
-                   .fontSize(8)
-                   .text('For any issues, contact support@tastetrial.com | +91 1234567890', 50, footerY + 30, { align: 'center' })
-                   .text('© 2024 Taste Trial. All rights reserved.', 50, footerY + 45, { align: 'center' });
-
-                doc.end();
-                stream.on("finish", () => resolve(invoicePath));
-                stream.on("error", reject);
-            });
-        };
-
-        const charges = calculateCharges(orders);
-        const invoicePath = await generatePDF(orders, charges);
-
-        res.download(invoicePath, `invoice-${orderId}.pdf`, (err) => {
-            if (err) {
-                console.error("Download error:", err);
-                return res.status(500).json({ error: "Error downloading the invoice" });
-            }
-            fs.unlink(invoicePath, (unlinkErr) => {
-                if (unlinkErr) console.error("Error removing temporary file:", unlinkErr);
-            });
-        });
-
-    } catch (error) {
-        console.error("Invoice generation error:", error);
-        res.status(500).json({ 
-            error: "Failed to generate invoice",
-            details: error.message 
-        });
+  <style>
+    :root {
+      --primary-color: #2563eb;
+      --sidebar-width: 320px;
+      --header-height: 70px;
     }
-};
 
-module.exports = { downloadBill };
-</script>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f8fafc;
+      margin: 0;
+      overflow-x: hidden;
+    }
+
+    .sidebar {
+      width: var(--sidebar-width);
+      background: white;
+      color: #1e293b;
+      padding-top: 1rem;
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
+      transition: transform 0.3s ease;
+      top: 53px;
+      position: fixed;
+      height: 100vh;
+    
+    }
+
+    .sidebar .logo {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem 1.5rem;
+      margin-bottom: 0.5rem;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .sidebar .logo img {
+      height: 40px;
+      width: 40px;
+      border-radius: 8px;
+      margin-right: 0.75rem;
+      object-fit: cover;
+    }
+
+    .sidebar .logo-text {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+   
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      color: #64748b;
+      text-decoration: none;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      margin-bottom: 2px;
+    }
+
+    .nav-link:hover {
+      background-color: #f1f5f9;
+      color: var(--primary-color);
+    }
+
+
+    .nav-link i {
+      width: 1.5rem;
+      margin-right: 0.75rem;
+      font-size: 1.1rem;
+    }
+
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: var(--header-height);
+      background-color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      z-index: 10;
+    }
+
+    .header-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    .logout-btn {
+      padding: 0.5rem 1.25rem;
+      background-color: #ef4444;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .logout-btn:hover {
+      background-color: #dc2626;
+    }
+
+    .main-content {
+      margin-left: var(--sidebar-width);
+      margin-top: var(--header-height);
+      padding: 2rem;
+    }
+
+    .welcome-card {
+      background: linear-gradient(135deg, var(--primary-color), #1d4ed8);
+      border-radius: 16px;
+      padding: 2rem;
+      color: white;
+      margin-bottom: 2rem;
+    }
+
+    .welcome-title {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .welcome-subtitle {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+
+    .stats-card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      height: 100%;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .stats-title {
+      color: var(--primary-color);
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .stats-value {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .stats-subtitle {
+      color: #64748b;
+      font-size: 0.875rem;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+
+      .header {
+        left: 0;
+      }
+
+      .main-content {
+        margin-left: 0;
+      }
+
+      .sidebar.show {
+        transform: translateX(0);
+      }
+    }
+
+    .logo img {
+      height: 40px;
+      width: 40px;
+      border-radius: 19px;
+      margin-right: 0.75rem;
+      object-fit: cover;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="sidebar">
+    <nav>
+      <div class="nav-item">
+        <a href="/admin/dashboard" class="nav-link active">
+          <i class="fas fa-home"></i>
+          Dashboard
+        </a>
+      </div>
+      <div class="nav-item">
+        <a href="/admin/usermanagement" class="nav-link">
+          <i class="fas fa-users"></i>
+          User Management
+        </a>
+      </div>
+      <div class="nav-item">
+        <a href="/admin/banner" class="nav-link">
+          <i class="fas fa-image"></i>
+          Banner Management
+        </a>
+      </div>
+      <div class="nav-item">
+        <a href="/admin/category" class="nav-link">
+          <i class="fas fa-list"></i>
+          Category Management
+        </a>
+      </div>
+      <div class="nav-item">
+        <a href="/admin/food" class="nav-link">
+          <i class="fas fa-utensils"></i>
+          Food Management
+        </a>
+      </div>
+      <div class="nav-item">
+        <a href="/admin/varient" class="nav-link">
+          <i class="fas fa-tags"></i>
+          Variant Management
+        </a>
+      </div>
+      <div class="nav-item">
+        <a href="/admin/hotel" class="nav-link">
+          <i class="fas fa-hotel"></i>
+          Hotel Management
+        </a>
+      </div>
+      <div class="nav-item">
+        <a href="/admin/rate" class="nav-link">
+          <i class="fas fa-star"></i>
+          Rate Management
+        </a>
+      </div>
+      <div class="nav-item">
+        <a href="/admin/order" class="nav-link">
+          <i class="fas fa-shopping-cart"></i>
+          Order Management
+        </a>
+      </div>
+      <div class="nav-item">
+        <a href="/admin/coupon" class="nav-link">
+          <i class="fas fa-percent"></i>
+          Coupon Management
+        </a>
+      </div>
+      <div class="nav-item">
+        <a href="/admin/returndata" class="nav-link">
+          <i class="fas fa-undo"></i>
+          Return Order Management
+        </a>
+        <div class="nav-item" style="margin-left:-3px">
+          <a href="/admin/delivery" class="nav-link">
+            <i class="bi bi-truck"></i>
+            Delivery Fee Management
+          </a>
+      </div>
+    </nav>
+  </div>
+
+  <div class="header">
+    <div class="logo">
+      <img src="/uploads/logo.jpeg" alt="Logo">
+      <span class="logo-text">Taste Trial</span>
+    </div>
+    <button class="logout-btn" onclick="logout()">
+      <i class="fas fa-sign-out-alt me-2"></i>Logout
+    </button>
+  </div>
+
+  <!-- logout modal -->
+  <div class="modal fade" id="logout" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="myModalLabel">Are You sure ? </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Do You Want To Logout
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
+          <button class="btn btn-primary" onclick="logoutfun()">Yes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // Get current path
+      const currentPath = window.location.pathname;
+
+      // Get all nav links
+      const navLinks = document.querySelectorAll('.nav-link');
+
+      // Remove any existing active classes
+      navLinks.forEach(link => {
+        link.classList.remove('active');
+
+        // Check if the href matches the current path
+        if (link.getAttribute('href') === currentPath) {
+          link.classList.add('active');
+        }
+      });
+
+      // Add click handler for navigation
+      navLinks.forEach(link => {
+        link.addEventListener('click', function (e) {
+          // Remove active class from all links
+          navLinks.forEach(l => l.classList.remove('active'));
+
+          // Add active class to clicked link
+          this.classList.add('active');
+        });
+      });
+    });
+
+    function logout() {
+  console.log("hai");
+  var myModal = new bootstrap.Modal(document.getElementById('logout'));  
+  myModal.show();  // Correct way to show the modal
+}
+function logoutfun(){
+  window.location.href='/admin/login'
+}
+
+  </script>

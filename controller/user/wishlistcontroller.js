@@ -5,10 +5,10 @@ const { ObjectId } = require('mongodb');
 
 const addToWishlist = async (req, res) => {
    try {
-      console.log("hai")
-      console.log(req.body)
-      console.log(req.session.user)
-    
+
+        if(!req.session.user){
+         return res.json({error: "Please login for continue"})
+        }
          const newWishlist = new wishlistschema({
             rate_id: req.body.rateid,
             user_id: req.session.user
@@ -89,7 +89,9 @@ const removeWishData= async(req,res)=>{
    try {
      
       const {userid,rateid}=req.body
-      console.log(req.body)
+      if(!req.session.user){
+      return res.json({error:"Please login for continue"})
+      }
       await wishlistschema.deleteOne({user_id:userid,rate_id:rateid})
       return res.json({removeMessage:"Data Removed SuccessFully"})
    } catch (error) {
@@ -99,15 +101,17 @@ const removeWishData= async(req,res)=>{
 
 const AddToCart = async(req,res)=>{
    try {
-      console.log("Haiiiiii")
-      console.log(req.body)
+  
       const userId=req.session.user
       const carts=await cartschema.findOne({rate_id:req.body.rateId})
       if(carts){
          return res.json({exist:"Product Already Exist In Cart"})
       }
+      if(!userId){
+         return res.json({error:"Please login to continue"})
+      }
       const rates=await rateschema.findOne({_id:req.body.rateId})
-      console.log(rates)
+
       if(rates.stock==0){
          return res.json({nostock:"No stock Available"})
       }

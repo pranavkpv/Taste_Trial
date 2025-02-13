@@ -228,14 +228,17 @@
                <h3 class="text-success">Rate Details</h3>
                <p><strong>Base Rate : </strong><%= (element.number*element.rateDetails.rate).toFixed(2) %></p>
                <p><strong>Gst Amount :
-                  </strong><%= (element.number*(element.rateDetails.rate*element.rateDetails.gst_per/100)).toFixed(2) %></p>
+                  </strong><%= (element.number*(element.rateDetails.rate*element.rateDetails.gst_per/100)).toFixed(2) %>
+               </p>
                <p><strong>Packing Charge :
-                  </strong><%= (element.number*(element.rateDetails.rate*element.rateDetails.packing_per/100)).toFixed(2) %></p>
+                  </strong><%= (element.number*(element.rateDetails.rate*element.rateDetails.packing_per/100)).toFixed(2) %>
+               </p>
 
                <% if (element.foodDetails[0].offer > 0 || element.categoryDetails[0].offer > 0) { %>
                <% if (element.foodDetails[0].offer > element.categoryDetails[0].offer){ %>
                <p><strong> Offer Amount :
-                  </strong><%= (element.number *element.rateDetails.rate*element.foodDetails[0].offer/100).toFixed(2) %></p>
+                  </strong><%= (element.number *element.rateDetails.rate*element.foodDetails[0].offer/100).toFixed(2) %>
+               </p>
                <p class="fs-5">Final Amount
                   :<%= (element.number*(element.rateDetails.rate+element.rateDetails.rate*element.rateDetails.gst_per/100+
                  element.rateDetails.rate*element.rateDetails.packing_per/100
@@ -243,7 +246,8 @@
                </p>
                <% } else { %>
                <p><strong> Offer Amount :
-                  </strong><%= (element.number*element.rateDetails.rate*element.categoryDetails[0].offer/100).toFixed(2) %></p>
+                  </strong><%= (element.number*element.rateDetails.rate*element.categoryDetails[0].offer/100).toFixed(2) %>
+               </p>
                <p class="fs-5">Final Amount
                   :<%= (element.number*(element.rateDetails.rate+element.rateDetails.rate*element.rateDetails.gst_per/100+
                     element.rateDetails.rate*element.rateDetails.packing_per/100
@@ -390,7 +394,7 @@ datas.forEach(element => {
             <input type="hidden" value="<%= element.number %>" id="numberofproduct" name="numberofproduct">
             <% }) %>
             <!-- Hidden field to store the selected payment method -->
-            <input type="text" id="selectedPaymentMethod" name="selectedPaymentMethod" value="COD">
+            <input type="hidden" id="selectedPaymentMethod" name="selectedPaymentMethod" value="COD">
             <% if (couponsuccessmessage && couponsuccessmessage.length>0) { %>
             <input type="hidden" value="<%= coupons._id %>" name="couponId" id="couponId">
             <% } %>
@@ -495,23 +499,31 @@ datas.forEach(element => {
          } else {
             let netAmountElement = document.querySelector('#withCoupon') || document.querySelector('#withoutCoupon');
             let amount = netAmountElement ? parseInt(netAmountElement.innerText.trim()) : 0;
+            const addressSelect = document.getElementById('addressSelect').value
             const response = await fetch('/pay/create-order', {
                method: 'POST',
                headers: { 'Content-Type': 'application/json' },
-               body: JSON.stringify({ amount })
+               body: JSON.stringify({ amount, addressSelect })
             });
 
             const data = await response.json();
-            if (!data.success) {
+            if (data.address) {
                Swal.fire({
                   title: "Error!",
-                  text: "Failed to create order. Please try again.",
-                  icon: "error",
-                  showConfirmButton: false,
-                  timer: 2000
+                  text: data.address,
+                  icon: "warning",
+                  showConfirmButton: true,
+                  showCancelButton: true,  // ✅ Added Cancel button
+                  confirmButtonText: "Go to Address",
+                  cancelButtonText: "Cancel"
+               }).then((result) => {
+                  if (result.isConfirmed) { 
+                     window.location.href = '/user/address';
+                  }
                });
                return;
             }
+
 
             const options = {
                key: '<%= process.env.RAZORPAY_KEY_ID %>',
@@ -647,15 +659,15 @@ datas.forEach(element => {
 
 <% if (Addresserror && Addresserror.length > 0) { %>
 <script>
-  Swal.fire({
-  title: "Add Address",
-  showDenyButton: true,
-  icon:"warning",
-  confirmButtonText: "Do you Want To Add the Address",
-}).then((result) => {
-  if (result.isConfirmed) {
-   window.location.href=`/user/address`
-  } 
-});
+   Swal.fire({
+      title: "Add Address",
+      showDenyButton: true,
+      icon: "warning",
+      confirmButtonText: "Do you Want To Add the Address",
+   }).then((result) => {
+      if (result.isConfirmed) {
+         window.location.href = `/user/address`
+      }
+   });
 </script>
 <% } %>

@@ -186,6 +186,12 @@
       color: white;
       border-color: var(--primary-color);
    }
+   .breadcrumb-item + .breadcrumb-item::before {
+    display: inline-block;
+    vertical-align: middle; /* Ensures proper alignment */
+    margin-top: 10px; /* Adjust if needed */
+    transform: rotate(0deg); /* Prevents unwanted rotation */
+}
 </style>
 
 <%- include('partials/userheader') %>
@@ -229,13 +235,11 @@
          <% if (element.CategoryDetails[0].offer >0 || element.foodDetails[0].offer >0) { %>
          <% if (element.CategoryDetails[0].offer > element.foodDetails[0].offer) { %>
          <div class="Offer">
-            <span class="offer bg-success p-2 text-white"
-               style="border-radius: 20px;"><%= element.CategoryDetails[0].offer %> % Offer</span>
+            <span class="offer bg-success p-2 text-white"style= "border-radius: 20px;" ><%= element.CategoryDetails[0].offer %> % Offer</span>
          </div>
          <% } else { %>
          <div class="Offer">
-            <span class="offer bg-success p-2 text-white"
-               style="border-radius: 20px;"><%= element.foodDetails[0].offer %> % Offer</span>
+            <span class="offer bg-success p-2 text-white"style="border-radius: 20px;"><%= element.foodDetails[0].offer %> % Offer</span>
          </div>
          <% } %>
          <% } %>
@@ -255,6 +259,7 @@
    </div>
    <% }) %>
 </div>
+
 <%- include('partials/userfooter') %>
 
 <script>
@@ -299,6 +304,15 @@
                if (!response.ok) throw new Error('Network response was not ok');
 
                const result = await response.json();
+               if(result.error){
+                  Swal.fire({
+                     title:result.error ,
+                     icon: 'error',
+                     showConfirmButton: true
+                  }).then(()=>{
+                     window.location.href="/user/logout"
+                  })
+               }
 
                if (result.successWishlist || result.removeMessage) {
                   // Toggle wishlist state
@@ -349,7 +363,18 @@
                      numberofstock: 1
                   })
                })
+
                const data = await response.json()
+               if(data.error){
+                  Swal.fire({
+                     title: 'error',
+                     text: data.error,
+                     icon: 'error',
+                     confirmButtonText: 'OK'
+                  }).then(()=>{
+                     window.location.href='/user/logout'
+                  })
+               }
                if (data.exist) {
                   Swal.fire({
                      title: 'Exist',

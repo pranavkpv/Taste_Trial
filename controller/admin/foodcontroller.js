@@ -59,6 +59,7 @@ const food = async (req, res) => {
       var foodss=foods
       var selectedCategory="All" 
      }
+     console.log(foodss)
       const categories = await categoryschema.find({isdeleted:false})
       res.render('admin/food', { foodss, categories, errormessage, successmessage, existmessage, editexistmessage,searchedfoodname ,startIndex,page,
          category,selectedCategory

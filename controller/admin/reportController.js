@@ -70,7 +70,7 @@ const salesReport = async (req, res) => {
             foreignField: "_id",
             as: "couponDetails"
          }
-      },
+      }
      
       ])
       const couponSum = orders.reduce((sum, element) => {

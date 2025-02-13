@@ -1061,6 +1061,17 @@ const logout = async (req, res) => {
 }
 
 
+const deleteAccount = async(req,res)=>{
+   try {
+      const userId=req.session.user
+      await userschema.findByIdAndDelete({_id:userId})
+      return res.json({success:"SuccessFully Deleted The Account"})
+   } catch (error) {
+     console.log(error) 
+   }
+}
+
+
 
 
 
@@ -1074,5 +1085,5 @@ module.exports = {
    wallet,
    review,
    confirmorder, orderSuccess,
-   applyCoupon, removeCoupon
+   applyCoupon, removeCoupon,deleteAccount
 }

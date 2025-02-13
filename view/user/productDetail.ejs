@@ -325,6 +325,13 @@
       grid-column: span 1;
     }
   }
+
+  .breadcrumb-item + .breadcrumb-item::before {
+    display: inline-block;
+    vertical-align: middle; /* Ensures proper alignment */
+    margin-top: 10px; /* Adjust if needed */
+    transform: rotate(0deg); /* Prevents unwanted rotation */
+}
 </style>
 
 <%- include('partials/userheader') %>
@@ -387,11 +394,9 @@
 
       <div class="action-buttons">
         <button class="btn btn-primary" id="addToCart">Add to Cart</button>
-        <button class="btn text-dark btn-wishlist" id="wishlistButton" style="border-color: red;">
+        <button class="btn text-dark btn-wishlist" id="wishlistButton" style="border-color: red;width:650px">
           Add to Wishlist
         </button>
-        
-        <button class="btn btn-secondary btn-order">Order Now</button>
       </div>
 
       <div class="delivery-info">
@@ -406,48 +411,6 @@
   </div>
 
   <!-- Reviews Section -->
-  <div class="reviews-section">
-    <div class="reviews-header">
-      <h2>Customer Reviews</h2>
-      <div class="rating-summary">
-        <span class="average-rating">4.8</span>
-        <div class="rating-stars">★★★★★</div>
-        <span>(128 reviews)</span>
-      </div>
-    </div>
-
-    <div class="reviews-list">
-      <div class="review-card">
-        <div class="review-header">
-          <span class="reviewer-name">Rahul M.</span>
-          <span class="review-date">2 days ago</span>
-        </div>
-        <div class="review-stars">★★★★★</div>
-        <p class="review-text">Absolutely delicious! The biriyani was perfectly spiced and the chicken was tender.
-          Portion size was generous. Will definitely order again!</p>
-      </div>
-
-      <div class="review-card">
-        <div class="review-header">
-          <span class="reviewer-name">Priya S.</span>
-          <span class="review-date">1 week ago</span>
-        </div>
-        <div class="review-stars">★★★★☆</div>
-        <p class="review-text">Great taste and authentic flavor. Delivery was quick and packaging was good. Would
-          recommend!</p>
-      </div>
-
-      <div class="review-card">
-        <div class="review-header">
-          <span class="reviewer-name">Ahmed K.</span>
-          <span class="review-date">2 weeks ago</span>
-        </div>
-        <div class="review-stars">★★★★★</div>
-        <p class="review-text">One of the best biryanis I've had in a while. The aroma and taste are amazing. Fast
-          delivery too!</p>
-      </div>
-    </div>
-  </div>
 </div>
 
 
@@ -505,6 +468,15 @@
         draggable: true
       });
     }
+    if(givendata.noUser){
+      Swal.fire({
+        title: givendata.noUser,
+        icon: "error",
+        draggable: true
+      }).then(()=>{
+        window.location.href='/user/logout'
+      })
+    }
     if (givendata.existProduct) {
       Swal.fire({
         title: givendata.existProduct,
@@ -548,10 +520,24 @@
   // Event listener for button click
   wishlistButton.addEventListener("click", async function () {
     const url = isInWishlist ? "/user/removeWishData" : "/user/addToWishlist";
+
+    const rateElement = document.getElementById('rateId');
+    const userElement = document.getElementById('userId');
+
     const data = {
-      rateid: document.getElementById('rateId').value,
-      userid:document.getElementById('userId').value
+      rateid: rateElement ? rateElement.value : null,
+      userid: userElement ? userElement.value : null
     };
+
+    if (!data.rateid || !data.userid) {
+      Swal.fire({
+        title: "Error",
+        text: "Missing required data.",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
+      return;
+    }
 
     try {
       const response = await fetch(url, {
@@ -560,8 +546,20 @@
         body: JSON.stringify(data),
       });
 
+      if (!response.ok) {
+        throw new Error("Failed to communicate with the server.");
+      }
+
       const result = await response.json();
-      console.log(result);
+
+      if (result.error) {
+        Swal.fire({
+          title: result.error,
+          icon: "error",
+          confirmButtonText: "OK",
+        });
+        return;
+      }
 
       if (result.successWishlist || result.removeMessage) {
         isInWishlist = !isInWishlist; // Toggle wishlist state
@@ -577,13 +575,14 @@
     } catch (error) {
       Swal.fire({
         title: "Error",
-        text: "Something went wrong!",
+        text: error.message || "Something went wrong!",
         icon: "error",
         confirmButtonText: "OK",
       });
       console.error(error);
     }
-  });
+});
+
 });
 
 

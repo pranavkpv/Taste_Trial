@@ -325,6 +325,13 @@
       grid-column: span 1;
     }
   }
+
+  .breadcrumb-item + .breadcrumb-item::before {
+    display: inline-block;
+    vertical-align: middle; /* Ensures proper alignment */
+    margin-top: 10px; /* Adjust if needed */
+    transform: rotate(0deg); /* Prevents unwanted rotation */
+}
 </style>
 
 <%- include('partials/userheader') %>
@@ -390,7 +397,10 @@
         <button class="btn text-dark btn-wishlist" id="wishlistButton" style="border-color: red;width:650px">
           Add to Wishlist
         </button>
+<<<<<<< HEAD
       
+=======
+>>>>>>> 63499e0410abb3105660c1ee9323d3ade75246d9
       </div>
 
       <div class="delivery-info">
@@ -404,8 +414,12 @@
     </div>
   </div>
 
+<<<<<<< HEAD
 
   
+=======
+  <!-- Reviews Section -->
+>>>>>>> 63499e0410abb3105660c1ee9323d3ade75246d9
 </div>
 
 
@@ -463,6 +477,15 @@
         draggable: true
       });
     }
+    if(givendata.noUser){
+      Swal.fire({
+        title: givendata.noUser,
+        icon: "error",
+        draggable: true
+      }).then(()=>{
+        window.location.href='/user/logout'
+      })
+    }
     if (givendata.existProduct) {
       Swal.fire({
         title: givendata.existProduct,
@@ -513,10 +536,24 @@
   // Event listener for button click
   wishlistButton.addEventListener("click", async function () {
     const url = isInWishlist ? "/user/removeWishData" : "/user/addToWishlist";
+
+    const rateElement = document.getElementById('rateId');
+    const userElement = document.getElementById('userId');
+
     const data = {
-      rateid: document.getElementById('rateId').value,
-      userid:document.getElementById('userId').value
+      rateid: rateElement ? rateElement.value : null,
+      userid: userElement ? userElement.value : null
     };
+
+    if (!data.rateid || !data.userid) {
+      Swal.fire({
+        title: "Error",
+        text: "Missing required data.",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
+      return;
+    }
 
     try {
       const response = await fetch(url, {
@@ -525,8 +562,20 @@
         body: JSON.stringify(data),
       });
 
+      if (!response.ok) {
+        throw new Error("Failed to communicate with the server.");
+      }
+
       const result = await response.json();
-      console.log(result);
+
+      if (result.error) {
+        Swal.fire({
+          title: result.error,
+          icon: "error",
+          confirmButtonText: "OK",
+        });
+        return;
+      }
 
       if (result.successWishlist || result.removeMessage) {
         isInWishlist = !isInWishlist; // Toggle wishlist state
@@ -542,13 +591,14 @@
     } catch (error) {
       Swal.fire({
         title: "Error",
-        text: "Something went wrong!",
+        text: error.message || "Something went wrong!",
         icon: "error",
         confirmButtonText: "OK",
       });
       console.error(error);
     }
-  });
+});
+
 });
 
 

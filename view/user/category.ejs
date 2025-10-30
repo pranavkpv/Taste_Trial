@@ -186,9 +186,18 @@
       color: white;
       border-color: var(--primary-color);
    }
+<<<<<<< HEAD
    .offerbox{
       border-radius: 20px;
    }
+=======
+   .breadcrumb-item + .breadcrumb-item::before {
+    display: inline-block;
+    vertical-align: middle; /* Ensures proper alignment */
+    margin-top: 10px; /* Adjust if needed */
+    transform: rotate(0deg); /* Prevents unwanted rotation */
+}
+>>>>>>> 63499e0410abb3105660c1ee9323d3ade75246d9
 </style>
 
 <%- include('partials/userheader') %>
@@ -232,11 +241,19 @@
          <% if (element.CategoryDetails[0].offer >0 || element.foodDetails[0].offer >0) { %>
          <% if (element.CategoryDetails[0].offer > element.foodDetails[0].offer) { %>
          <div class="Offer">
+<<<<<<< HEAD
             <span class="offerbox bg-success p-2 text-white" ><%= element.CategoryDetails[0].offer %> % Offer</span>
          </div>
          <% } else { %>
          <div class="Offer">
             <span class="offerbox bg-success p-2 text-white"><%= element.foodDetails[0].offer %> % Offer</span>
+=======
+            <span class="offer bg-success p-2 text-white"style= "border-radius: 20px;" ><%= element.CategoryDetails[0].offer %> % Offer</span>
+         </div>
+         <% } else { %>
+         <div class="Offer">
+            <span class="offer bg-success p-2 text-white"style="border-radius: 20px;"><%= element.foodDetails[0].offer %> % Offer</span>
+>>>>>>> 63499e0410abb3105660c1ee9323d3ade75246d9
          </div>
          <% } %>
          <% } %>
@@ -256,6 +273,7 @@
    </div>
    <% }) %>
 </div>
+
 <%- include('partials/userfooter') %>
 
 
@@ -301,7 +319,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (!response.ok) throw new Error('Network response was not ok');
 
+<<<<<<< HEAD
             const result = await response.json();
+=======
+               const result = await response.json();
+               if(result.error){
+                  Swal.fire({
+                     title:result.error ,
+                     icon: 'error',
+                     showConfirmButton: true
+                  }).then(()=>{
+                     window.location.href="/user/logout"
+                  })
+               }
+>>>>>>> 63499e0410abb3105660c1ee9323d3ade75246d9
 
             if (result.successWishlist || result.removeMessage) {
                // Toggle wishlist state
@@ -351,9 +382,50 @@ document.addEventListener('DOMContentLoaded', function () {
                   rateId, hotelid, foodid, varientid,
                   numberofstock: 1
                })
+<<<<<<< HEAD
             })
             const data = await response.json()
             if (data.exist) {
+=======
+
+               const data = await response.json()
+               if(data.error){
+                  Swal.fire({
+                     title: 'error',
+                     text: data.error,
+                     icon: 'error',
+                     confirmButtonText: 'OK'
+                  }).then(()=>{
+                     window.location.href='/user/logout'
+                  })
+               }
+               if (data.exist) {
+                  Swal.fire({
+                     title: 'Exist',
+                     text: data.exist,
+                     icon: 'info',
+                     confirmButtonText: 'OK'
+                  });
+               }
+               if (data.stock) {
+                  Swal.fire({
+                     title: 'limit',
+                     text: data.stock,
+                     icon: 'info',
+                     confirmButtonText: 'OK'
+                  });
+               }
+               if (data.success) {
+                  Swal.fire({
+                     title: 'success',
+                     text: data.success,
+                     icon: 'success',
+                     confirmButtonText: 'OK'
+                  });
+               }
+            } catch (error) {
+               console.error('Error:', error);
+>>>>>>> 63499e0410abb3105660c1ee9323d3ade75246d9
                Swal.fire({
                   title: 'Exist',
                   text: data.exist,

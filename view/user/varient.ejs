@@ -83,6 +83,12 @@
       font-size: 12px;
       padding: 5px 10px;
     }
+    .breadcrumb-item + .breadcrumb-item::before {
+    display: inline-block;
+    vertical-align: middle; /* Ensures proper alignment */
+    margin-top: 10px; /* Adjust if needed */
+    transform: rotate(0deg); /* Prevents unwanted rotation */
+}
 </style>
 
 <%- include('partials/userheader') %>

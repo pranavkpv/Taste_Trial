@@ -45,13 +45,21 @@ const productDetail = async (req, res) => {
 
 const productcart = async (req, res) => {
    try {
+<<<<<<< HEAD
     
+=======
+      console.log("hai")
+      
+>>>>>>> 63499e0410abb3105660c1ee9323d3ade75246d9
       const userid = req.session.user;
       if(!userid){
          return res.json({error:"Please Login To Continue"})
       }
       const carts = await cartSchema.find({ user_id: userid });
       const rates = await rateschema.findOne({ _id: req.body.rateid });
+      if(!userid){
+        return res.json({noUser: "please login for continue"});
+      }
 
       if (parseInt(req.body.numberofstock) > parseInt(rates.stock)) {
         

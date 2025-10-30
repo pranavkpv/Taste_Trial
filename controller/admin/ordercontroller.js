@@ -77,7 +77,7 @@ const order = async (req, res) => {
                as:"couponDetails"
             }
          }
-         ,{$match:{"items.status":{$ne:"waiting for approval"},paidStatus:{$ne:"failed"},...totalFilter}}, { $sort: { createdAt: -1 } },
+         ,{$match:{"items.status":{$ne:["waiting for approval"]},paidStatus:{$ne:"failed"},...totalFilter}}, { $sort: { createdAt: -1 } },
          {$skip:skip},{$limit:limit}
       ]);
 

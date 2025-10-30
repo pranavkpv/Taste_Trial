@@ -75,7 +75,7 @@ router.post('/editAddress',profilecontroller.editAddress)
 router.post('/deleteAddress',profilecontroller.deleteAddress)
 
 //AddTocart
-router.post('/productcart',userauth.noUser,userproductDetailController.productcart)
+router.post('/productcart',userproductDetailController.productcart)
 
 
 //cart
@@ -84,10 +84,17 @@ router.post('/removeCart',cartcontroller.removeCart)
 
 //wishlist
 router.get('/wishlist',userauth.noUser,wishlistcontroller.wishlist)
+<<<<<<< HEAD
 router.post('/addToWishlist',userauth.noUser,wishlistcontroller.addToWishlist)
 router.post('/removeWishlist',userauth.noUser,wishlistcontroller.removeWishlist)
 router.post('/removeWishData',userauth.noUser,wishlistcontroller.removeWishData)
 router.post('/AddToCart',userauth.noUser,wishlistcontroller.AddToCart)
+=======
+router.post('/addToWishlist',wishlistcontroller.addToWishlist)
+router.post('/removeWishlist',wishlistcontroller.removeWishlist)
+router.post('/removeWishData',wishlistcontroller.removeWishData)
+router.post('/AddToCart',wishlistcontroller.AddToCart)
+>>>>>>> 63499e0410abb3105660c1ee9323d3ade75246d9
 
 
 
@@ -125,7 +132,7 @@ router.post('/removeCoupon',usercontroller.removeCoupon)
 router.get('/wallethistory',userauth.noUser,walletcontroller.wallet)
 router.get('/download-invoice',userauth.noUser,usercontroller.downloadBill)
 
-
+router.post('/deleteAccount',usercontroller.deleteAccount)
 
 router.get('/logout',usercontroller.logout)
 

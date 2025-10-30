@@ -103,14 +103,16 @@
             </thead>
             <tbody>
               <% orders.forEach(element => { %>
-                <tr>
-                  <td class="py-2"><%= element.formattedCreatedAt %></td>
-                  <td class="py-2"><%= element.userDetails[0].firstname %> <%= element.userDetails[0].lastname %></td>
-                  <td class="py-2 text-primary">#<%= element._id %></td>
-                  <td class="py-2">Purchase Amount</td>
-                  <td class="py-2 text-end"><%= Math.round(element.totalAmount) %></td>
-                  <td class="py-2 text-end">0</td>
-                </tr>
+                <% if (element.totalAmount > 0) { %>
+                  <tr>
+                    <td class="py-2"><%= element.formattedCreatedAt %></td>
+                    <td class="py-2"><%= element.userDetails[0].firstname %> <%= element.userDetails[0].lastname %></td>
+                    <td class="py-2 text-primary">#<%= element._id %></td>
+                    <td class="py-2">Purchase Amount</td>
+                    <td class="py-2 text-end"><%= Math.round(element.totalAmount) %></td>
+                    <td class="py-2 text-end">0</td>
+                  </tr>
+                <% } %>
                 <% if (element.totalOffer>0) { %>
                   <tr class="table-light">
                     <td class="py-2"><%= element.formattedCreatedAt %></td>

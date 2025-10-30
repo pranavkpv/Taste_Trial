@@ -7,6 +7,8 @@
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
   <title>Taste Trial-Delicious Food
     Delivered To You</title>
 
@@ -211,12 +213,14 @@
 <body>
   <header class="main-header">
     <!-- Left Section: Logo & Title -->
-    <div class="header-left">
-      <div class="brand">
-        <img src="/uploads/logo.jpeg" alt="Company Logo" class="brand-logo">
-        <h1 class="brand-name">Taste Trial</h1>
+    <a href="/user/home" class="text-decoration-none">
+      <div class="header-left">
+        <div class="brand">
+          <img src="/uploads/logo.jpeg" alt="Company Logo" class="brand-logo">
+          <h1 class="brand-name">Taste Trial</h1>
+        </div>
       </div>
-    </div>
+    </a>
 
     <!-- Middle Section: Search -->
     <div class="header-center">
@@ -245,16 +249,33 @@
           <i class="fas fa-user-circle"></i>
         </a>
       </nav>
-      <button class="logout-button" onclick="logoutfun()">
+      <button class="logout-button" data-bs-toggle="modal" data-bs-target="#centeredModal">
         <i class="fas fa-sign-out-alt"></i>
         <span>Logout</span>
       </button>
     </div>
   </header>
+  <div class="modal fade" id="centeredModal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-body">
+          Do You Want To Logout
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-danger" onclick="logoutfun()">Yes</button>
+        </div>
+      </div>
+    </div>
+  </div>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 
   <script>
     function logoutfun() {
       window.location.href = "/user/logout"
     }
+
+    
   </script>

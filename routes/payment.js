@@ -1,6 +1,8 @@
 const Razorpay = require("razorpay");
 const express = require("express");
 const router = express.Router();
+const addressSchema=require('../model/addressschema')
+const locationSchema=require('../model/locationSchema')
 
 const razorpayInstance = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID, // Replace with your Key ID
@@ -11,11 +13,16 @@ const razorpayInstance = new Razorpay({
 router.post("/create-order", async (req, res) => {
 
     try {
-     
+          const addressId=req.body.addressSelect
+          const address=await addressSchema.findOne({_id:addressId})
+          const location = await locationSchema.findOne({_id:address.location_id})
+         if(req.body.addressSelect=="" || !req.body.addressSelect){
+            return res.json({address:"Please Select Address If No Address Exist Please Add Address"})
+         }
         const { amount,currency,receipt } = req.body;
 
         const options = {
-            amount: amount *100 , // Razorpay amount is in paise (1 INR = 100 paise)
+            amount: (amount + location.deliveryCharge) *100 , 
             currency: currency || "INR",
             receipt: receipt || "receipt#1",
         };

@@ -182,6 +182,12 @@
         transform: translateY(-50%);
         color: #666;
     }
+    .breadcrumb-item + .breadcrumb-item::before {
+    display: inline-block;
+    vertical-align: middle; /* Ensures proper alignment */
+    margin-top: 10px; /* Adjust if needed */
+    transform: rotate(0deg); /* Prevents unwanted rotation */
+}
 </style>
 
 <%- include('partials/userheader') %>

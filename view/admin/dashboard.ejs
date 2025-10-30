@@ -223,7 +223,7 @@
           </div>
 
 
-          <div class="form-group mb-0">
+          <!-- <div class="form-group mb-0">
             <label for="month" class="form-label text-sm text-gray-600">Select Month</label>
             <select id="month" name="month" class="form-control" value="">
               <option value=""><%= corrMonth %></option>
@@ -240,19 +240,9 @@
               <option value="11">November</option>
               <option value="12">December</option>
             </select>
-          </div>
+          </div> -->
 
-          <div class="form-group mb-0">
-            <label for="year" class="form-label text-sm text-gray-600">Year</label>
-            <select id="year" name="year" class="form-control">
-              <option value=""><%= year %></option>
-              <% const currentYear = new Date().getFullYear(); %>
-              <% for (let i = currentYear; i >= currentYear - 10; i--) { %>  
-                <option value="<%= i %>" <%= year == i ? 'selected' : '' %>><%= i %></option>
-              <% } %>
-            </select>
-            
-          </div>
+   
           
           
           <button type="submit" class="btn btn-primary align-self-end mb-0" style="height: 38px;">

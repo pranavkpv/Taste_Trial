@@ -4,215 +4,246 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <style>
-  /* Custom CSS */
-  :root {
-      --primary-bg: #f8f9fa;
-      --card-hover: #f0f2f5;
-  }
+    /* Custom CSS */
+    :root {
+        --primary-bg: #f8f9fa;
+        --card-hover: #f0f2f5;
+    }
 
-  body {
-      background-color: var(--primary-bg);
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  }
+    body {
+        background-color: var(--primary-bg);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
 
-  .menu {
-      background-color: white;
-      min-height: 100vh;
-      box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-      position: sticky;
-      top: 0;
-  }
+    .menu {
+        background-color: white;
+        min-height: 100vh;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        position: sticky;
+        top: 0;
+    }
 
-  .content-header {
-      padding: 2rem 1rem;
-      background-color: white;
-      border-radius: 10px;
-      margin-bottom: 2rem;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-  }
+    .content-header {
+        padding: 2rem 1rem;
+        background-color: white;
+        border-radius: 10px;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
 
-  .card {
-      border: none;
-      border-radius: 15px;
-      transition: all 0.3s ease;
-      box-shadow: 0 2px 15px rgba(0,0,0,0.05);
-  }
+    .card {
+        border: none;
+        border-radius: 15px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+    }
 
-  .card:hover {
-      transform: translateY(-5px);
-      background-color: var(--card-hover);
-      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-  }
+    .card:hover {
+        transform: translateY(-5px);
+        background-color: var(--card-hover);
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    }
 
-  .card-icon {
-      font-size: 2rem;
-      margin-bottom: 1rem;
-  }
+    .card-icon {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
 
-  .btn {
-      border-radius: 8px;
-      padding: 0.5rem 1.5rem;
-      font-weight: 500;
-      transition: all 0.3s ease;
-  }
+    .btn {
+        border-radius: 8px;
+        padding: 0.5rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
 
-  .btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-  }
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
 
-  .main-content {
-      padding: 1rem;
-  }
+    .main-content {
+        padding: 1rem;
+    }
 
-  /* Custom colors for cards */
-  .orders-icon { color: #4361ee; }
-  .wishlist-icon { color: #ef476f; }
-  .wallet-icon { color: #06d6a0; }
-  .account-icon { color: #118ab2; }
-  .support-icon { color: #ffd166; }
-  .logout-icon { color: #e63946; }
-  .nav-links a.active {
-      background: #34495e;
-      border-left: 3px solid #3498db;
-  }
-  .footer {
-         background: var(--dark);
-         color: white;
-         padding: 4rem 0 2rem;
-         margin-top: 0px;
-      }
+    /* Custom colors for cards */
+    .orders-icon {
+        color: #4361ee;
+    }
 
-      .footer-title {
-         font-size: 1.2rem;
-         font-weight: 600;
-         margin-bottom: 1.5rem;
-      }
+    .wishlist-icon {
+        color: #ef476f;
+    }
 
-      .footer-links {
-         list-style: none;
-         padding: 0;
-      }
+    .wallet-icon {
+        color: #06d6a0;
+    }
 
-      .footer-links li {
-         margin-bottom: 0.8rem;
-      }
+    .account-icon {
+        color: #118ab2;
+    }
 
-      .footer-links a {
-         color: #ddd;
-         text-decoration: none;
-         transition: color 0.3s ease;
-      }
+    .support-icon {
+        color: #ffd166;
+    }
 
-      .footer-links a:hover {
-         color: var(--primary);
-      }
-      .sidebar{
-        height:1100px
-      }
+    .logout-icon {
+        color: #e63946;
+    }
+
+    .nav-links a.active {
+        background: #34495e;
+        border-left: 3px solid #3498db;
+    }
+
+    .footer {
+        background: var(--dark);
+        color: white;
+        padding: 4rem 0 2rem;
+        margin-top: 0px;
+    }
+
+    .footer-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+    }
+
+    .footer-links {
+        list-style: none;
+        padding: 0;
+    }
+
+    .footer-links li {
+        margin-bottom: 0.8rem;
+    }
+
+    .footer-links a {
+        color: #ddd;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+    .footer-links a:hover {
+        color: var(--primary);
+    }
+
+    .sidebar {
+        height: 1100px
+    }
+    .breadcrumb-item + .breadcrumb-item::before {
+    display: inline-block;
+    vertical-align: middle; /* Ensures proper alignment */
+    margin-top: 10px; /* Adjust if needed */
+    transform: rotate(0deg); /* Prevents unwanted rotation */
+}
+
+
+
+
 </style>
 <%- include('partials/userheader') %>
-    
+
 
 <div class="container-fluid">
-  <div class="row">
-      <!-- Sidebar -->
-      <div class="col-md-2 menu">
-          <%- include('partials/profileside') %>
-      </div>
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-2 menu">
+            <%- include('partials/profileside') %>
+        </div>
 
-      <!-- Main Content -->
-   
-      <div class="col-md-10 py-4 " style="margin-top: 100px;">
-          <div class="content-header ms-2">
-            <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='%236c757d'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                  <li class="breadcrumb-item"><a href="/user/home">Home</a></li>
-                  <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
-                </ol>
-              </nav>
-              <h1 class="fw-bold">Welcome to Your Dashboard</h1>
-              <h1 class="d-none"><%= userid %></h1>
-              <p class="text-muted mb-0">Manage your account, orders, and preferences here.</p>
-          </div>
+        <!-- Main Content -->
 
-          <div class="main-content">
-              <div class="row g-4">
-                  <!-- Orders Card -->
-                  <div class="col-md-4">
-                      <div class="card h-100">
-                          <div class="card-body p-4">
-                              <i class="fas fa-shopping-bag card-icon orders-icon"></i>
-                              <h5 class="fw-bold mb-3">My Orders</h5>
-                              <p class="text-muted">Track, return, or reorder your past purchases.</p>
-                              <a href="/user/order" class="btn btn-primary mt-2">View Orders</a>
-                          </div>
-                      </div>
-                  </div>
+        <div class="col-md-10 py-4 " style="margin-top: 100px;">
+            <div class="content-header ms-2">
+                <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='%236c757d'/%3E%3C/svg%3E&#34;);"
+                    aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/user/home">Home </a></li>
+                        <li class="breadcrumb-item" aria-current="page">Dashboard</li>
+                    </ol>
+                </nav>
+                <h1 class="fw-bold">Welcome to Your Dashboard</h1>
+                <h1 class="d-none"><%= userid %></h1>
+                <p class="text-muted mb-0">Manage your account, orders, and preferences here.</p>
+            </div>
 
-                  <!-- Wishlist Card -->
-                  <div class="col-md-4">
-                      <div class="card h-100">
-                          <div class="card-body p-4">
-                              <i class="fas fa-heart card-icon wishlist-icon"></i>
-                              <h5 class="fw-bold mb-3">Wishlist</h5>
-                              <p class="text-muted">Manage the items you've saved for later.</p>
-                              <a href="/user/wishlist" class="btn btn-danger mt-2">Manage Wishlist</a>
-                          </div>
-                      </div>
-                  </div>
+            <div class="main-content">
+                <div class="row g-4">
+                    <!-- Orders Card -->
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body p-4">
+                                <i class="fas fa-shopping-bag card-icon orders-icon"></i>
+                                <h5 class="fw-bold mb-3">My Orders</h5>
+                                <p class="text-muted">Track, return, or reorder your past purchases.</p>
+                                <a href="/user/order" class="btn btn-primary mt-2">View Orders</a>
+                            </div>
+                        </div>
+                    </div>
 
-                  <!-- Wallet Card -->
-                  <div class="col-md-4">
-                      <div class="card h-100">
-                          <div class="card-body p-4">
-                              <i class="fas fa-wallet card-icon wallet-icon"></i>
-                              <h5 class="fw-bold mb-3">Wallet</h5>
-                              <p class="text-muted">Check your wallet balance and transactions.</p>
-                              <a href="/user/wallethistory" class="btn btn-success mt-2">View Wallet</a>
-                          </div>
-                      </div>
-                  </div>
+                    <!-- Wishlist Card -->
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body p-4">
+                                <i class="fas fa-heart card-icon wishlist-icon"></i>
+                                <h5 class="fw-bold mb-3">Wishlist</h5>
+                                <p class="text-muted">Manage the items you've saved for later.</p>
+                                <a href="/user/wishlist" class="btn btn-danger mt-2">Manage Wishlist</a>
+                            </div>
+                        </div>
+                    </div>
 
-                  <!-- Account Settings Card -->
-                  <div class="col-md-4">
-                      <div class="card h-100">
-                          <div class="card-body p-4">
-                              <i class="fas fa-user-cog card-icon account-icon"></i>
-                              <h5 class="fw-bold mb-3">Account Settings</h5>
-                              <p class="text-muted">Update your account information and password.</p>
-                              <a href="/user/changeAccount" class="btn btn-info mt-2 text-white">Update Details</a>
-                          </div>
-                      </div>
-                  </div>
+                    <!-- Wallet Card -->
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body p-4">
+                                <i class="fas fa-wallet card-icon wallet-icon"></i>
+                                <h5 class="fw-bold mb-3">Wallet</h5>
+                                <p class="text-muted">Check your wallet balance and transactions.</p>
+                                <a href="/user/wallethistory" class="btn btn-success mt-2">View Wallet</a>
+                            </div>
+                        </div>
+                    </div>
 
-                  <!-- Support Card -->
-                  <div class="col-md-4">
-                      <div class="card h-100">
-                          <div class="card-body p-4">
-                              <i class="fas fa-headset card-icon support-icon"></i>
-                              <h5 class="fw-bold mb-3">Change Password</h5>
-                              <p class="text-muted">Changing The Password And Input strong For More Secure.</p>
-                              <a href="/user/changeAccount" class="btn btn-warning mt-2">Change Password</a>
-                          </div>
-                      </div>
-                  </div>
+                    <!-- Account Settings Card -->
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body p-4">
+                                <i class="fas fa-user-cog card-icon account-icon"></i>
+                                <h5 class="fw-bold mb-3">Account Settings</h5>
+                                <p class="text-muted">Update your account information and password.</p>
+                                <a href="/user/changeAccount" class="btn btn-info mt-2 text-white">Update Details</a>
+                            </div>
+                        </div>
+                    </div>
 
-                  <!-- Logout Card -->
-                  <div class="col-md-4">
-                      <div class="card h-100">
-                          <div class="card-body p-4">
-                              <i class="fas fa-sign-out-alt card-icon logout-icon"></i>
-                              <h5 class="fw-bold mb-3">Logout</h5>
-                              <p class="text-muted">Log out of your account securely.</p>
-                              <a href="#" class="btn btn-danger mt-2">Logout</a>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-          </div>
-      </div>
-  </div>
+                    <!-- Support Card -->
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body p-4">
+                                <i class="fas fa-headset card-icon support-icon"></i>
+                                <h5 class="fw-bold mb-3">Change Password</h5>
+                                <p class="text-muted">Changing The Password And Input strong For More Secure.</p>
+                                <a href="/user/changeAccount" class="btn btn-warning mt-2">Change Password</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Logout Card -->
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body p-4">
+                                <i class="fas fa-sign-out-alt card-icon logout-icon"></i>
+                                <h5 class="fw-bold mb-3">Logout</h5>
+                                <p class="text-muted">Log out of your account securely.</p>
+                                <a href="#" class="btn btn-danger mt-2">Logout</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 <footer class="footer">
     <div class="container">
@@ -241,23 +272,22 @@
             <div class="col-md-3">
                 <h5 class="footer-title">Follow Us</h5>
                 <div class="d-flex gap-3">
-                 <a href="#" class="text-white"><i class="fab fa-facebook fa-lg"></i></a>
-                 <a href="#" class="text-white"><i class="fab fa-twitter fa-lg"></i></a>
-                 <a href="#" class="text-white"><i class="fab fa-instagram fa-lg"></i></a>
-                 <a href="#" class="text-white"><i class="fab fa-youtube fa-lg"></i></a>
-             </div>
-         </div>
-     </div>
-     <hr class="mt-4 mb-3 border-light">
-     <div class="text-center">
-         <p class="mb-0">&copy; 2025 FoodieHub. All rights reserved.</p>
-     </div>
-  </div>
-  </footer>
+                    <a href="#" class="text-white"><i class="fab fa-facebook fa-lg"></i></a>
+                    <a href="#" class="text-white"><i class="fab fa-twitter fa-lg"></i></a>
+                    <a href="#" class="text-white"><i class="fab fa-instagram fa-lg"></i></a>
+                    <a href="#" class="text-white"><i class="fab fa-youtube fa-lg"></i></a>
+                </div>
+            </div>
+        </div>
+        <hr class="mt-4 mb-3 border-light">
+        <div class="text-center">
+            <p class="mb-0">&copy; 2025 FoodieHub. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
 
 
-    
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
-  
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>

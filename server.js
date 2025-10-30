@@ -5,27 +5,16 @@ const adminRouter=require('./routes/admin')
 const userRouter=require('./routes/user')
 const connectDB=require("./db/connectDB")
 const userschema=require("./model/usershema")
-const adminschema=require("./model/adminschema")
 const categoryschema=require("./model/categoryschema")
-const hotelSchema=require("./model/hotelschema")
-const foodSchema=require("./model/foodschema")
 const bannerschema=require('./model/bannerschema')
-const varientSchema=require('./model/varientschema')
 const session = require('express-session');
 const flash = require('connect-flash');
 const cookieParser = require('cookie-parser');
 const passport = require('passport')
 const foodschema = require('./model/foodschema')
-const rateSchema = require('./model/rateschema')
-const addressSchema=require('./model/addressschema')
 const GoogleStrategy = require('passport-google-oauth20').Strategy
-const orderSchema=require('./model/orderschema')
-const wishlistSchema=require('./model/wishlistschema')
-const couponSchema=require('./model/couponschema')
 const paymentRoute=require('./routes/payment')
-const walletSchema=require('./model/walletSchema')
-const locationSchema=require('./model/locationSchema')
-require('dotenv').config(); // Load environment variables
+require('dotenv').config(); 
 
 const Razorpay = require('razorpay');
 
@@ -39,17 +28,17 @@ const razorpayInstance = new Razorpay({
 
 app.use(flash());
 app.use(session({
-   secret: 'your_secret_key', // Replace with a secure secret key
-   resave: false, // Do not force save the session if it was not modified
-   saveUninitialized: true, // Save a session that is uninitialized
+   secret: 'your_secret_key', 
+   resave: false, 
+   saveUninitialized: true, 
    cookie: { 
     maxAge: 24 * 60 * 60 * 1000 * 1400000, 
-     secure: false // Make this true if using HTTPS
+     secure: false 
    }
 }));
 
 app.use((req, res, next) => {
-   req.session.save(next);  // Force the session to be saved
+   req.session.save(next);  
  });
 
  app.use(passport.initialize());
@@ -57,8 +46,8 @@ app.use((req, res, next) => {
  passport.use(new GoogleStrategy({
   clientID : process.env.GOOGLE_CLIENT_ID,
   clientSecret : process.env.GOOGLE_CLIENT_SECRET,
-  // callbackURL : "http://localhost:3000/auth/google/callback"
-  callbackURL:"http://tastetrial.info/auth/google/callback"
+  callbackURL : "http://localhost:3000/auth/google/callback"
+  // callbackURL:"http://tastetrial.info/auth/google/callback"
  },
 
  async (accessToken, refreshToken, profile, done) => {
@@ -67,20 +56,15 @@ app.use((req, res, next) => {
     let user = await userschema.findOne({ email: profile.emails[0].value });
     
     if (!user) {
-      // If the user does not exist, create a new user
       user = new userschema({
         firstname: profile.name.givenName,
         lastname: profile.name.familyName,
         email: profile.emails[0].value,
-        password: 'googleOAuthPassword', // You could generate a random password, or leave it empty
-        phonenumber: "000000000", // Set a default value or leave null
+        password: 'googleOAuthPassword', 
+        phonenumber: "000000000", 
       });
-
-      // Save the new user to the database
       await user.save();
     }
-    
-    // Pass the user profile to the done function (which will be used for session management)
     return done(null, user);
   } catch (err) {
     return done(err, false);
@@ -141,4 +125,4 @@ connectDB()
 app.use("/admin",adminRouter)
 app.use("/user",userRouter)
 app.use("/pay",paymentRoute)
-app.listen(3000)
+app.listen(3000,()=>console.log("server is running"))

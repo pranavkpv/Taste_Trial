@@ -1,4 +1,4 @@
-const mongoose=require('mongoose')
+const mongoose = require('mongoose')
 
 const food=require('../model/foodschema')
 const category=require('../model/categoryschema')
@@ -21,12 +21,11 @@ async function updateOffer(){
 
 const connectDB=async()=>{
    try {
-      // const connect=await mongoose.connect("mongodb://localhost:27017/tastetrial")
-      const connect=await mongoose.connect("mongodb+srv://User:User%40123@cluster0.xholv.mongodb.net/")
-      console.log("connect database")
+      await mongoose.connect("mongodb://localhost:27017/tastetrial")
+      // const connect=await mongoose.connect("mongodb+srv://User:User%40123@cluster0.xholv.mongodb.net/tastetrial"
       updateOffer()
    } catch (error) {
-      console.log("Error")
+      console.log("Error",error)
    }
    
 }

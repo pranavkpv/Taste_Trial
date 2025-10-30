@@ -270,17 +270,21 @@
    <div id="carouselExample" class="carousel slide" data-bs-ride="carousel">
       <div class="carousel-inner">
          <div class="carousel-item active">
-            <div class="carousel-overlay"></div>
-            <img src="<%= banners[0].image %>" class="d-block w-100" alt="<%= banners[0].title %>">
-            <div class="carousel-content">
-               <h1 class="carousel-title"><%= banners[0].title %></h1>
-               <form action="/user/category">
-                  <button class="cta-button" type="submit">
-                     <span>Purchase Now</span>
-                     <i class="fas fa-arrow-right"></i>
-                  </button>
-               </form>
+            <div class="carousel-overlay">
+               <% if (banners && banners.length > 0 ) { %>
+                  <img src="<%= banners[0].image %>" class="d-block w-100" alt="<%= banners[0].title %>">
+                  <div class="carousel-content">
+                     <h1 class="carousel-title"><%= banners[0].title %></h1>
+                     <form action="/user/category">
+                        <button class="cta-button" type="submit">
+                           <span>Purchase Now</span>
+                           <i class="fas fa-arrow-right"></i>
+                        </button>
+                     </form>
+                  </div>
+               <% } %>
             </div>
+           
          </div>
 
          <% banners.slice(1).forEach(element => { %>

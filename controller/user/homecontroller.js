@@ -28,6 +28,7 @@ const home = async (req, res) => {
       // Get filtered and paginated data
       const categories = await categoryschema.find(finalFilter).skip(skip).limit(limit);
       const banners = await bannerschema.find({ is_blocked: false })
+      console.log(banners)
       const foods = await foodschema.find({ is_blocked: false })
       res.render('user/home', { banners, categories, foods, searchmessage: "category",searcheditemname,page,selectedpage,successmessage  })
    } catch (error) {

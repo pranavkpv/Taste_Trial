@@ -45,12 +45,6 @@ const productDetail = async (req, res) => {
 
 const productcart = async (req, res) => {
    try {
-<<<<<<< HEAD
-    
-=======
-      console.log("hai")
-      
->>>>>>> 63499e0410abb3105660c1ee9323d3ade75246d9
       const userid = req.session.user;
       if(!userid){
          return res.json({error:"Please Login To Continue"})

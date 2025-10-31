@@ -1,158 +1,110 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>OTP Verification</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <style>
-    body {
-      background-color: #f8f9fa;
-    }
-
-    .otp-container {
-      max-width: 400px;
-      margin: 50px auto;
-      padding: 20px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      background-color: #fff;
-      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .resend-btn.disabled {
-      color: #aaa;
-      pointer-events: none;
-    }
-
-    .timer {
-      font-weight: bold;
-      color: #dc3545;
-    }
-  </style>
 </head>
-
-<body>
-  <form id="successSign">
-    <div class="otp-container">
-      <h3 class="text-center mb-3">OTP Verification</h3>
-      <p class="text-center text-muted">Enter the OTP sent to your email.</p>
-      <div class="d-flex justify-content-center mb-3">
-        <input type="text" id="enteredOTP" name="Otp" class="form-control text-center w-50">
-      </div>
-      <div class="d-grid gap-2">
-        <button class="btn btn-primary" id="verify" type="submit">Verify</button>
-      </div>
-      <div class="text-center mt-3">
-        <span>Resend OTP in <span class="timer" id="timer">30</span> seconds</span><br>
-
-        <button id="resendButton" type="button" class="btn btn-secondary w-100">Resend
-          OTP</button>
+<body class="bg-light">
+  <main>
+    <div class="container min-vh-100 d-flex justify-content-center align-items-center">
+      <div class="card shadow-lg border-0 rounded-4 w-100" style="max-width: 400px;">
+        <div class="card-body p-4">
+          <div class="text-center mb-4">
+            <span class="d-flex align-items-center justify-content-center rounded-circle bg-primary mb-3 mx-auto" style="width:70px;height:70px;">
+              <i class="fa fa-key fa-2x text-white"></i>
+            </span>
+            <h3 class="fw-bold mb-1">OTP Verification</h3>
+            <p class="text-muted mb-1">Enter the OTP sent to your email.</p>
+          </div>
+          <form id="successSign">
+            <div class="mb-4">
+              <input type="text" id="enteredOTP" name="Otp" class="form-control form-control-lg text-center rounded-pill" maxlength="6" placeholder="Enter OTP" autocomplete="one-time-code">
+            </div>
+            <div class="d-grid mb-3">
+              <button class="btn btn-primary btn-lg rounded-pill fw-bold" id="verify" type="submit">Verify</button>
+            </div>
+            <div class="text-center mt-2">
+              <span class="d-block mb-1">Resend OTP in <span class="fw-bold text-danger" id="timer">30</span> seconds</span>
+              <button id="resendButton" type="button" class="btn btn-secondary btn-lg w-100 rounded-pill mt-1">Resend OTP</button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
-  </form>
+  </main>
 
   <script>
     let timeLeft = 30;
     let timerInterval;
-
     const timerElement = document.getElementById("timer");
     const resendButton = document.getElementById("resendButton");
+    const verifyButton = document.getElementById("verify");
 
-    // Start Timer Function
     const startTimer = () => {
-      timeLeft = 30; // Reset the timer
-      resendButton.classList.add("disabled"); // Disable the resend button
-      timerElement.textContent = timeLeft; // Update the timer display
-
-      // Clear any existing interval
-      if (timerInterval) clearInterval(timerInterval);
-
-      // Start a new timer
+      timeLeft = 30;
+      resendButton.setAttribute('disabled', true);
+      timerElement.textContent = timeLeft;
+      timerInterval && clearInterval(timerInterval);
       timerInterval = setInterval(() => {
         if (timeLeft > 0) {
           timeLeft--;
           timerElement.textContent = timeLeft;
         } else {
           clearInterval(timerInterval);
-          resendButton.classList.remove("disabled"); // Enable the resend button
+          resendButton.removeAttribute('disabled');
+          verifyButton.setAttribute('disabled', true);
         }
       }, 1000);
     };
 
-
-    // // OTP Verification
-    document.getElementById("verify").addEventListener('click', () => {
-      const enteredOTP = document.getElementById("enteredOTP").value;
-      const actualotp = document.getElementById("actualotp").value;
-      if (enteredOTP !== actualotp) {
-        Swal.fire({
-          icon: "error",
-          title: "Invalid OTP Please Try Again"
-        });
+    // OTP verify
+    document.getElementById('successSign').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const Otp = document.getElementById('enteredOTP').value;
+      const response = await fetch('/user/confirmOTP', {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ otp: Otp })
+      });
+      const data = await response.json();
+      if (data.error) {
+        Swal.fire({title: data.error, icon: "error", draggable: true});
       }
-    })
-
-    startTimer();
-    //resendOTP
-    document.getElementById('resendButton').addEventListener('click', async () => {
-      try {
-        const response = await fetch('/user/resendOTP', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ userId: 'USER_ID_HERE' }), // Pass any necessary data
-        });
-
-        const result = await response.json();
-        if (response.ok) {
-          alert('OTP resent successfully!');
-        } else {
-          alert(`Error: ${ result.message || 'Failed to resend OTP' }`);
-        }
-      } catch (error) {
-        console.error('Error resending OTP:', error);
+      if (data.successmessage) {
+        Swal.fire({title: data.successmessage, icon: "success", draggable: true})
+          .then((result) => { if (result.isConfirmed) window.location.href = "/user/load"; });
       }
     });
 
-    document.getElementById('successSign').addEventListener('submit', async function (e) {
-      e.preventDefault()
-      const Otp = document.getElementById('enteredOTP').value
-      const response = await fetch('/user/confirmOTP', {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ otp: Otp })
-      })
-      const data = await response.json()
-      if (data.error) {
-        Swal.fire({
-          title: data.error,
-          icon: "error",
-          draggable: true
-        })
-      }
-      if (data.successmessage) {
-        Swal.fire({
-          title: data.successmessage,
-          icon: "success",
-          draggable: true
-        }).then((result) => {
-          if (result.isConfirmed) {
-            window.location.href = "/user/load";
-          }
+    // Resend OTP
+    resendButton.addEventListener('click', async () => {
+      resendButton.setAttribute('disabled', true); 
+      verifyButton.removeAttribute('disabled');
+      try {
+        const response = await fetch('/user/resendOTP', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ userId: 'USER_ID_HERE' })
         });
+        const result = await response.json();
+        if (response.ok) {
+          Swal.fire({title: 'OTP resent successfully!', icon: 'success'});
+          startTimer();
+        } else {
+          Swal.fire({title: result.message || 'Failed to resend OTP', icon: 'error'});
+          resendButton.removeAttribute('disabled');
+        }
+      } catch (error) {
+        Swal.fire({title: 'Connection Error', icon: 'error'});
+        resendButton.removeAttribute('disabled');
       }
+    });
 
-
-    })
-
+    startTimer();
   </script>
-
-
-
 
   <% if (errormessage && errormessage.length > 0 ) { %>
   <script>
@@ -163,5 +115,7 @@
   </script>
   <% } %>
 
-
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</body>
+</html>

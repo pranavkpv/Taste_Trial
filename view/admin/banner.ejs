@@ -1,203 +1,222 @@
-
 <%- include('partials/admin') %>
-<link rel="stylesheet" href="/banner.css">
-<div class="content">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h3 class="">Banner Management</h3>
-    <button class=" addItem" onclick="addItem()" data-bs-toggle="modal" data-bs-target="#addBannerModal"> + Add
-      Item</button>
-  </div>
 
-  <div class="row search-bar">
-    <div class="col-md-6 ">
-      <div class="input-group">
-        <span class="input-group-text bg-secondary text-light"><i class="fas fa-search"></i></span>
-        <input type="text" 
-       id="searchInput" 
-       oninput="searchBanner(this.value)" 
-       class="form-control" 
-       placeholder="Search by Banner..." 
-       value="<%= searchedbannername || '' %>">
-
-     </div>
-     
+<div class="mt-5 w-75" style="margin-left:15%;">
+  <div class="content container-fluid px-4 py-4 ">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+      <h3 class="mb-0">Banner Management</h3>
+      <button class="btn btn-success" onclick="addItem()" data-bs-toggle="modal" data-bs-target="#addBannerModal">
+        <i class="fas fa-plus me-1"></i> Add Item
+      </button>
     </div>
-  </div>
 
-  <!-- Table -->
-  <div class="table-responsive custom-table-bg">
-    <table class="table table-hover text-center">
-        <thead>
-            <tr>
-                <th>Sl No</th>
-                <th>Title</th>
-                <th>Image</th>
-                <th>Action</th>
-            </tr>
+    <!-- Search bar -->
+    <div class="row mb-3">
+      <div class="col-md-6 col-sm-12">
+        <div class="input-group">
+          <span class="input-group-text bg-success text-white"><i class="fas fa-search"></i></span>
+          <input type="text" id="searchInput" oninput="searchBanner(this.value)" class="form-control"
+            placeholder="Search by Banner..." value="<%= searchedbannername || '' %>">
+        </div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-responsive">
+      <table class="table table-hover align-middle text-center">
+        <thead class="table-light">
+          <tr>
+            <th scope="col">Sl No</th>
+            <th scope="col">Title</th>
+            <th scope="col">Image</th>
+            <th scope="col" style="width: 140px;">Actions</th>
+          </tr>
         </thead>
-        <tbody class="tableBody">
-            <!-- loop of banner data -->
-            <% banners.forEach((element, index) => { %>
-            <tr>
-                <td class="tableindex"><%=  startIndex+index %></td>
-                <td class="tabledata"><%= element.title %></td>
-                <td><img src="<%= element.image %>" alt="Burger" style="height:50px"></td>
-                <td class="action-icons">
-                    <a class="text-dark" href="" data-bs-toggle="modal" data-bs-target="#editBannerModal" onclick="editfun('<%= element.title %>','<%= element.image %>','<%= element._id %>')"><i class="bi bi-pencil-square"></i></a>
-                    <a class="text-dark" href="" data-bs-toggle="modal" data-bs-target="#deleteBannerModal" onclick="deletefun('<%= element._id %>')"><i class="bi bi-trash3-fill"></i></a>
-                    <% if (element.is_blocked ==true) { %>
-                    <a class="text-dark" href="" data-bs-toggle="modal" data-bs-target="#unblockBannerModal" onclick="unhidefun('<%= element._id %>')"><i class="bi bi-eye"></i></a>
-                    <% } else { %>
-                    <a class="text-dark" href="" data-bs-toggle="modal" data-bs-target="#blockBannerModal" onclick="hidefun('<%= element._id %>')"><i class="bi bi-eye-slash"></i></a>
-                    <% } %>
-                </td>
-                <td class="d-none isblocked" id="isblocked"><%= element.is_blocked %></td>
-            </tr>
-            <% }) %>
-            <!-- /close the loop -->
+        <tbody>
+          <% banners.forEach((element, index) => { %>
+          <tr class="<%= element.is_blocked ? 'text-muted' : '' %>">
+            <td><%= startIndex + index %></td>
+            <td><%= element.title %></td>
+            <td>
+              <img src="<%= element.image %>" alt="Banner Image" class="img-thumbnail"
+                style="height:50px; max-width: 100px; object-fit: cover;">
+            </td>
+            <td>
+              <a href="#" class="text-success me-2" data-bs-toggle="modal" data-bs-target="#editBannerModal"
+                onclick="editfun('<%= element.title %>', '<%= element.image %>', '<%= element._id %>')" title="Edit">
+                <i class="bi bi-pencil-square fs-5"></i>
+              </a>
+              <a href="#" class="text-danger me-2" data-bs-toggle="modal" data-bs-target="#deleteBannerModal"
+                onclick="deletefun('<%= element._id %>')" title="Delete">
+                <i class="bi bi-trash3-fill fs-5"></i>
+              </a>
+              <% if (element.is_blocked) { %>
+              <a href="#" class="text-success" data-bs-toggle="modal" data-bs-target="#unblockBannerModal"
+                onclick="unhidefun('<%= element._id %>')" title="Unblock">
+                <i class="bi bi-eye fs-5"></i>
+              </a>
+              <% } else { %>
+              <a href="#" class="text-secondary" data-bs-toggle="modal" data-bs-target="#blockBannerModal"
+                onclick="hidefun('<%= element._id %>')" title="Block">
+                <i class="bi bi-eye-slash fs-5"></i>
+              </a>
+              <% } %>
+            </td>
+          </tr>
+          <% }) %>
         </tbody>
-    </table>
-    <div id="pagination" style="text-align: center; margin-bottom: 20px;">
-      <% for (let i = 1; i <= page; i++) { %>
-         <button onclick="loadPage('<%= i %>')" class="btn btn-success">
-            <%= i %>
-         </button>
-      <% } %>
-   </div>
-</div>
+      </table>
+    </div>
 
+    <!-- Pagination -->
+    <nav aria-label="Page navigation" class="d-flex justify-content-center mt-3">
+      <ul class="pagination pagination-sm">
+        <% for (let i = 1; i <= page; i++) { %>
+        <li class="page-item  <%= i === selectedpage ? 'active' : '' %>">
+          <button class="page-link <%= i === selectedpage ? 'bg-success' : '' %>" onclick="loadPage('<%= i %>')"><%= i %></button>
+        </li>
+        <% } %>
+      </ul>
+    </nav>
 
-</div>
+  </div>
 
-<!-- Add Modal -->
-<div class="modal fade" id="addBannerModal" tabindex="-1" aria-labelledby="addBannerModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered custom-modal-width">
-    <div class="modal-content">
-      <form action="/admin/addbanner" method="post" onsubmit="return validateForm()" enctype="multipart/form-data">
-        <div class="modal-body">
-          <div class="mb-3">
-            <h2>Add Banner</h2>
-            <label for="bannerTitle" class="form-label">Enter Title Name</label>
-            <input type="text" class="form-control" id="bannerTitle" placeholder="Enter title" name="title">
-            <p class="text-danger d-none error-message" id="titlehidden">Please Enter Title!</p>
+  <!-- Add Banner Modal -->
+  <div class="modal fade" id="addBannerModal" tabindex="-1" aria-labelledby="addBannerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <form action="/admin/addbanner" method="post" onsubmit="return validateForm()" enctype="multipart/form-data"
+          novalidate>
+          <div class="modal-header">
+            <h5 class="modal-title" id="addBannerModalLabel">Add Banner</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-      
-          <div class="mb-3">
-            <label for="bannerImage" class="form-label">Upload Image</label>
-            <input type="file" class="form-control" id="bannerImage" accept="image/*" onchange="previewImage(event)" name="image">
-            <p class="text-danger d-none error-message" id="imagehidden">Please Upload Image!</p>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="bannerTitle" class="form-label">Enter Title Name</label>
+              <input type="text" class="form-control" id="bannerTitle" placeholder="Enter title" name="title" required>
+              <div class="invalid-feedback">Please enter a title.</div>
+            </div>
+
+            <div class="mb-3">
+              <label for="bannerImage" class="form-label">Upload Image</label>
+              <input type="file" class="form-control" id="bannerImage" accept="image/*" onchange="previewImage(event)"
+                name="image" required>
+              <div class="invalid-feedback">Please upload an image.</div>
+            </div>
+
+            <div class="text-center">
+              <img id="imagePreview" src="#" alt="Image Preview" class="img-thumbnail d-none" style="max-width: 200px;">
+            </div>
           </div>
-      
-          <div class="mb-3 text-center">
-            <img id="imagePreview" src="#" alt="Image Preview" class="img-thumbnail d-none" style="max-width: 200px;">
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-success">Save</button>
           </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button type="submit" class="btn btn-success">Save</button>
-        </div>
-      </form>
-      
+        </form>
+      </div>
     </div>
   </div>
-</div>
 
-<!-- Edit Banner -->
-<div class="modal fade" id="editBannerModal" tabindex="-1" aria-labelledby="addBannerModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered custom-modal-width">
-    <div class="modal-content">
-      <form action="/admin/editbanner" method="post" onsubmit="return editvalidateForm()" enctype="multipart/form-data">
-        <div class="modal-body">
-          <div class="mb-3">
-            <h2>Edit Banner</h2>
+  <!-- Edit Banner Modal -->
+  <div class="modal fade" id="editBannerModal" tabindex="-1" aria-labelledby="editBannerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <form action="/admin/editbanner" method="post" onsubmit="return editvalidateForm()"
+          enctype="multipart/form-data" novalidate>
+          <div class="modal-header">
+            <h5 class="modal-title" id="editBannerModalLabel">Edit Banner</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
             <input type="hidden" id="editid" name="editid">
-            <label for="bannerTitle" class="form-label">Enter Title Name</label>
-            <input type="text" class="form-control" id="editbannerTitle" placeholder="Enter title" name="title">
-            <p class="text-danger d-none error-message" id="edittitlehidden">Please Enter Title!</p>
-          </div>
-      
-          <div class="mb-3">
-            <label for="bannerImage" class="form-label">Upload Image</label>
-            <input type="file" class="form-control" id="bannerImage" accept="image/*" onchange="previewImage(event)" name="image">
-      
-          </div>
-      
-          <div class="mb-3 text-center">
-            <img id="editimagePreview" src="#" alt="Image Preview" class="img-thumbnail " style="max-width: 200px;">
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button type="submit" class="btn btn-success">Save</button>
-        </div>
-      </form>
-      
-    </div>
-  </div>
-</div>
+            <div class="mb-3">
+              <label for="editbannerTitle" class="form-label">Enter Title Name</label>
+              <input type="text" class="form-control" id="editbannerTitle" placeholder="Enter title" name="title"
+                required>
+              <div class="invalid-feedback">Please enter a title.</div>
+            </div>
 
-<!-- block Banner -->
-<div class="modal fade" id="blockBannerModal" tabindex="-1" aria-labelledby="addBannerModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered custom-modal-width">
-    <div class="modal-content">
-      <form action="/admin/hidebanner" method="post">
-        <input type="hidden" id="hideid" name="hideid">
-        <div class="modal-body">
-          <p>Do you want to hide the banner?</p>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
-          <button type="submit" class="btn btn-success">Yes</button>
-        </div>
-      </form>
-      
-    </div>
-  </div>
-</div>
+            <div class="mb-3">
+              <label for="editbannerImage" class="form-label">Upload Image</label>
+              <input type="file" class="form-control" id="editbannerImage" accept="image/*"
+                onchange="previewImage(event)" name="image">
+            </div>
 
-<!-- unblock Banner -->
-<div class="modal fade" id="unblockBannerModal" tabindex="-1" aria-labelledby="addBannerModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered custom-modal-width">
-    <div class="modal-content">
-      <form action="/admin/unhidebanner" method="post">
-        <input type="hidden" id="unhideid" name="unhideid">
-        <div class="modal-body">
-          <p>Do you want to unhide the banner?</p>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
-          <button type="submit" class="btn btn-success">Yes</button>
-        </div>
-      </form>
-      
+            <div class="text-center">
+              <img id="editimagePreview" src="#" alt="Image Preview" class="img-thumbnail" style="max-width: 200px;">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-success">Save</button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
-</div>
- 
-<!-- delete Banner -->
-<div class="modal fade" id="deleteBannerModal" tabindex="-1" aria-labelledby="addBannerModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered custom-modal-width">
-    <div class="modal-content">
-      <form action="/admin/deletebanner" method="post">
-        <input type="hidden" id="deleteid" name="deleteid">
-        <div class="modal-body">
-          <p>Do you want to delete the banner?</p>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
-          <button type="submit" class="btn btn-success">Yes</button>
-        </div>
-      </form>
-      
+
+  <!-- Block Banner Modal -->
+  <div class="modal fade" id="blockBannerModal" tabindex="-1" aria-labelledby="blockBannerModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <form action="/admin/hidebanner" method="post">
+          <input type="hidden" id="hideid" name="hideid">
+          <div class="modal-body">
+            <p>Do you want to hide the banner?</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+            <button type="submit" class="btn btn-success">Yes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Unblock Banner Modal -->
+  <div class="modal fade" id="unblockBannerModal" tabindex="-1" aria-labelledby="unblockBannerModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <form action="/admin/unhidebanner" method="post">
+          <input type="hidden" id="unhideid" name="unhideid">
+          <div class="modal-body">
+            <p>Do you want to unhide the banner?</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+            <button type="submit" class="btn btn-success">Yes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Banner Modal -->
+  <div class="modal fade" id="deleteBannerModal" tabindex="-1" aria-labelledby="deleteBannerModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <form action="/admin/deletebanner" method="post">
+          <input type="hidden" id="deleteid" name="deleteid">
+          <div class="modal-body">
+            <p>Do you want to delete the banner?</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+            <button type="submit" class="btn btn-success">Yes</button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 </div>
 
 <%- include('partials/footer') %>
+
 <script>
-
-
-  //  preview of the image
+  // Image preview handler
   function previewImage(event) {
     const imageInput = event.target;
     const preview = document.getElementById('imagePreview');
@@ -207,151 +226,114 @@
       const reader = new FileReader();
       reader.onload = function (e) {
         preview.src = e.target.result;
-        preview.classList.remove('d-none'); // Show the preview
+        preview.classList.remove('d-none');
         editpreview.src = e.target.result;
-        editpreview.classList.remove('d-none');      
+        editpreview.classList.remove('d-none');
       };
       reader.readAsDataURL(imageInput.files[0]);
-      reader.readAsDataURL(editpreview.files[0]);
     } else {
       preview.src = '#';
-      preview.classList.add('d-none'); // Hide the preview
+      preview.classList.add('d-none');
       editpreview.src = '#';
     }
   }
 
-  function validateForm() {
-  const bannerTitle = document.getElementById('bannerTitle').value.trim();
-  const bannerImage = document.getElementById('bannerImage');
-  const titleHidden = document.getElementById('titlehidden');
-  const imageHidden = document.getElementById('imagehidden');
+  // Add form validation (Bootstrap custom)
+  (function () {
+    'use strict';
+    const forms = document.querySelectorAll('form');
+    Array.from(forms).forEach(form => {
+      form.addEventListener('submit', event => {
+        if (!form.checkValidity()) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+  })();
 
-
-  let isValid = true;
-
-  // Validate Title
-  if (!bannerTitle) {
-    titleHidden.classList.remove('d-none'); // Show the error message
-    isValid = false;
-  } else {
-    titleHidden.classList.add('d-none'); // Hide the error message
+  function editfun(title, image, id) {
+    document.getElementById('editbannerTitle').value = title;
+    document.getElementById('editimagePreview').src = image;
+    document.getElementById('editid').value = id;
   }
 
-  // Validate Image
-  if (bannerImage.files.length === 0 ) {
-    imageHidden.classList.remove('d-none'); // Show the error message
-    isValid = false;
-  } else {
-    imageHidden.classList.add('d-none'); // Hide the error message
+  function hidefun(id) {
+    document.getElementById('hideid').value = id;
+  }
+  function unhidefun(id) {
+    document.getElementById('unhideid').value = id;
+  }
+  function deletefun(id) {
+    document.getElementById('deleteid').value = id;
   }
 
-  return isValid; // Return true only if both fields are valid
-}
-
- function editfun(title,image,id){
-    document.getElementById('editbannerTitle').value=title
-    document.getElementById('editimagePreview').src=image
-    document.getElementById('editid').value=id
-
- }
-
- function hidefun(id){
-  document.getElementById('hideid').value=id
- }
- function unhidefun(id){
-  document.getElementById('unhideid').value=id
- }
- function deletefun(id){
-  document.getElementById('deleteid').value=id
- }
-
- function editvalidateForm() {
-  const editbannerTitle=document.getElementById('editbannerTitle').value.trim();
-  const edittitleHidden = document.getElementById('edittitlehidden');
-  let isValid = true;
-
-  // Validate Title
-  if (!editbannerTitle) {
-    edittitleHidden.classList.remove('d-none'); // Show the error message
-    isValid = false;
-  } else {
-    edittitleHidden.classList.add('d-none'); // Hide the error message
-  }
-
-  return isValid; 
-}
-
-document.querySelectorAll(".isblocked").forEach((statusElement, index) => {
-    if (statusElement.textContent.trim() === "true") {
-      document.querySelectorAll(".tabledata")[index].style.color = "#616362"
-      document.querySelectorAll(".tableindex")[index].style.color = "#616362"
+  // Highlight blocked rows
+  document.querySelectorAll('.tableBody tr').forEach((row, i) => {
+    const isBlocked = row.querySelector('.isblocked');
+    if (isBlocked && isBlocked.textContent.trim() === 'true') {
+      row.classList.add('text-muted');
     }
   });
 
-
   let debounceTimer;
+  function searchBanner(value) {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      const currentPage = 1;
+      window.location.href = `/admin/banner?pagenumber=${ currentPage }&banner=${ encodeURIComponent(value) }`;
+    }, 700);
+  }
 
-function searchBanner(value) {
-   clearTimeout(debounceTimer);
-   debounceTimer = setTimeout(() => {
-      const currentPage = 1; 
-      window.location.href = `/admin/banner?pagenumber=${currentPage}&banner=${encodeURIComponent(value)}`;
-   }, 700); 
-}
-
-function loadPage(pageNumber) {
-   const searchValue = document.getElementById('searchInput').value || '';
-   window.location.href = `/admin/banner?pagenumber=${pageNumber}&banner=${encodeURIComponent(searchValue)}`;
-}
-
+  function loadPage(pageNumber) {
+    const searchValue = document.getElementById('searchInput').value || '';
+    window.location.href = `/admin/banner?pagenumber=${ pageNumber }&banner=${ encodeURIComponent(searchValue) }`;
+  }
 </script>
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-
 <% if (existmessage && existmessage.length > 0) { %>
-  <script>
-    Swal.fire({
-      text: "<%= existmessage %>",
-      icon: "info",
-      confirmButtonText: "OK",
-    }).then(() => {
-      // Re-open the modal after SweetAlert
-      const addBannerModal = document.getElementById('addBannerModal');
-      if (addBannerModal) {
-        const modalInstance = new bootstrap.Modal(addBannerModal);
-        modalInstance.show();
-      }
-    });
-  </script>
+<script>
+  Swal.fire({
+    text: "<%= existmessage %>",
+    icon: "info",
+    confirmButtonText: "OK"
+  }).then(() => {
+    const addBannerModal = document.getElementById('addBannerModal');
+    if (addBannerModal) {
+      const modalInstance = new bootstrap.Modal(addBannerModal);
+      modalInstance.show();
+    }
+  });
+</script>
 <% } %>
 
-
-
-<% if (successmessage && successmessage.length>0) { %>
-  <script>
-    Swal.fire({
-      text: "<%= successmessage %>",
-      icon: "success"
-    });
-  </script>
+<% if (successmessage && successmessage.length > 0) { %>
+<script>
+  Swal.fire({
+    text: "<%= successmessage %>",
+    icon: "success"
+  });
+</script>
 <% } %>
 
-<% if (editexistmessage && editexistmessage.length>0) { %>
-  <script>
-    Swal.fire({
-      text: "<%= editexistmessage %>",
-      icon: "info",
-      confirmButtonText: "Try Again"
-    });
-  </script>
+<% if (editexistmessage && editexistmessage.length > 0) { %>
+<script>
+  Swal.fire({
+    text: "<%= editexistmessage %>",
+    icon: "info",
+    confirmButtonText: "Try Again"
+  });
+</script>
 <% } %>
 
-
-<% if (errormessage && errormessage.length>0) { %>
-  <script>
-    Swal.fire({
-      text: "<%= errormessage %>",
-      icon: "error"
-    });
-  </script>
+<% if (errormessage && errormessage.length > 0) { %>
+<script>
+  Swal.fire({
+    text: "<%= errormessage %>",
+    icon: "error"
+  });
+</script>
 <% } %>

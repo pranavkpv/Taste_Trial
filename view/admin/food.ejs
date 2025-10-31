@@ -1,151 +1,171 @@
 <%- include('partials/admin') %>
-<link rel="stylesheet" href="/food.css">
-<div class="content">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h3 class="">Food Management</h3>
-    <button class=" addItem" onclick="addItem()" data-bs-toggle="modal" data-bs-target="#addFoodModal"> + Add
-      Item</button>
-  </div>
 
-  <!-- Search Bar -->
-  <div class="row search-bar">
-    <div class="col-md-6 ">
-      <div class="input-group">
-        <span class="input-group-text bg-secondary text-light"><i class="fas fa-search"></i></span>
-        <input type="text" 
-       id="searchInput" 
-       oninput="searchFood(this.value)" 
-       class="form-control" 
-       placeholder="Search by Foodname..." 
-       value="<%= searchedfoodname || '' %>">
+<div class="mt-5 w-75" style="margin-left:15%;">
+  <div class="container-fluid px-4 py-4">
 
-     </div>  
+    <!-- Header with title and Add button -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+      <h3 class="mb-0">Food Management</h3>
+      <button class="btn btn-success" onclick="addItem()" data-bs-toggle="modal" data-bs-target="#addFoodModal">
+        <i class="fas fa-plus me-1"></i> Add Item
+      </button>
     </div>
-    <div class="col-md-6">
-      <select name="" id="selectCategory" class="form-control w-50" onchange="selectCategory()">
-        <option value="" class="d-none"><% if (category && category!="all") { %>
-         <%= selectedCategory.categoryname %> 
-         <% } else { %>
-          All Category   
-        <% } %></option>
-        <option value="all">All Category  </option>
-        <% categories.forEach(element => { %>
-         <option value="<%= element._id %>"><%= element.categoryname %></option>
-        <% }) %>
-      </select>
-    </div>
-  </div>
 
-  <!-- Table -->
-  <div class="table-responsive custom-table-bg">
-    <table class="table table-hover text-center">
-        <thead>
-            <tr>
-                <th>Sl No</th>
-                <th>Category Name</th>
-                <th>Foodname</th>
-                <th>Offer %</th>
-                <th>Expiry Date</th>
-                <th>Image</th>
-                <th>Action</th>
-            </tr>
+    <!-- Search and Category filter -->
+    <div class="row mb-3">
+      <div class="col-md-6 col-sm-12 mb-2 mb-md-0">
+        <div class="input-group">
+          <span class="input-group-text bg-success text-white"><i class="fas fa-search"></i></span>
+          <input type="text" id="searchInput" oninput="searchFood(this.value)" class="form-control"
+            placeholder="Search by Foodname..." value="<%= searchedfoodname || '' %>">
+        </div>
+      </div>
+      <div class="col-md-6 col-sm-12">
+        <select id="selectCategory" class="form-select w-50" onchange="selectCategory()">
+          <option value="" class="d-none">
+            <%= category && category != "" ? selectedCategory.categoryname : "All Category" %></option>
+          <option value="">All Category</option>
+          <% categories.forEach(element => { %>
+          <option value="<%= element._id %>"><%= element.categoryname %></option>
+          <% }) %>
+        </select>
+      </div>
+    </div>
+
+    <!-- Food Table -->
+    <div class="table-responsive">
+      <table class="table table-hover text-center align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Sl No</th>
+            <th>Category Name</th>
+            <th>Foodname</th>
+            <th>Offer %</th>
+            <th>Expiry Date</th>
+            <th>Image</th>
+            <th style="width: 150px;">Action</th>
+          </tr>
         </thead>
-        <tbody class="tableBody">
-            <!-- loop of food data -->
-            <% foodss.forEach((element, index) => { %>
-            <tr>
-                <td class="tableindex"><%=  startIndex+index %></td>
-                <td class="tablecategory"><%= element.categoryDetails[0].categoryname %></td>
-                <td class="tabledata"><%= element.foodname %></td>
-                <td class="tableOffer"><%= element.offer %></td>
-                <td class="tableExpiry"><%= element.formattedExpiryDate %></td>
-                <td><img src="<%= element.image %>" alt="Hotel Image" style="height:50px"></td>
-                <td class="action-icons">
-                    <a class="text-dark" href="" data-bs-toggle="modal" data-bs-target="#editfoodModal" onclick="editfun('<%= element.category_id %>','<%= element.foodname %>','<%= element.image %>','<%= element._id %>','<%= element.is_veg %>','<%= element.duration_time%>','<%= element.offer %>','<%= element.formattedExpiryDate %>')"><i class="bi bi-pencil-square"></i></a>
-                    <a class="text-dark" href="" data-bs-toggle="modal" data-bs-target="#deletefoodModal" onclick="deletefun('<%= element._id %>')"><i class="bi bi-trash3-fill"></i></a>
-                    <% if (element.is_blocked==true) { %>
-                    <a class="text-dark" href="" data-bs-toggle="modal" data-bs-target="#unblockfoodModal" onclick="unhidefun('<%= element._id %>')"><i class="bi bi-eye"></i></a>
-                    <% } else { %>
-                    <a class="text-dark" href="" data-bs-toggle="modal" data-bs-target="#blockfoodModal" onclick="hidefun('<%= element._id %>')"><i class="bi bi-eye-slash"></i></a>
-                    <% } %>
-                </td>
-                <td class="d-none isblocked" id="isblocked"><%= element.is_blocked %></td>
-            </tr>
-            <% }) %>
-            <!-- /close the loop -->
+        <tbody>
+          <% foodss.forEach((element, index) => { %>
+          <tr class="<%= element.is_blocked ? 'text-muted' : '' %>">
+            <td class="tableindex"><%= startIndex + index %></td>
+            <td class="tablecategory"><%= element.categoryDetails.categoryname %></td>
+            <td class="tabledata"><%= element.foodname %></td>
+            <td class="tableOffer"><%= element.offer %></td>
+            <td class="tableExpiry"><%= element.formattedExpiryDate %></td>
+            <td>
+              <img src="<%= element.image %>" alt="Food Image" class="img-thumbnail"
+                style="height:50px; max-width:80px; object-fit: cover;">
+            </td>
+            <td>
+              <a href="#" class="text-success me-2" data-bs-toggle="modal" data-bs-target="#editfoodModal"
+                onclick="editfun('<%= element.category_id %>', '<%= element.foodname %>', '<%= element.image %>', '<%= element._id %>', '<%= element.is_veg %>', '<%= element.duration_time%>', '<%= element.offer %>', '<%= element.formattedExpiryDate %>')"
+                title="Edit">
+                <i class="bi bi-pencil-square fs-5"></i>
+              </a>
+              <a href="#" class="text-danger me-2" data-bs-toggle="modal" data-bs-target="#deletefoodModal"
+                onclick="deletefun('<%= element._id %>')" title="Delete">
+                <i class="bi bi-trash3-fill fs-5"></i>
+              </a>
+              <% if (element.is_blocked == true) { %>
+              <a href="#" class="text-success" data-bs-toggle="modal" data-bs-target="#unblockfoodModal"
+                onclick="unhidefun('<%= element._id %>')" title="Unblock">
+                <i class="bi bi-eye fs-5"></i>
+              </a>
+              <% } else { %>
+              <a href="#" class="text-secondary" data-bs-toggle="modal" data-bs-target="#blockfoodModal"
+                onclick="hidefun('<%= element._id %>')" title="Block">
+                <i class="bi bi-eye-slash fs-5"></i>
+              </a>
+              <% } %>
+            </td>
+          </tr>
+          <% }) %>
         </tbody>
-    </table>
-    <div id="pagination" style="text-align: center; margin-bottom: 20px;">
-      <% for (let i = 1; i <= page; i++) { %>
-         <button onclick="loadPage('<%= i %>')" class="btn btn-success">
-            <%= i %>
-         </button>
-      <% } %>
-   </div>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <nav aria-label="Category pagination" class="d-flex justify-content-center mt-4">
+      <ul class="pagination pagination-sm">
+        <% for (let i = 1; i <= page; i++) { %>
+        <li class="page-item <%= i === selectedpage ? 'active' : '' %>">
+          <button class="page-link <%= i === selectedpage ? 'bg-success' : '' %>"
+            onclick="loadPage('<%= i %>')"><%= i %></button>
+        </li>
+        <% } %>
+      </ul>
+    </nav>
+  </div>
 </div>
 
-</div>
-
-<!-- Add Modal -->
+<!-- Add Food Modal -->
 <div class="modal fade" id="addFoodModal" tabindex="-1" aria-labelledby="addFoodModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered custom-modal-width">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content">
-      <form action="/admin/addfood" method="post" onsubmit="return validateForm()" enctype="multipart/form-data">
+      <form action="/admin/addfood" method="post" onsubmit="return validateForm()" enctype="multipart/form-data"
+        novalidate>
+        <div class="modal-header">
+          <h5 class="modal-title" id="addFoodModalLabel">Add Food</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
         <div class="modal-body">
+          <!-- Category Select -->
           <div class="mb-3">
-            <h2>Add Food</h2>
             <label for="categoryname" class="form-label">Select Category</label>
-            <select name="category_id" id="categoryname" class="form-control">
-              <!-- loop -->
-               <option value="">select</option>
+            <select name="category_id" id="categoryname" class="form-select" required>
+              <option value="">Select</option>
               <% categories.forEach(element => { %>
-               <option value="<%= element._id %>"><%= element.categoryname %></option>
+              <option value="<%= element._id %>"><%= element.categoryname %></option>
               <% }) %>
-              <!-- /loop -->
             </select>
-            <p class="text-danger d-none error-message" id="hiddencategoryname">Please Select category !</p>
+            <div class="invalid-feedback">Please select a category</div>
           </div>
-
+          <!-- Food Name -->
           <div class="mb-3">
             <label for="foodname" class="form-label">Enter Food Name</label>
-            <input type="text" class="form-control" id="foodname" placeholder="Enter Food Name" name="foodname">
-            <p class="text-danger d-none error-message" id="hiddenfoodname">Please Enter Food Name !</p>
+            <input type="text" class="form-control" id="foodname" name="foodname" placeholder="Enter Food Name"
+              required />
+            <div class="invalid-feedback">Please enter food name</div>
           </div>
-
+          <!-- Veg/Non-veg -->
           <div class="mb-3">
             <label for="isveg" class="form-label">Select Veg or Non-veg</label>
-            <select name="isveg" id="isveg" class="form-control">
-              <option>veg</option>
-              <option>non-veg</option>
+            <select name="isveg" id="isveg" class="form-select" required>
+              <option value="veg">Veg</option>
+              <option value="non-veg">Non-Veg</option>
             </select>
+            <div class="invalid-feedback">Please select veg or non-veg</div>
           </div>
+          <!-- Duration Time -->
           <div class="mb-3">
             <label for="duration_time" class="form-label">Enter Duration Time (min)</label>
-            <input type="number" class="form-control" value="0" id="duration_time" placeholder="Enter Food Name" name="duration_time">
-            <p class="text-danger d-none error-message" id="hiddenfoodname">Please Enter Duration Time !</p>
+            <input type="number" class="form-control" id="duration_time" name="duration_time" value="0" min="0"
+              required />
+            <div class="invalid-feedback">Please enter duration time</div>
           </div>
-
+          <!-- Offer -->
           <div class="mb-3">
             <label for="Offer" class="form-label">Enter Offer %</label>
-            <input type="number" class="form-control" id="Offer" min="0" placeholder="Enter title" name="offer" value="0">
-            <p class="text-danger d-none error-message" id="Offerhidden">Please Enter Offer %!</p>
+            <input type="number" class="form-control" id="Offer" name="offer" value="0" min="0" required />
+            <div class="invalid-feedback">Please enter offer %</div>
           </div>
-
-          
-
+          <!-- Expiry Date -->
           <div class="mb-3">
             <label for="expiryDate" class="form-label">Select Expiry Date</label>
-            <input type="date" class="form-control" id="expiryDate" placeholder="Enter title" name="expirydate" >
+            <input type="date" class="form-control" id="expiryDate" name="expirydate" />
           </div>
-      
+          <!-- Food Image -->
           <div class="mb-3">
             <label for="foodImage" class="form-label">Upload Image</label>
-            <input type="file" class="form-control" id="foodImage" accept="image/*" onchange="previewImage(event)" name="image">
-            <p class="text-danger d-none error-message" id="imagehidden">Please Upload Image!</p>
+            <input type="file" class="form-control" id="foodImage" name="image" accept="image/*"
+              onchange="previewImage(event)" required />
+            <div class="invalid-feedback">Please upload an image</div>
           </div>
-      
-          <div class="mb-3 text-center">
-            <img id="imagePreview" src="#" alt="Image Preview" class="img-thumbnail d-none" style="max-width: 200px;">
+          <!-- Image Preview -->
+          <div class="text-center mb-3">
+            <img id="imagePreview" src="#" alt="Image Preview" class="img-thumbnail d-none" style="max-width: 200px;" />
           </div>
         </div>
         <div class="modal-footer">
@@ -153,70 +173,75 @@
           <button type="submit" class="btn btn-success">Save</button>
         </div>
       </form>
-      
     </div>
   </div>
 </div>
 
-<!-- Edit Food -->
+<!-- Edit Food Modal -->
 <div class="modal fade" id="editfoodModal" tabindex="-1" aria-labelledby="editfoodModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered custom-modal-width">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content">
-      <form action="/admin/editfood" method="post" onsubmit="return editvalidateForm()" enctype="multipart/form-data">
+      <form action="/admin/editfood" method="post" onsubmit="return editvalidateForm()" enctype="multipart/form-data"
+        novalidate>
+        <div class="modal-header">
+          <h5 class="modal-title" id="editfoodModalLabel">Edit Food</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
         <div class="modal-body">
+          <input type="hidden" name="editid" id="editid" />
+          <!-- Category Select -->
           <div class="mb-3">
-            <h2>Edit Food</h2>
-            <input type="hidden" name="editid" id="editid">
             <label for="editcategoryname" class="form-label">Select Category</label>
-            <select name="category_id" id="editcategoryname" class="form-control">
-              <!-- loop -->
-               <option value="">select</option>
+            <select name="category_id" id="editcategoryname" class="form-select" required>
+              <option value="">Select</option>
               <% categories.forEach(element => { %>
-               <option value="<%= element._id %>"><%= element.categoryname %></option>
+              <option value="<%= element._id %>"><%= element.categoryname %></option>
               <% }) %>
-              <!-- /loop -->
             </select>
-            <p class="text-danger d-none error-message" id="edithiddencategoryname">Please Select category !</p>
+            <div class="invalid-feedback">Please select a category</div>
           </div>
-
+          <!-- Food Name -->
           <div class="mb-3">
             <label for="editfoodname" class="form-label">Enter Food Name</label>
-            <input type="text" class="form-control" id="editfoodname" placeholder="Enter Food Name" name="foodname">
-            <p class="text-danger d-none error-message" id="edithiddenfoodname">Please Enter Food Name !</p>
+            <input type="text" class="form-control" id="editfoodname" name="foodname" required />
+            <div class="invalid-feedback">Please enter food name</div>
           </div>
-
+          <!-- Veg/Non-veg -->
           <div class="mb-3">
             <label for="editisveg" class="form-label">Select Veg or Non-veg</label>
-            <select name="is_veg" id="editisveg" class="form-control">
-              <option>veg</option>
-              <option>non-veg</option>
+            <select name="is_veg" id="editisveg" class="form-select" required>
+              <option value="veg">Veg</option>
+              <option value="non-veg">Non-Veg</option>
             </select>
+            <div class="invalid-feedback">Please select veg or non-veg</div>
           </div>
-
+          <!-- Duration Time -->
+          <div class="mb-3">
+            <label for="editduration_time" class="form-label">Enter Duration Time (min)</label>
+            <input type="number" class="form-control" id="editduration_time" name="duration_time" min="0" value="0"
+              required />
+            <div class="invalid-feedback">Please enter duration time</div>
+          </div>
+          <!-- Offer -->
           <div class="mb-3">
             <label for="editOffer" class="form-label">Enter Offer %</label>
-            <input type="number" class="form-control" id="editOffer" min="0" placeholder="Enter title" name="Offer" value="0">
-            <p class="text-danger d-none error-message" id="editOfferhidden">Please Enter Offer %!</p>
+            <input type="number" class="form-control" id="editOffer" name="Offer" min="0" value="0" required />
+            <div class="invalid-feedback">Please enter offer %</div>
           </div>
-
+          <!-- Expiry Date -->
           <div class="mb-3">
             <label for="editexpiryDate" class="form-label">Select Expiry Date</label>
-            <input type="date" class="form-control" id="editexpiryDate" placeholder="Enter title" name="expirydate">
+            <input type="date" class="form-control" id="editexpiryDate" name="expirydate" />
           </div>
-
-          <div class="mb-3">
-            <label for="duration_time" class="form-label">Enter Duration Time (min)</label>
-            <input type="number" class="form-control" value="0" id="editduration_time" placeholder="Enter Food Name" name="duration_time">
-            <p class="text-danger d-none error-message" id="hiddenfoodname">Please Enter Duration Time !</p>
-          </div>
-      
+          <!-- Food Image -->
           <div class="mb-3">
             <label for="editfoodImage" class="form-label">Upload Image</label>
-            <input type="file" class="form-control" id="editfoodImage" accept="image/*" onchange="previewImage(event)" name="image">
+            <input type="file" class="form-control" id="editfoodImage" name="image" accept="image/*"
+              onchange="previewImage(event)" />
           </div>
-      
-          <div class="mb-3 text-center">
-            <img id="editimagePreview" src="#" alt="Image Preview" class="img-thumbnail " style="max-width: 200px;">
+          <!-- Image Preview -->
+          <div class="text-center mb-3">
+            <img id="editimagePreview" src="#" alt="Image Preview" class="img-thumbnail" style="max-width: 200px;" />
           </div>
         </div>
         <div class="modal-footer">
@@ -228,12 +253,12 @@
   </div>
 </div>
 
-<!-- block Food -->
+<!-- Block Food Modal -->
 <div class="modal fade" id="blockfoodModal" tabindex="-1" aria-labelledby="blockfoodModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered custom-modal-width">
+  <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <form action="/admin/hidefood" method="post">
-        <input type="hidden" id="hideid" name="hideid">
+        <input type="hidden" id="hideid" name="hideid" />
         <div class="modal-body">
           <p>Do you want to hide the food?</p>
         </div>
@@ -246,12 +271,12 @@
   </div>
 </div>
 
-<!-- unblock Food -->
+<!-- Unblock Food Modal -->
 <div class="modal fade" id="unblockfoodModal" tabindex="-1" aria-labelledby="unblockHotelModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered custom-modal-width">
+  <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <form action="/admin/unhidefood" method="post">
-        <input type="hidden" id="unhideid" name="unhideid">
+        <input type="hidden" id="unhideid" name="unhideid" />
         <div class="modal-body">
           <p>Do you want to unhide the food?</p>
         </div>
@@ -264,12 +289,12 @@
   </div>
 </div>
 
-<!-- delete Food -->
+<!-- Delete Food Modal -->
 <div class="modal fade" id="deletefoodModal" tabindex="-1" aria-labelledby="deleteHotelModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered custom-modal-width">
+  <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <form action="/admin/deletefood" method="post">
-        <input type="hidden" id="deleteid" name="deleteid">
+        <input type="hidden" id="deleteid" name="deleteid" />
         <div class="modal-body">
           <p>Do you want to delete the food?</p>
         </div>
@@ -283,35 +308,31 @@
 </div>
 
 <%- include('partials/footer') %>
+
 <script>
-  
   let debounceTimer;
 
-
-
-
   function searchFood(value) {
-   clearTimeout(debounceTimer);
-   debounceTimer = setTimeout(() => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
       const currentPage = 1;
-      const selectedCategory = document.getElementById("selectCategory").value
-      window.location.href = `/admin/food?pagenumber=${currentPage}&food=${encodeURIComponent(value)}&category=${encodeURIComponent(selectedCategory)}`;
-   }, 700);
-}
+      const selectedCategory = document.getElementById("selectCategory").value;
+      window.location.href = `/admin/food?pagenumber=${ currentPage }&food=${ encodeURIComponent(value) }&category=${ encodeURIComponent(selectedCategory) }`;
+    }, 700);
+  }
 
-function loadPage(pageNumber) {
-   const selectCategory = document.getElementById("selectCategory").value;
-   const searchValue = document.getElementById('searchInput').value || '';
-   window.location.href = `/admin/food?pagenumber=${pageNumber}&food=${encodeURIComponent(searchValue)}&category=${encodeURIComponent(selectCategory)}`;
-}
+  function loadPage(pageNumber) {
+    const selectCategory = document.getElementById("selectCategory").value;
+    const searchValue = document.getElementById('searchInput').value || '';
+    window.location.href = `/admin/food?pagenumber=${ pageNumber }&food=${ encodeURIComponent(searchValue) }&category=${ encodeURIComponent(selectCategory) }`;
+  }
 
-function selectCategory() {
-   const currentPage = 1;
-   const searchValue = document.getElementById('searchInput').value || '';
-   const selectCategory = document.getElementById("selectCategory").value;
-   window.location.href = `/admin/food?pagenumber=${currentPage}&food=${encodeURIComponent(searchValue)}&category=${encodeURIComponent(selectCategory)}`;
-}
-
+  function selectCategory() {
+    const currentPage = 1;
+    const searchValue = document.getElementById('searchInput').value || '';
+    const selectCategory = document.getElementById("selectCategory").value;
+    window.location.href = `/admin/food?pagenumber=${ currentPage }&food=${ encodeURIComponent(searchValue) }&category=${ encodeURIComponent(selectCategory) }`;
+  }
 
   function previewImage(event) {
     const imageInput = event.target;
@@ -322,177 +343,146 @@ function selectCategory() {
       const reader = new FileReader();
       reader.onload = function (e) {
         preview.src = e.target.result;
-        preview.classList.remove('d-none'); // Show the preview
+        preview.classList.remove('d-none');
         editpreview.src = e.target.result;
-        editpreview.classList.remove('d-none');      
+        editpreview.classList.remove('d-none');
       };
       reader.readAsDataURL(imageInput.files[0]);
-      reader.readAsDataURL(editpreview.files[0]);
     } else {
       preview.src = '#';
-      preview.classList.add('d-none'); // Hide the preview
+      preview.classList.add('d-none');
       editpreview.src = '#';
     }
   }
 
   function validateForm() {
-  const categoryname = document.getElementById('categoryname').value;
-  const hiddencategoryname = document.getElementById('hiddencategoryname');
-  const foodname = document.getElementById('foodname').value;
-  const hiddenfoodname = document.getElementById('hiddenfoodname');
-  const foodImage = document.getElementById('foodImage');
-  const imagehidden = document.getElementById('imagehidden');
- 
+    const categoryname = document.getElementById('categoryname').value;
+    const hiddencategoryname = document.getElementById('hiddencategoryname');
+    const foodname = document.getElementById('foodname').value;
+    const hiddenfoodname = document.getElementById('hiddenfoodname');
+    const foodImage = document.getElementById('foodImage');
+    const imagehidden = document.getElementById('imagehidden');
 
-
-  let isValid = true;
-  // Validate category name
-  if (!categoryname || categoryname==="select") {
-    hiddencategoryname.classList.remove('d-none'); // Show the error message
-    isValid = false;
-  } else {
-    hiddencategoryname.classList.add('d-none'); // Hide the error message
+    let isValid = true;
+    if (!categoryname || categoryname === "select") {
+      hiddencategoryname.classList.remove('d-none');
+      isValid = false;
+    } else {
+      hiddencategoryname.classList.add('d-none');
+    }
+    if (!foodname) {
+      hiddenfoodname.classList.remove('d-none');
+      isValid = false;
+    } else {
+      hiddenfoodname.classList.add('d-none');
+    }
+    if (foodImage.files.length === 0) {
+      imagehidden.classList.remove('d-none');
+      isValid = false;
+    } else {
+      imagehidden.classList.add('d-none');
+    }
+    return isValid;
   }
 
-  //validate foodname
-  if (!foodname) {
-    hiddenfoodname.classList.remove('d-none'); // Show the error message
-    isValid = false;
-  } else {
-    hiddenfoodname.classList.add('d-none'); // Hide the error message
+  function editvalidateForm() {
+    const editcategoryname = document.getElementById('editcategoryname').value;
+    const edithiddencategoryname = document.getElementById('edithiddencategoryname');
+    const editfoodname = document.getElementById('editfoodname').value;
+    const edithiddenfoodname = document.getElementById('edithiddenfoodname');
+
+    edithiddencategoryname.classList.add('d-none');
+    edithiddenfoodname.classList.add('d-none');
+
+    let isValid = true;
+    if (!editcategoryname) {
+      edithiddencategoryname.classList.remove('d-none');
+      isValid = false;
+    }
+    if (!editfoodname) {
+      edithiddenfoodname.classList.remove('d-none');
+      isValid = false;
+    }
+    return isValid;
   }
 
-  // Validate Image
-  if (foodImage.files.length === 0 ) {
-    imagehidden.classList.remove('d-none'); // Show the error message
-    isValid = false;
-  } else {
-    imagehidden.classList.add('d-none'); // Hide the error message
+  function reverseDate(date) {
+    const [day, month, year] = date.split('-');
+    return `${ year }-${ month }-${ day }`;
   }
 
-  return isValid; // Return true only if both fields are valid
-}
-
-
-function editvalidateForm() {
-  const editcategoryname = document.getElementById('editcategoryname').value;
-  const edithiddencategoryname = document.getElementById('edithiddencategoryname');
-  const editfoodname = document.getElementById('editfoodname').value;
-  const edithiddenfoodname = document.getElementById('edithiddenfoodname');
-  const editfoodImage = document.getElementById('editfoodImage');
-  const editimagehidden = document.getElementById('editimagehidden');
- 
-
-
-  let isValid = true;
-  // Validate category name
-  if (!editcategoryname) {
-    edithiddencategoryname.classList.remove('d-none'); // Show the error message
-    isValid = false;
-  } else {
-    edithiddencategoryname.classList.add('d-none'); // Hide the error message
+  function editfun(categoryname, foodname, image, id, isveg, duration_time, offer, expiryDate) {
+    document.getElementById('editcategoryname').value = categoryname;
+    document.getElementById('editfoodname').value = foodname;
+    document.getElementById('editimagePreview').src = image;
+    document.getElementById('editid').value = id;
+    document.getElementById('editisveg').value = isveg;
+    document.getElementById('editduration_time').value = duration_time;
+    document.getElementById('editOffer').value = offer;
+    document.getElementById('editexpiryDate').value = reverseDate(expiryDate);
   }
 
-  //validate foodname
-  if (!editfoodname) {
-    edithiddenfoodname.classList.remove('d-none'); // Show the error message
-    isValid = false;
-  } else {
-    edithiddenfoodname.classList.add('d-none'); // Hide the error message
+  function deletefun(id) {
+    document.getElementById('deleteid').value = id;
   }
 
-  return isValid; // Return true only if both fields are valid
+  function hidefun(id) {
+    document.getElementById('hideid').value = id;
+  }
 
-}
+  function unhidefun(id) {
+    document.getElementById('unhideid').value = id;
+  }
 
-function reverseDate(date){
-   const [day,month,year]=date.split('-');
-    return `${year}-${month}-${day}`
-}
-
-function editfun(categoryname,foodname,image,id,isveg,duration_time,offer,expiryDate){
-  document.getElementById('editcategoryname').value=categoryname
-  document.getElementById('editfoodname').value=foodname
-  document.getElementById('editimagePreview').src=image
-  document.getElementById('editid').value=id
-  document.getElementById('editisveg').value=isveg
-  document.getElementById('editduration_time').value=duration_time
-  document.getElementById('editOffer').value=offer
-  const reversedate=reverseDate(expiryDate)
-  document.getElementById('editexpiryDate').value = reversedate;
-
-
-}
-function deletefun(id){
-  document.getElementById('deleteid').value=id
-}
-
-function hidefun(id){
-  document.getElementById('hideid').value=id
-}
-
-function unhidefun(id){
-  document.getElementById('unhideid').value=id
-}
-
-
-document.querySelectorAll(".isblocked").forEach((statusElement, index) => {
+  document.querySelectorAll(".isblocked").forEach((statusElement, index) => {
     if (statusElement.textContent.trim() === "true") {
-      document.querySelectorAll(".tabledata")[index].style.color = "#616362"
-      document.querySelectorAll(".tableindex")[index].style.color = "#616362"
-      document.querySelectorAll(".tablecategory")[index].style.color = "#616362"
-
+      document.querySelectorAll(".tabledata")[index].style.color = "#616362";
+      document.querySelectorAll(".tableindex")[index].style.color = "#616362";
+      document.querySelectorAll(".tablecategory")[index].style.color = "#616362";
     }
   });
-
- 
- 
 </script>
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <% if (existmessage && existmessage.length > 0) { %>
-  <script>
-    Swal.fire({
-      text: "<%= existmessage %>",
-      icon: "info",
-      confirmButtonText: "OK",
-    }).then(() => {
-      // Re-open the modal after SweetAlert
-      const addfoodModal = document.getElementById('addFoodModal');
-      if (addfoodModal) {
-        const modalInstance = new bootstrap.Modal(addfoodModal);
-        modalInstance.show();
-      }
-    });
-  </script>
+<script>
+  Swal.fire({
+    text: "<%= existmessage %>",
+    icon: "info",
+    confirmButtonText: "OK",
+  }).then(() => {
+    const addFoodModal = document.getElementById('addFoodModal');
+    if (addFoodModal) {
+      const modalInstance = new bootstrap.Modal(addFoodModal);
+      modalInstance.show();
+    }
+  });
+</script>
 <% } %>
 
-
-
-<% if (successmessage && successmessage.length>0) { %>
-  <script>
-    Swal.fire({
-      text: "<%= successmessage %>",
-      icon: "success"
-    });
-  </script>
+<% if (successmessage && successmessage.length > 0) { %>
+<script>
+  Swal.fire({
+    text: "<%= successmessage %>",
+    icon: "success"
+  });
+</script>
 <% } %>
 
-
-
-<% if (errormessage && errormessage.length>0) { %>
-  <script>
-    Swal.fire({
-      text: "<%= errormessage %>",
-      icon: "error"
-    });
-  </script>
+<% if (errormessage && errormessage.length > 0) { %>
+<script>
+  Swal.fire({
+    text: "<%= errormessage %>",
+    icon: "error"
+  });
+</script>
 <% } %>
 
-<% if (editexistmessage && editexistmessage.length>0) { %>
-  <script>
-    Swal.fire({
-      text: "<%= editexistmessage %>",
-      icon: "info"
-    });
-  </script>
+<% if (editexistmessage && editexistmessage.length > 0) { %>
+<script>
+  Swal.fire({
+    text: "<%= editexistmessage %>",
+    icon: "info"
+  });
+</script>
 <% } %>

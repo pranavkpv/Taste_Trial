@@ -25,7 +25,7 @@ const hotel = async (req, res) => {
       const errormessage = req.flash("error")
       const editexistmessage = req.flash('editexist')
       const foodss = await foodschema.find({is_blocked:false})
-      res.render("admin/hotel", { hotels,foodss, existdatamessage, 
+      res.render("admin/hotel", { hotels,foodss, existdatamessage, selectedpage,
          saveddatamessage,errormessage,editexistmessage,page,searchedhotelname,startIndex})
    } catch (error) {
       console.log(error)

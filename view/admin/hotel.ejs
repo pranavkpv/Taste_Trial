@@ -1,241 +1,250 @@
 <%- include('partials/admin') %>
-<link rel="stylesheet" href="/hotel.css">
-<div class="content">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h3 class="">Hotel Management</h3>
-    <button class=" addItem" onclick="addItem()" data-bs-toggle="modal" data-bs-target="#addHotelModal"> + Add
-      Item</button>
+
+<div class="mt-5 w-75" style="margin-left:15%;">
+  <div class="container-fluid px-4 py-4">
+
+  <!-- Header with title and add button -->
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+    <h3 class="mb-0">Hotel Management</h3>
+    <button class="btn btn-success" onclick="addItem()" data-bs-toggle="modal" data-bs-target="#addHotelModal">
+      <i class="fas fa-plus me-1"></i> Add Item
+    </button>
   </div>
 
-<!-- Search Bar -->
-<div class="row search-bar">
-  <div class="col-md-6 ">
-    <div class="input-group">
-      <span class="input-group-text bg-secondary text-light"><i class="fas fa-search"></i></span>
-      <input type="text" 
-     id="searchInput" 
-     oninput="searchHotel(this.value)" 
-     class="form-control" 
-     placeholder="Search by Category..." 
-     value="<%= searchedhotelname || '' %>">
-
-   </div>
-   
+  <!-- Search Bar -->
+  <div class="row mb-3">
+    <div class="col-md-6 col-sm-12">
+      <div class="input-group">
+        <span class="input-group-text bg-success text-white"><i class="fas fa-search"></i></span>
+        <input type="text" id="searchInput" oninput="searchHotel(this.value)" class="form-control"
+          placeholder="Search by Hotelname..." value="<%= searchedhotelname || '' %>" />
+      </div>
+    </div>
   </div>
-</div>
 
-  <!-- Table -->
-  <div class="table-responsive custom-table-bg">
-    <table class="table table-hover text-center">
-      <thead>
+  <!-- Hotels Table -->
+  <div class="table-responsive">
+    <table class="table table-hover text-center align-middle">
+      <thead class="table-light">
         <tr>
           <th>Sl No</th>
           <th>Title</th>
           <th>Image</th>
-          <th>Action</th>
+          <th style="width: 150px;">Action</th>
         </tr>
       </thead>
-      <tbody class="tableBody">
-        <!-- loop of hotel data -->
+      <tbody>
         <% hotels.forEach((element, index) => { %>
-        <tr>
-          <td class="tableindex"><%= startIndex+index %></td>
+        <tr class="<%= element.is_blocked ? 'text-muted' : '' %>">
+          <td class="tableindex"><%= startIndex + index %></td>
           <td class="tabledata"><%= element.hotelname %></td>
-          <td><img src="<%= element.image %>" alt="Hotel Image" style="height:50px"></td>
-          <td class="action-icons">
-            <a class="text-dark" href="" data-bs-toggle="modal" data-bs-target="#editHotelModal"
-              onclick="editfun('<%= element.hotelname %>','<%= element.hoteladdress %>','<%= element.contact_no %>','<%= element.alternative_no %>','<%= element.image %>','<%= element._id %>','<%= element.food_items %>')"><i
-                class="bi bi-pencil-square"></i></a>
-            <a class="text-dark" href="" data-bs-toggle="modal" data-bs-target="#deleteHotelModal"
-              onclick="deletefun('<%= element._id %>')"><i class="bi bi-trash3-fill"></i></a>
-              <% if (element.is_blocked==true) { %>
-                <a class="text-dark" href="" data-bs-toggle="modal" data-bs-target="#unblockHotelModal"
-                onclick="unhidefun('<%= element._id %>')"><i class="bi bi-eye"></i></a>
-                <% } else { %>
-                  <a class="text-dark" href="" data-bs-toggle="modal" data-bs-target="#blockHotelModal"
-                  onclick="hidefun('<%= element._id %>')"><i class="bi bi-eye-slash"></i></a>
-              <% } %>
-            
+          <td><img src="<%= element.image %>" alt="Hotel Image" class="img-thumbnail"
+              style="max-height:50px; max-width:100px; object-fit:cover;" /></td>
+          <td>
+            <a href="#" class="text-success me-2" data-bs-toggle="modal" data-bs-target="#editHotelModal"
+              onclick="editfun('<%= element.hotelname %>', '<%= element.hoteladdress %>', '<%= element.contact_no %>', '<%= element.alternative_no %>', '<%= element.image %>', '<%= element._id %>', '<%= element.food_items %>')"
+              title="Edit">
+              <i class="bi bi-pencil-square fs-5"></i>
+            </a>
+            <a href="#" class="text-danger me-2" data-bs-toggle="modal" data-bs-target="#deleteHotelModal"
+              onclick="deletefun('<%= element._id %>')" title="Delete">
+              <i class="bi bi-trash3-fill fs-5"></i>
+            </a>
+            <% if (element.is_blocked) { %>
+            <a href="#" class="text-success" data-bs-toggle="modal" data-bs-target="#unblockHotelModal"
+              onclick="unhidefun('<%= element._id %>')" title="Unblock">
+              <i class="bi bi-eye fs-5"></i>
+            </a>
+            <% } else { %>
+            <a href="#" class="text-secondary" data-bs-toggle="modal" data-bs-target="#blockHotelModal"
+              onclick="hidefun('<%= element._id %>')" title="Block">
+              <i class="bi bi-eye-slash fs-5"></i>
+            </a>
+            <% } %>
           </td>
-          <td class="d-none isblocked" id="isblocked"><%= element.is_blocked %></td>
         </tr>
         <% }) %>
-        <!-- /close the loop -->
       </tbody>
     </table>
-    <div id="pagination" style="text-align: center; margin-bottom: 20px;">
-      <% for (let i = 1; i <= page; i++) { %>
-         <button onclick="loadPage('<%= i %>')" class="btn btn-success">
-            <%= i %>
-         </button>
-      <% } %>
-   </div>
   </div>
 
+  <!-- Pagination -->
+  <nav aria-label="Category pagination" class="d-flex justify-content-center mt-4">
+      <ul class="pagination pagination-sm">
+        <% for (let i = 1; i <= page; i++) { %>
+        <li class="page-item <%= i === selectedpage ? 'active' : '' %>">
+          <button class="page-link <%= i === selectedpage ? 'bg-success' : '' %>"
+            onclick="loadPage('<%= i %>')"><%= i %></button>
+        </li>
+        <% } %>
+      </ul>
+    </nav>
+
+</div>
 </div>
 
-<!-- Add Modal -->
+<!-- Add Hotel Modal -->
 <div class="modal fade" id="addHotelModal" tabindex="-1" aria-labelledby="addHotelModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-xl">
-    <div class="modal-content p-2">
-      <form action="/admin/addhotel" method="post" onsubmit="return validateForm()" enctype="multipart/form-data"
-        id="foodSelectionForm">
-        <h2>Add Hotel</h2>
-        <div class="modal-body d-flex" style="gap:200px">
-          <div class="left" style="width:40%">
+    <div class="modal-content p-3">
+      <form id="foodSelectionForm" action="/admin/addhotel" method="post" onsubmit="return validateForm()"
+        enctype="multipart/form-data" novalidate>
+        <div class="modal-header">
+          <h5 class="modal-title" id="addHotelModalLabel">Add Hotel</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body d-flex flex-wrap gap-4 justify-content-between">
+          <div class="flex-grow-1 me-3" style="min-width: 300px;">
             <div class="mb-3">
-              <label for="hotelTitle" class="form-label">Enter Hotel Name</label>
-              <input type="text" class="form-control" id="hotelname" placeholder="Enter Hotel Name" name="hotelname">
-              <p class="text-danger d-none error-message" id="hotelhidden">Please Enter Hotel!</p>
+              <label for="hotelname" class="form-label">Enter Hotel Name</label>
+              <input type="text" id="hotelname" name="hotelname" class="form-control" placeholder="Enter Hotel Name"
+                required />
+              <div class="invalid-feedback">Please enter hotel name!</div>
             </div>
-
             <div class="mb-3">
-              <label for="hotelAddress" class="form-label">Enter Hotel Address</label>
-              <input type="text" class="form-control" id="hoteladdress" placeholder="Enter Hotel Address"
-                name="hoteladdress">
-              <p class="text-danger d-none error-message" id="addresshidden">Please Enter Hotel!</p>
+              <label for="hoteladdress" class="form-label">Enter Hotel Address</label>
+              <input type="text" id="hoteladdress" name="hoteladdress" class="form-control"
+                placeholder="Enter Hotel Address" required />
+              <div class="invalid-feedback">Please enter hotel address!</div>
             </div>
-
-
             <div class="mb-3">
               <label for="contactnumber" class="form-label">Enter Contact Number</label>
-              <input type="text" class="form-control" id="contactnumber" placeholder="Enter Contact Number"
-                name="contactnumber">
-              <p class="text-danger d-none error-message" id="contacthidden">Please Enter Contact Number!</p>
+              <input type="text" id="contactnumber" name="contactnumber" class="form-control"
+                placeholder="Enter Contact Number" required />
+              <div class="invalid-feedback">Please enter contact number!</div>
             </div>
           </div>
-          <div class="right" style="width:40%">
+          <div class="flex-grow-1" style="min-width: 300px;">
             <div class="mb-3">
               <label for="alternativenumber" class="form-label">Enter Alternative Number</label>
-              <input type="text" class="form-control" id="alternativenumber" placeholder="Enter Alternative Number"
-                name="alternativenumber">
-              <p class="text-danger d-none error-message" id="alternativehidden">Please Enter Alternative Number !</p>
+              <input type="text" id="alternativenumber" name="alternativenumber" class="form-control"
+                placeholder="Enter Alternative Number" required />
+              <div class="invalid-feedback">Please enter alternative number!</div>
             </div>
-
             <div class="mb-3">
               <label for="hotelImage" class="form-label">Upload Image</label>
-              <input type="file" class="form-control" id="hotelImage" accept="image/*" onchange="previewImage(event)"
-                name="image">
-              <p class="text-danger d-none error-message" id="imagehidden">Please Upload Image!</p>
+              <input type="file" id="hotelImage" name="image" class="form-control" accept="image/*"
+                onchange="previewImage(event)" required />
+              <div class="invalid-feedback">Please upload an image!</div>
             </div>
-
-            <div class="mb-3 text-center">
-              <img id="imagePreview" src="#" alt="Image Preview" class="img-thumbnail d-none" style="max-width: 200px;">
+            <div class="text-center mb-3">
+              <img id="imagePreview" src="#" alt="Image Preview" class="img-thumbnail d-none"
+                style="max-width: 200px;" />
             </div>
             <div class="mb-3">
               <div class="dropdown">
-                <button class="btn dropdown-toggle btn-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  Select Foodname
+                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                  aria-expanded="false">
+                  Select Food Name
                 </button>
-                <ul class="dropdown-menu p-3">
+                <ul class="dropdown-menu p-3" style="max-height:250px; overflow-y:auto;">
                   <li>
                     <div class="form-check">
                       <input class="form-check-input select-all" type="checkbox" id="selectAll"
-                        onchange="selectAllCheckboxes(this)">
+                        onchange="selectAllCheckboxes(this)" />
                       <label class="form-check-label" for="selectAll">Select All</label>
                     </div>
                   </li>
+                  <% foodss.forEach(element => { %>
                   <li>
-                    <% foodss.forEach(element => { %>
                     <div class="form-check">
-                      <input class="form-check-input option-checkbox food-checkbox" type="checkbox" id="option1"
-                        name="foodname" value="<%= element.foodname %>">
-                      <label class="form-check-label" for="option1"><%= element.foodname %></label>
+                      <input class="form-check-input option-checkbox food-checkbox" type="checkbox"
+                        id="food_<%= element._id %>" name="foodname" value="<%= element._id %>" />
+                      <label class="form-check-label" for="food_<%= element._id %>"><%= element.foodname %></label>
                     </div>
-                    <% }) %>
                   </li>
+                  <% }) %>
                 </ul>
               </div>
             </div>
           </div>
         </div>
-        <input type="hidden" name="selectedFoods" id="selectedFoods">
+        <input type="hidden" name="selectedFoods" id="selectedFoods" />
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
           <button type="submit" class="btn btn-success">Save</button>
         </div>
       </form>
-
     </div>
   </div>
 </div>
 
-<!-- Edit Hotel -->
+<!-- Edit Hotel Modal -->
 <div class="modal fade" id="editHotelModal" tabindex="-1" aria-labelledby="editHotelModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-xl">
-    <div class="modal-content p-2">
-      <form action="/admin/edithotel" id="foodSelectionForm" method="post" onsubmit="return editvalidateForm()"
-        enctype="multipart/form-data">
-        <h2>Edit Hotel</h2>
-        <div class="modal-body d-flex" style="gap:200px">
-          <div class="left" style="width:40%">
+    <div class="modal-content p-3">
+      <form id="foodSelectionForm" action="/admin/edithotel" method="post" onsubmit="return editvalidateForm()"
+        enctype="multipart/form-data" novalidate>
+        <input type="hidden" id="editid" name="editid" />
+        <div class="modal-header">
+          <h5 class="modal-title" id="editHotelModalLabel">Edit Hotel</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body d-flex flex-wrap gap-4 justify-content-between">
+          <div class="flex-grow-1 me-3" style="min-width: 300px;">
             <div class="mb-3">
-              <input type="hidden" id="editid" name="editid">
-              <label for="edithotelTitle" class="form-label">Enter Hotel Name</label>
-              <input type="text" class="form-control" id="edithotelname" placeholder="Enter Hotel" name="hotelname">
-              <p class="text-danger d-none error-message" id="edithotelhidden">Please Enter Hotel!</p>
+              <label for="edithotelname" class="form-label">Enter Hotel Name</label>
+              <input type="text" id="edithotelname" name="hotelname" class="form-control" placeholder="Enter Hotel Name"
+                required />
+              <div class="invalid-feedback">Please enter hotel name!</div>
             </div>
-
             <div class="mb-3">
               <label for="edithoteladdress" class="form-label">Enter Hotel Address</label>
-              <input type="text" class="form-control" id="edithoteladdress" placeholder="Enter Hotel Address"
-                name="hoteladdress">
-              <p class="text-danger d-none error-message" id="editaddresshidden">Please Enter Hotel Address!</p>
+              <input type="text" id="edithoteladdress" name="hoteladdress" class="form-control"
+                placeholder="Enter Hotel Address" required />
+              <div class="invalid-feedback">Please enter hotel address!</div>
             </div>
-
-
             <div class="mb-3">
-              <label for="contactnumber" class="form-label">Enter Contact Number</label>
-              <input type="text" class="form-control" id="editcontactnumber" placeholder="Enter Contact Number"
-                name="contactnumber">
-              <p class="text-danger d-none error-message" id="editcontacthidden">Please Enter Contact Number!</p>
+              <label for="editcontactnumber" class="form-label">Enter Contact Number</label>
+              <input type="text" id="editcontactnumber" name="contactnumber" class="form-control"
+                placeholder="Enter Contact Number" required />
+              <div class="invalid-feedback">Please enter contact number!</div>
             </div>
           </div>
-          <div class="right" style="width:40%">
+          <div class="flex-grow-1" style="min-width: 300px;">
             <div class="mb-3">
-              <label for="alternativenumber" class="form-label">Enter Alternative Number</label>
-              <input type="text" class="form-control" id="editalternativenumber" placeholder="Enter Alternative Number"
-                name="alternativenumber">
-              <p class="text-danger d-none error-message" id="editalternativehidden">Please Enter Alternative Number !
-              </p>
+              <label for="editalternativenumber" class="form-label">Enter Alternative Number</label>
+              <input type="text" id="editalternativenumber" name="alternativenumber" class="form-control"
+                placeholder="Enter Alternative Number" required />
+              <div class="invalid-feedback">Please enter alternative number!</div>
             </div>
-
             <div class="mb-3">
               <label for="edithotelImage" class="form-label">Upload Image</label>
-              <input type="file" class="form-control" id="edithotelImage" accept="image/*"
-                onchange="previewImage(event)" name="image">
-
+              <input type="file" id="edithotelImage" name="image" class="form-control" accept="image/*"
+                onchange="previewImage(event)" />
             </div>
-
-            <div class="mb-3 text-center">
-              <img id="editimagePreview" src="#" alt="Image Preview" class="img-thumbnail" style="max-width: 200px;">
+            <div class="text-center mb-3">
+              <img id="editimagePreview" src="#" alt="Image Preview" class="img-thumbnail" style="max-width: 200px;" />
             </div>
             <div class="mb-3">
               <div class="dropdown">
-                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  Select Foodname
+                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                  aria-expanded="false">
+                  Select Food Name
                 </button>
-                <ul class="dropdown-menu p-3">
+                <ul class="dropdown-menu p-3" style="max-height:250px; overflow-y:auto;">
                   <li>
                     <div class="form-check">
-                      <input class="form-check-input select-all" type="checkbox" id="selectAll"
-                        onchange="selectAllCheckboxes(this)">
-                      <label class="form-check-label" for="selectAll">Select All</label>
+                      <input class="form-check-input select-all" type="checkbox" id="editselectAll"
+                        onchange="selectAllCheckboxes(this)" />
+                      <label class="form-check-label" for="editselectAll">Select All</label>
                     </div>
                   </li>
-                    <% foodss.forEach(element => { %>
-                      <li class="editlist">
-                          <input class="form-check-input option-checkbox editfood-checkbox" type="checkbox" id="editoptions"
-                            name="foodname" value="<%= element._id %>">
-                          <label class="editform-check-label" for="option1"><%= element.foodname%></label>
-                      </li>  
-                    <% }) %>
+                  <% foodss.forEach(element => { %>
+                  <li>
+                    <div class="form-check">
+                      <input class="form-check-input option-checkbox editfood-checkbox" type="checkbox"
+                        id="editfood_<%= element._id %>" name="foodname" value="<%= element._id %>" />
+                      <label class="form-check-label" for="editfood_<%= element._id %>"><%= element.foodname %></label>
+                    </div>
+                  </li>
+                  <% }) %>
                 </ul>
               </div>
             </div>
           </div>
         </div>
-        <input type="hidden" name="selectedFoods" id="editselectedFoods">
+        <input type="hidden" name="selectedFoods" id="editselectedFoods" />
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
           <button type="submit" class="btn btn-success">Save</button>
@@ -245,12 +254,12 @@
   </div>
 </div>
 
-<!-- block Hotel -->
-<div class="modal fade" id="blockHotelModal" tabindex="-1" aria-labelledby="blockHotelModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered custom-modal-width">
+<!-- Block / Unblock / Delete modals (simplified layout) -->
+<div class="modal fade" id="blockHotelModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <form action="/admin/hideHotel" method="post">
-        <input type="hidden" id="hideid" name="hideid">
+        <input type="hidden" id="hideid" name="hideid" />
         <div class="modal-body">
           <p>Do you want to hide the hotel?</p>
         </div>
@@ -263,13 +272,11 @@
   </div>
 </div>
 
-<!-- unblock Hotel -->
-<div class="modal fade" id="unblockHotelModal" tabindex="-1" aria-labelledby="unblockHotelModalLabel"
-  aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered custom-modal-width">
+<div class="modal fade" id="unblockHotelModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <form action="/admin/unHidehotel" method="post">
-        <input type="hidden" id="unhideid" name="unhideid">
+        <input type="hidden" id="unhideid" name="unhideid" />
         <div class="modal-body">
           <p>Do you want to unhide the hotel?</p>
         </div>
@@ -282,12 +289,11 @@
   </div>
 </div>
 
-<!-- delete Hotel -->
-<div class="modal fade" id="deleteHotelModal" tabindex="-1" aria-labelledby="deleteHotelModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered custom-modal-width">
+<div class="modal fade" id="deleteHotelModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <form action="/admin/deleteHotel" method="post">
-        <input type="hidden" id="deleteid" name="deleteid">
+        <input type="hidden" id="deleteid" name="deleteid" />
         <div class="modal-body">
           <p>Do you want to delete the hotel?</p>
         </div>
@@ -301,148 +307,54 @@
 </div>
 
 <%- include('partials/footer') %>
+
 <script>
+  // Debounced search function
+  let debounceTimer;
+  function searchHotel(value) {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      const currentPage = 1;
+      window.location.href = `/admin/hotel?pagenumber=${ currentPage }&hotel=${ encodeURIComponent(value) }`;
+    }, 700);
+  }
 
-let debounceTimer;
+  function loadPage(pageNumber) {
+    const searchValue = document.getElementById('searchInput').value || '';
+    window.location.href = `/admin/hotel?pagenumber=${ pageNumber }&hotel=${ encodeURIComponent(searchValue) }`;
+  }
 
-function searchHotel(value) {
-   clearTimeout(debounceTimer);
-   debounceTimer = setTimeout(() => {
-      const currentPage = 1; // Reset to the first page for a new search
-      window.location.href = `/admin/hotel?pagenumber=${currentPage}&hotel=${encodeURIComponent(value)}`;
-   }, 700); // Adjust delay (in milliseconds) as needed
-}
-
-function loadPage(pageNumber) {
-   const searchValue = document.getElementById('searchInput').value || '';
-   window.location.href = `/admin/hotel?pagenumber=${pageNumber}&hotel=${encodeURIComponent(searchValue)}`;
-}
-
-
+  // Preview image for add/edit
   function previewImage(event) {
-    const imageInput = event.target;
+    const input = event.target;
     const preview = document.getElementById('imagePreview');
     const editpreview = document.getElementById('editimagePreview');
-
-    if (imageInput.files && imageInput.files[0]) {
+    if (input.files && input.files[0]) {
       const reader = new FileReader();
-      reader.onload = function (e) {
-        preview.src = e.target.result;
-        preview.classList.remove('d-none'); // Show the preview
-        editpreview.src = e.target.result;
-        editpreview.classList.remove('d-none');
+      reader.onload = e => {
+        if (preview) {
+          preview.src = e.target.result;
+          preview.classList.remove('d-none');
+        }
+        if (editpreview) {
+          editpreview.src = e.target.result;
+          editpreview.classList.remove('d-none');
+        }
       };
-      reader.readAsDataURL(imageInput.files[0]);
-      reader.readAsDataURL(editpreview.files[0]);
+      reader.readAsDataURL(input.files[0]);
     } else {
-      preview.src = '#';
-      preview.classList.add('d-none'); // Hide the preview
-      editpreview.src = '#';
+      if (preview) {
+        preview.src = '#';
+        preview.classList.add('d-none');
+      }
+      if (editpreview) {
+        editpreview.src = '#';
+        editpreview.classList.add('d-none');
+      }
     }
   }
 
-  function validateForm() {
-    const hotelTitle = document.getElementById('hotelname').value.trim();
-    const hotelImage = document.getElementById('hotelImage');
-    const hotelhidden = document.getElementById('hotelhidden');
-    const imagehidden = document.getElementById('imagehidden');
-    const hoteladdress = document.getElementById('hoteladdress').value;
-    const addresshidden = document.getElementById('addresshidden');
-    const contactnumber = document.getElementById('contactnumber').value;
-    const contacthidden = document.getElementById('contacthidden');
-    const alternativenumber = document.getElementById('alternativenumber').value;
-    const alternativehidden = document.getElementById('alternativehidden')
-
-
-    let isValid = true;
-    // Validate Title
-    if (!hotelTitle) {
-      hotelhidden.classList.remove('d-none'); // Show the error message
-      isValid = false;
-    } else {
-      hotelhidden.classList.add('d-none'); // Hide the error message
-    }
-
-    //validate hotel Address
-    if (!hoteladdress) {
-      addresshidden.classList.remove('d-none'); // Show the error message
-      isValid = false;
-    } else {
-      addresshidden.classList.add('d-none'); // Hide the error message
-    }
-    //validate contactnumber
-    if (!contactnumber) {
-      contacthidden.classList.remove('d-none'); // Show the error message
-      isValid = false;
-    } else {
-      contacthidden.classList.add('d-none'); // Hide the error message
-    }
-    //validate alternativenumber
-    if (!alternativenumber) {
-      alternativehidden.classList.remove('d-none'); // Show the error message
-      isValid = false;
-    } else {
-      alternativehidden.classList.add('d-none'); // Hide the error message
-    }
-
-    // Validate Image
-    if (hotelImage.files.length === 0) {
-      imagehidden.classList.remove('d-none'); // Show the error message
-      isValid = false;
-    } else {
-      imagehidden.classList.add('d-none'); // Hide the error message
-    }
-
-    return isValid; // Return true only if both fields are valid
-  }
-
-  function editvalidateForm() {
-    const edithotelTitle = document.getElementById('edithotelname').value.trim();
-    const edithotelImage = document.getElementById('edithotelImage');
-    const edithotelhidden = document.getElementById('edithotelhidden');
-    const editimagehidden = document.getElementById('editimagehidden');
-    const edithoteladdress = document.getElementById('edithoteladdress').value;
-    const editaddresshidden = document.getElementById('editaddresshidden');
-    const editcontactnumber = document.getElementById('editcontactnumber').value;
-    const editcontacthidden = document.getElementById('editcontacthidden');
-    const editalternativenumber = document.getElementById('editalternativenumber').value;
-    const editalternativehidden = document.getElementById('editalternativehidden')
-
-
-    let isValid = true;
-    // Validate Title
-    if (!edithotelTitle) {
-      edithotelhidden.classList.remove('d-none'); // Show the error message
-      isValid = false;
-    } else {
-      edithotelhidden.classList.add('d-none'); // Hide the error message
-    }
-
-    //validate hotel Address
-    if (!edithoteladdress) {
-      editaddresshidden.classList.remove('d-none'); // Show the error message
-      isValid = false;
-    } else {
-      editaddresshidden.classList.add('d-none'); // Hide the error message
-    }
-    //validate contactnumber
-    if (!editcontactnumber) {
-      editcontacthidden.classList.remove('d-none'); // Show the error message
-      isValid = false;
-    } else {
-      editcontacthidden.classList.add('d-none'); // Hide the error message
-    }
-    //validate alternativenumber
-    if (!editalternativenumber) {
-      editalternativehidden.classList.remove('d-none'); // Show the error message
-      isValid = false;
-    } else {
-      editalternativehidden.classList.add('d-none'); // Hide the error message
-    }
-
-    return isValid; // Return true only if both fields are valid
-  }
-
+  // Modal setters
   function editfun(hotelname, hoteladdress, contactnumber, alternativenumber, image, id, fooditems) {
     document.getElementById('edithotelname').value = hotelname;
     document.getElementById('edithoteladdress').value = hoteladdress;
@@ -455,61 +367,45 @@ function loadPage(pageNumber) {
     const foodItemsArray = Array.isArray(fooditems) ? fooditems : fooditems.split(',');
     const checkboxes = document.querySelectorAll('.editfood-checkbox');
 
-    // Iterate over all checkboxes and set their checked state
     checkboxes.forEach(checkbox => {
-        checkbox.checked = foodItemsArray.includes(checkbox.value);
+      checkbox.checked = foodItemsArray.includes(checkbox.value);
     });
-}
+  }
 
   function deletefun(id) {
-    document.getElementById('deleteid').value = id
+    document.getElementById('deleteid').value = id;
   }
-
   function hidefun(id) {
-    document.getElementById('hideid').value = id
+    document.getElementById('hideid').value = id;
   }
-
   function unhidefun(id) {
-    document.getElementById('unhideid').value = id
+    document.getElementById('unhideid').value = id;
   }
 
-
+  // Style blocked items
   document.querySelectorAll(".isblocked").forEach((statusElement, index) => {
     if (statusElement.textContent.trim() === "true") {
-      document.querySelectorAll(".tabledata")[index].style.color = "#616362"
-      document.querySelectorAll(".tableindex")[index].style.color = "#616362"
+      document.querySelectorAll(".tabledata")[index].style.color = "#616362";
+      document.querySelectorAll(".tableindex")[index].style.color = "#616362";
     }
   });
 
+  // Select all checkboxes logic
   function selectAllCheckboxes(selectAllCheckbox) {
     const checkboxes = document.querySelectorAll('.option-checkbox');
-    checkboxes.forEach((checkbox) => {
-      checkbox.checked = selectAllCheckbox.checked;
-    });
+    checkboxes.forEach(cb => cb.checked = selectAllCheckbox.checked);
   }
-  //remove selectall tick
   document.querySelectorAll('.option-checkbox').forEach((checkbox) => {
     checkbox.addEventListener('change', () => {
       const selectAll = document.getElementById('selectAll');
-      const allChecked = Array.from(document.querySelectorAll('.option-checkbox')).every((cb) => cb.checked);
+      const allChecked = [...document.querySelectorAll('.option-checkbox')].every(cb => cb.checked);
       selectAll.checked = allChecked;
     });
   });
-
-  document.getElementById("foodSelectionForm").addEventListener("submit", function (e) {
-    const selectedFoods = [];
-    const checkboxes = document.querySelectorAll(".food-checkbox:checked");
-    checkboxes.forEach((checkbox) => {
-      selectedFoods.push(checkbox.value);
-    });
-    document.getElementById("selectedFoods").value = JSON.stringify(selectedFoods);
-  });
-
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- SweetAlert notifications as per your server-side flags -->
 <% if (existdatamessage && existdatamessage.length > 0) { %>
 <script>
   Swal.fire({
@@ -517,7 +413,6 @@ function loadPage(pageNumber) {
     icon: "info",
     confirmButtonText: "OK",
   }).then(() => {
-    // Re-open the modal after SweetAlert
     const addhotelModal = document.getElementById('addHotelModal');
     if (addhotelModal) {
       const modalInstance = new bootstrap.Modal(addhotelModal);
@@ -527,9 +422,7 @@ function loadPage(pageNumber) {
 </script>
 <% } %>
 
-
-
-<% if (saveddatamessage && saveddatamessage.length>0) { %>
+<% if (saveddatamessage && saveddatamessage.length > 0) { %>
 <script>
   Swal.fire({
     text: "<%= saveddatamessage %>",
@@ -538,9 +431,7 @@ function loadPage(pageNumber) {
 </script>
 <% } %>
 
-
-
-<% if (errormessage && errormessage.length>0) { %>
+<% if (errormessage && errormessage.length > 0) { %>
 <script>
   Swal.fire({
     text: "<%= errormessage %>",
@@ -549,7 +440,7 @@ function loadPage(pageNumber) {
 </script>
 <% } %>
 
-<% if (editexistmessage && editexistmessage.length>0) { %>
+<% if (editexistmessage && editexistmessage.length > 0) { %>
 <script>
   Swal.fire({
     text: "<%= editexistmessage %>",

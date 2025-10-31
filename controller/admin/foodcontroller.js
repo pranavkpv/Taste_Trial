@@ -1,31 +1,23 @@
 const foodschema = require('../../model/foodschema')
 const categoryschema = require('../../model/categoryschema')
-const mongoose = require('mongoose')
+
 
 const food = async (req, res) => {
    try {
-      const category=req.query.category
-      const searchedfoodname = req.query.food || ''; // Get the search query
-      const selectedpage = Number(req.query.pagenumber) || 1; // Get the page number
-      const limit = 5; // Number of categories per page
-      const skip = (selectedpage - 1) * limit; // Calculate the skip value
-
-      // Search filter
-      const searchFilter = searchedfoodname
-         ? { foodname: { $regex: searchedfoodname, $options: 'i' } }
-         : {};
-
-      // Get filtered data count
-      const totaldata = await foodschema.countDocuments(searchFilter);
-      const page = Math.ceil(totaldata / limit);
-
-      // Get filtered and paginated data
+      const category = req.query.category || ''
+      const searchedfoodname = req.query.food || ''
+      const selectedpage = Number(req.query.pagenumber) || 1
+      const limit = 5
+      const skip = (selectedpage - 1) * limit
       const startIndex = skip + 1
-      const errormessage = req.flash('error')
-      const successmessage = req.flash('success')
-      const existmessage = req.flash('exist')
-      const editexistmessage = req.flash('editexist')
-      let foods = await foodschema.aggregate([
+
+      const errormessage = req.flash('error')[0] || ''
+      const successmessage = req.flash('success')[0] || ''
+      const existmessage = req.flash('exist')[0] || ''
+      const editexistmessage = req.flash('editexist')[0] || ''
+
+      let foodData = await foodschema.aggregate([
+         { $match: { foodname: { $regex: searchedfoodname, $options: 'i' } } },
          {
             $lookup: {
                from: "categories",
@@ -34,66 +26,98 @@ const food = async (req, res) => {
                as: "categoryDetails"
             }
          },
+         { $unwind: "$categoryDetails" },
+         { $match: { "categoryDetails.isdeleted": false } },
+         { $skip: skip },
+         { $limit: limit }
+      ])
+
+      let matchFood = await foodschema.aggregate([
+         { $match: { foodname: { $regex: searchedfoodname, $options: 'i' } } },
          {
-            $match: { 
-               ...searchFilter, 
+            $lookup: {
+               from: "categories",
+               localField: "category_id",
+               foreignField: "_id",
+               as: "categoryDetails"
             }
          },
-         { $skip: skip }, 
-         { $limit: limit } 
-      ]);
-      
-      foods = foods.map(food => {
+         { $unwind: "$categoryDetails" },
+         { $match: { "categoryDetails.isdeleted": false } }
+      ])
+
+      let formattedFoods = foodData.map(food => {
          if (food.expiry_date) {
             food.formattedExpiryDate = new Date(food.expiry_date)
                .toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" })
                .split("/")
-               .join("-");
+               .join("-")
          }
-         return food;
-      });
-     if(category && category!="all"){
-      var foodss=foods.filter((element)=>element.categoryDetails[0]._id==category)
-      var selectedCategory=await categoryschema.findOne({_id:category})
-     }else{
-      var foodss=foods
-      var selectedCategory="All" 
-     }
-     console.log(foodss)
-      const categories = await categoryschema.find({isdeleted:false})
-      res.render('admin/food', { foodss, categories, errormessage, successmessage, existmessage, editexistmessage,searchedfoodname ,startIndex,page,
-         category,selectedCategory
+         return food
+      })
+
+
+      let formattedData = []
+      let totalData = 0
+      let selectedCategory = []
+      if (category == "") {
+         selectedCategory = "All"
+         totalData = matchFood.length
+         formattedData = formattedFoods
+
+      }else {
+         formattedData = matchFood.filter(el => String(el.categoryDetails._id) === String(category))
+         selectedCategory = await categoryschema.findOne({ _id: category })
+         totalData = matchFood.filter(el => String(el.categoryDetails._id) === String(category)).length
+      }
+
+      const categories = await categoryschema.find({ isdeleted: false })
+      const page = Math.ceil(totalData / limit)
+      res.render('admin/food', {
+         foodss: formattedData,
+         categories,
+         errormessage,
+         successmessage,
+         existmessage,
+         editexistmessage,
+         searchedfoodname,
+         startIndex,
+         page,
+         category,
+         selectedCategory,
+         selectedpage
       })
    } catch (error) {
       console.log(error)
-      req.flash('error', "An Error Occured");
-      res.redirect('/admin/food');
+      req.flash('error', "An Error Occurred")
+      res.redirect('/admin/food')
    }
 }
 
+
 const addFood = async (req, res) => {
    try {
-      const { foodname, category_id, isveg,duration_time,offer,expirydate } = req.body;
+      const { foodname, category_id, isveg, duration_time, offer, expirydate } = req.body;
       const file = req.file;
-      const existFood = await foodschema.findOne({ foodname })
-      if(offer==0 && expirydate==""){
-         const image = `/uploads/${ file.filename }`
-         const newFoods = new foodschema({
-            foodname,
-            category_id,
-            is_veg: isveg,
-            image,
-            duration_time,
-            offer
-         })
-         await newFoods.save()
-         req.flash('success', "Food Is Saved SuccessFully");
-         res.redirect('/admin/food');
-      }
+      const existFood = await foodschema.findOne({ foodname: { $regex: foodname, $options: "i" } })
       if (existFood) {
          req.flash('exist', "Food Is Already Exist");
          res.redirect('/admin/food');
       } else {
+         if (offer == 0 && expirydate == "") {
+            const image = `/uploads/${ file.filename }`
+            const newFoods = new foodschema({
+               foodname,
+               category_id,
+               is_veg: isveg,
+               image,
+               duration_time,
+               offer
+            })
+            await newFoods.save()
+            req.flash('success', "Food Is Saved SuccessFully");
+            res.redirect('/admin/food');
+         }
          const image = `/uploads/${ file.filename }`
          const newFood = new foodschema({
             foodname,
@@ -102,7 +126,7 @@ const addFood = async (req, res) => {
             image,
             duration_time,
             offer,
-            expiry_date:expirydate
+            expiry_date: expirydate
          })
          await newFood.save()
          req.flash('success', "Food Is Saved SuccessFully");
@@ -129,25 +153,18 @@ const editFood = async (req, res) => {
          expirydate
       } = req.body;
       const file = req.file;
-      const existfood = await foodschema.find({ _id: { $ne: editid } });
-      const countDocument = await foodschema.countDocuments() - 1
-      let existvalue = 0;
-      for (let i = 0; i < countDocument; i++) {
-         if (existfood[i].foodname === foodname) {
-            existvalue++;
-         }
-      }
-      if (existvalue > 0) {
+      const existfood = await foodschema.findOne({ _id: { $ne: editid }, foodname: { $regex: foodname, $options: "i" } });
+      if (existfood) {
          req.flash('editexist', "Food Already Exist");
          res.redirect('/admin/food');
       } else {
          if (!file) {
-            await foodschema.findByIdAndUpdate({ _id: editid }, { foodname, category_id, is_veg,duration_time,offer:Offer,expiry_date:expirydate });
+            await foodschema.findByIdAndUpdate({ _id: editid }, { foodname, category_id, is_veg, duration_time, offer: Offer, expiry_date: expirydate });
             req.flash('success', "Food Updated Successfully");
             res.redirect('/admin/food');
          } else {
             const image = `/uploads/${ file.filename }`
-            await foodschema.findByIdAndUpdate({ _id: editid }, { foodname, category_id, is_veg,duration_time, image,offer:Offer,expiry_date:expirydate });
+            await foodschema.findByIdAndUpdate({ _id: editid }, { foodname, category_id, is_veg, duration_time, image, offer: Offer, expiry_date: expirydate });
             req.flash('success', "Food Updated Successfully");
             res.redirect('/admin/food');
          }

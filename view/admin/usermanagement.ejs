@@ -1,92 +1,91 @@
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 <%- include('partials/admin') %>
-<link rel="stylesheet" href="/usermanagement.css">
-<div class="content">
 
-  <h3 class="my-3">User Management</h3>
+<div class="mt-5 w-75" style="margin-left:15%;">
+  <div class="container-fluid px-4 py-4">
 
-  <!-- Search Bar -->
-  <div class="row search-bar">
-    <div class="col-md-6 ">
-      <div class="input-group">
-        <span class="input-group-text bg-secondary text-light"><i class="fas fa-search"></i></span>
-        <input type="text" id="searchInput" oninput="searchUser(this.value)" class="form-control"
-          placeholder="Search by username..." value="<%= searcheduser || '' %>">
+    <!-- Page Title -->
+    <h3 class="my-3">User Management</h3>
+
+    <!-- Search and Filter Row -->
+    <div class="row mb-4">
+      <!-- Search Input -->
+      <div class="col-md-6 mb-2 mb-md-0">
+        <div class="input-group">
+          <span class="input-group-text bg-success text-light"><i class="fas fa-search"></i></span>
+          <input type="text" id="searchInput" oninput="searchUser(this.value)" class="form-control"
+            placeholder="Search by username..." value="<%= searcheduser || '' %>">
+        </div>
+      </div>
+      <!-- Status Filter -->
+      <div class="col-md-6">
+        <select id="statusFilter" class="form-select w-50" onchange="filter()">
+          <option value="" <%= !status || status === '' ? 'selected' : '' %>>Select</option>
+          <option value="Blocked" <%= status === 'Blocked' ? 'selected' : '' %>>Blocked</option>
+          <option value="Unblocked" <%= status === 'Unblocked' ? 'selected' : '' %>>Unblocked</option>
+          <option value="All" <%= status === 'All' ? 'selected' : '' %>>All Users</option>
+        </select>
       </div>
     </div>
-    <div class="col-md-6">
-      <select name="" id="statusFilter" class="form-control w-50" onchange="filter()">
-        <option value="" class="d-none"><% if (status) { %>
-         <%= status %>
-         <% } else { %>
-          select
-        <% } %></option>
-        <option value="Blocked">Blocked</option>
-        <option value="Unblocked">Unblocked</option>
-        <option value="All">All User</option>
-      </select>
-    </div>
-    
-  </div>
 
-  <!-- Table -->
-  <div class="table-responsive custom-table-bg">
-    <table class="table table-hover text-center">
-      <thead>
-        <tr>
-          <th>Sl No</th>
-          <th>Username</th>
-          <th>Phone</th>
-          <th>Email</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <!-- Table displaying the users -->
-      <tbody class="tableBody">
-        <% if (userData && userData.length === 0) { %>
-           <tr>
-              <td colspan="5" class="text-center">No users found</td>
-           </tr>
-        <% } else { %>
-           <% userData.forEach((element, index) => { %>
-              <tr>
-                 <td class="tableindex"><%= startIndex + index %></td>
-                 <td class="tabledata"><%= element.firstname %> <%= element.lastname %></td>
-                 <td class="tablephone"><%= element.phonenumber %></td>
-                 <td class="tableemail"><%= element.email %></td>
-                 <td class="action-icons">
-                    <% if (element.is_blocked == true) { %>
-                       <a class="text-dark" href="#" data-bs-toggle="modal" data-bs-target="#unblockUserModal" onclick="unblockfun('<%= element._id %>')"><i class="fa-solid fa-unlock"></i></a>
-                    <% } else { %>
-                       <a class="text-dark" href="#" data-bs-toggle="modal" data-bs-target="#blockUserModal" onclick="blockfun('<%= element._id %>')"><i class="fa-solid fa-lock"></i></a>
-                    <% } %>
-                 </td>
-                 <td class="d-none isblocked" id="isblocked"><%= element.is_blocked %></td>
-              </tr>
-           <% }) %>
+    <!-- Users Table -->
+    <div class="table-responsive">
+      <table class="table table-hover text-center align-middle" id="userTable">
+        <thead class="table-light">
+          <tr>
+            <th scope="col">Sl No</th>
+            <th scope="col">Username</th>
+            <th scope="col">Phone</th>
+            <th scope="col">Email</th>
+            <th scope="col">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (userData && userData.length === 0) { %>
+          <tr>
+            <td colspan="5" class="text-center">No users found</td>
+          </tr>
+          <% } else { %>
+          <% userData.forEach((element, index) => { %>
+          <tr>
+            <td class="tableindex"><%= startIndex + index %></td>
+            <td class="tabledata"><%= element.firstname %> <%= element.lastname %></td>
+            <td class="tablephone"><%= element.phonenumber %></td>
+            <td class="tableemail"><%= element.email %></td>
+            <td>
+              <% if (element.is_blocked) { %>
+              <a href="#" class="text-success" data-bs-toggle="modal" data-bs-target="#unblockUserModal"
+                onclick="unblockfun('<%= element._id %>')" title="Unblock"><i class="fa-solid fa-unlock"></i></a>
+              <% } else { %>
+              <a href="#" class="text-success" data-bs-toggle="modal" data-bs-target="#blockUserModal"
+                onclick="blockfun('<%= element._id %>')" title="Block"><i class="fa-solid fa-lock"></i></a>
+              <% } %>
+            </td>
+          </tr>
+          <% }) %>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <nav aria-label="Page navigation" class="d-flex justify-content-center mt-3">
+      <ul class="pagination pagination-sm">
+        <% for (let i = 1; i <= page; i++) { %>
+        <li class="page-item  <%= i === selectedpage ? 'active' : '' %>">
+          <button class="page-link <%= i === selectedpage ? 'bg-success' : '' %>" onclick="loadPage('<%= i %>')"><%= i %></button>
+        </li>
         <% } %>
-     </tbody>
-     
-     
-
-    </table>
-    <div id="pagination" style="text-align: center; margin-bottom: 20px;">
-      <% for (let i = 1; i <= page; i++) { %>
-      <button onclick="loadPage('<%= i %>')" class="btn btn-success">
-        <%= i %>
-      </button>
-      <% } %>
-    </div>
+      </ul>
+    </nav>
   </div>
-
 </div>
 
-<!-- block User -->
+<!-- Block User Modal -->
 <div class="modal fade" id="blockUserModal" tabindex="-1" aria-labelledby="blockUserModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered custom-modal-width">
+  <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <form action="/admin/blockuser" method="post">
-        <input type="hidden" id="hideid" name="hideid">
+        <input type="hidden" id="hideid" name="hideid" />
         <div class="modal-body">
           <p>Do you want to block the user?</p>
         </div>
@@ -99,12 +98,12 @@
   </div>
 </div>
 
-<!-- unblock User -->
+<!-- Unblock User Modal -->
 <div class="modal fade" id="unblockUserModal" tabindex="-1" aria-labelledby="unblockUserModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered custom-modal-width">
+  <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <form action="/admin/unblockuser" method="post">
-        <input type="hidden" id="unhideid" name="unhideid">
+        <input type="hidden" id="unhideid" name="unhideid" />
         <div class="modal-body">
           <p>Do you want to unblock the user?</p>
         </div>
@@ -117,74 +116,32 @@
   </div>
 </div>
 
-
+<!-- Scripts -->
 <%- include('partials/footer') %>
 <script>
-
-
-
-  function blockfun(id) {
-    document.getElementById('hideid').value = id
-  }
-  function unblockfun(id) {
-    document.getElementById('unhideid').value = id
-  }
-
-  document.querySelectorAll(".isblocked").forEach((statusElement, index) => {
-    if (statusElement.textContent.trim() === "true") {
-      document.querySelectorAll(".tabledata")[index].style.color = "#616362"
-      document.querySelectorAll(".tableindex")[index].style.color = "#616362"
-      document.querySelectorAll(".tablephone")[index].style.color = "#616362"
-      document.querySelectorAll(".tableemail")[index].style.color = "#616362"
-    }
-  });
-
-
-
-
+  // Live search with debounce
   let debounceTimer;
-
   function searchUser(value) {
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => {
-    let status = document.getElementById("statusFilter").value;
-      const currentPage = 1;
-      window.location.href = `/admin/usermanagement?pagenumber=${ currentPage }&user=${ encodeURIComponent(value) }&status=${status}`;
+      const status = document.getElementById("statusFilter").value;
+      const page = 1;
+      window.location.href = `/admin/usermanagement?pagenumber=${ page }&user=${ encodeURIComponent(value) }&status=${ status }`;
     }, 700);
+  }
+
+  function filter() {
+    const searchValue = document.getElementById('searchInput').value || '';
+    const status = document.getElementById("statusFilter").value;
+    window.location.href = `/admin/usermanagement?pagenumber=1&user=${ encodeURIComponent(searchValue) }&status=${ status }`;
   }
 
   function loadPage(pageNumber) {
     const searchValue = document.getElementById('searchInput').value || '';
-    let status = document.getElementById("statusFilter").value;
-    window.location.href = `/admin/usermanagement?pagenumber=${ pageNumber }&user=${ encodeURIComponent(searchValue) }&status=${status}`;
+    const status = document.getElementById("statusFilter").value;
+    window.location.href = `/admin/usermanagement?pagenumber=${ pageNumber }&user=${ encodeURIComponent(searchValue) }&status=${ status }`;
   }
 
-  async function filter(){
-    const currentPage = 1;
-    const searchValue = document.getElementById('searchInput').value || '';
-    let status = document.getElementById("statusFilter").value;
-    window.location.href = `/admin/usermanagement?pagenumber=${ currentPage }&user=${ encodeURIComponent(searchValue)}&status=${status}`;
-  }
-
-
-
+  function blockfun(id) { document.getElementById('hideid').value = id; }
+  function unblockfun(id) { document.getElementById('unhideid').value = id; }
 </script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<% if (successmessage && successmessage.length>0) { %>
-<script>
-  Swal.fire({
-    text: "<%= successmessage %>",
-    icon: "success"
-  });
-</script>
-<% } %>
-
-
-<% if (errormessage && errormessage.length>0) { %>
-<script>
-  Swal.fire({
-    text: "<%= errormessage %>",
-    icon: "error"
-  });
-</script>
-<% } %>

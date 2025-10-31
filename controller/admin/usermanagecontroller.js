@@ -32,7 +32,8 @@ const usermanagement = async (req, res) => {
       const startIndex=skip+1
       const successmessage = req.flash('success')
       const errormessage = req.flash('error')
-      res.render("admin/usermanagement", { userData,status, errormessage, successmessage,searcheduser ,startIndex,page})
+      res.render("admin/usermanagement", { userData,status, errormessage, 
+         successmessage,searcheduser ,startIndex,page,selectedpage})
    } catch (error) {
       req.flash("error", "An Error Occured")
    }

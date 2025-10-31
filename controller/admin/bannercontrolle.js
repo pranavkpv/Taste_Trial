@@ -3,21 +3,15 @@ const bannerschema = require("../../model/bannerschema")
 
 const banner = async (req, res) => {
    try {
-      const searchedbannername = req.query.banner || ''; // Get the search query
-      const selectedpage = Number(req.query.pagenumber) || 1; // Get the page number
-      const limit = 5; // Number of categories per page
-      const skip = (selectedpage - 1) * limit; // Calculate the skip value
-
-      // Search filter
+      const searchedbannername = req.query.banner || ''; 
+      const selectedpage = Number(req.query.pagenumber) || 1; 
+      const limit = 5; 
+      const skip = (selectedpage - 1) * limit; 
       const searchFilter = searchedbannername
          ? { title: { $regex: searchedbannername, $options: 'i' } }
          : {};
-
-      // Get filtered data count
       const totaldata = await bannerschema.countDocuments(searchFilter);
       const page = Math.ceil(totaldata / limit);
-
-      // Get filtered and paginated data
       const banners = await bannerschema.find(searchFilter).skip(skip).limit(limit);
       const startIndex = skip + 1
 
@@ -25,54 +19,48 @@ const banner = async (req, res) => {
       const successmessage = req.flash("success")
       const errormessage = req.flash("error")
       const editexistmessage = req.flash('editexist')
-      res.render('admin/banner', { banners, existmessage, successmessage, errormessage, editexistmessage,searchedbannername,page,startIndex })
+      res.render('admin/banner', { banners, existmessage, successmessage, errormessage, editexistmessage, searchedbannername, page, startIndex,selectedpage })
    } catch (error) {
       console.log(error)
    }
 }
 const addbanner = async (req, res) => {
    try {
-      console.log("hai")
       const { title } = req.body;
       const file = req.file;
-      const image = `/uploads/${ file.filename }`;
-      // Check if the title already exists
-      const existTitle = await bannerschema.findOne({ title });
-      if (existTitle) {
-         req.flash('exist', "Banner Is Already Exist");
+
+      if (!file) {
+         req.flash('error', 'Please upload a valid image file');
          return res.redirect('/admin/banner');
       }
 
-      // Save the new banner
+      const image = `/uploads/${ file.filename }`;
 
-      const newBanner = new bannerschema({
-         image,
-         title
-      });
+      const existTitle = await bannerschema.findOne({ title:{$regex:title,$options:"i"} });
+      if (existTitle) {
+         req.flash('exist', "Banner already exists");
+         return res.redirect('/admin/banner');
+      }
+
+      const newBanner = new bannerschema({ image, title });
       await newBanner.save();
-      req.flash('success', "Banner Is Saved Successfully");
-      res.redirect('/admin/banner');
 
+      req.flash('success', "Banner added successfully");
+      res.redirect('/admin/banner');
    } catch (error) {
       console.error(error);
-      req.flash('error', "An error occurred");
+      req.flash('error', "An error occurred while adding the banner");
       res.redirect('/admin/banner');
    }
 };
+
 
 const editbanner = async (req, res) => {
    try {
       const { editid, title } = req.body
       const file = req.file
-      const existtitle = await bannerschema.find({ _id: { $ne: editid } })
-      const numberofDoc = await bannerschema.countDocuments() - 1
-      let existvalue = 0;
-      for (let i = 0; i < numberofDoc; i++) {
-         if (title == existtitle[i].title) {
-            existvalue++
-         }
-      }
-      if (existvalue > 0) {
+      const existtitle = await bannerschema.findOne({ _id: { $ne: editid },title:{$regex:title,$options:"i"} })
+      if (existtitle) {
          req.flash('editexist', "Banner Is Already Exist")
          res.redirect('/admin/banner')
       } else {

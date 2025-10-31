@@ -1,5 +1,4 @@
 <%- include('partials/admin') %>
-<link rel="stylesheet" href="/rate.css">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 <div class="content">
@@ -9,10 +8,6 @@
       Item</button>
   </div>
 
-  <!-- filter -->
-
-
-  <!-- Table -->
   <div class="table-responsive custom-table-bg">
     <table class="table table-hover text-center">
       <thead>
@@ -907,68 +902,6 @@
 <% } %>
 
 
-
-
-<!-- function editvalidateForm() {
-  const editcategoryname = document.getElementById('editcategoryname').value;
-  const edithiddencategoryname = document.getElementById('edithiddencategoryname');
-  const editfoodname = document.getElementById('editfoodname').value;
-  const edithiddenfoodname = document.getElementById('edithiddenfoodname');
-  const editfoodImage = document.getElementById('editfoodImage');
-  const editimagehidden = document.getElementById('editimagehidden');
- 
-
-
-  let isValid = true;
-  // Validate category name
-  if (!editcategoryname) {
-    edithiddencategoryname.classList.remove('d-none'); // Show the error message
-    isValid = false;
-  } else {
-    edithiddencategoryname.classList.add('d-none'); // Hide the error message
-  }
-
-  //validate foodname
-  if (!editfoodname) {
-    edithiddenfoodname.classList.remove('d-none'); // Show the error message
-    isValid = false;
-  } else {
-    edithiddenfoodname.classList.add('d-none'); // Hide the error message
-  }
-
-  return isValid; // Return true only if both fields are valid
-
-}
-
-function editfun(categoryname,foodname,image,id,isveg){
-  document.getElementById('editcategoryname').value=categoryname
-  document.getElementById('editfoodname').value=foodname
-  document.getElementById('editimagePreview').src=image
-  document.getElementById('editid').value=id
-  document.getElementById('editisveg').value=isveg
-
-}
-function deletefun(id){
-  document.getElementById('deleteid').value=id
-}
-
-function hidefun(id){
-  document.getElementById('hideid').value=id
-}
-
-function unhidefun(id){
-  document.getElementById('unhideid').value=id
-}
-
-
-document.querySelectorAll(".isblocked").forEach((statusElement, index) => {
-    if (statusElement.textContent.trim() === "true") {
-      document.querySelectorAll(".tabledata")[index].style.color = "#616362"
-      document.querySelectorAll(".tableindex")[index].style.color = "#616362"
-      document.querySelectorAll(".tablecategory")[index].style.color = "#616362"
-
-    }
-  }); -->
 
 </script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

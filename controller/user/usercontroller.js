@@ -38,31 +38,26 @@ const razorpayInstance = new Razorpay({
 const validuser = async (req, res) => {
    try {
       const { email, password } = req.body;
-
-      // Input Validation
-      if (!email || email.trim() === "" ) {
+       console.log(req.body)
+      if (!email || email.trim() === "") {
          return res.json({ messageEmail: "Email is required" });
       }
       if (!password || password.trim() === "") {
          return res.json({ messagePassword: "Password is required" });
       }
 
-      // Find User in Database
       const existUser = await userschema.findOne({ email, is_blocked: false });
 
       if (!existUser) {
-         return res.json({ existMessage: "Email is Wrong" });
+         return res.json({ existMessage: "user is not exist or use will be blocked" });
       }
 
-      // Compare Passwords (Use `await` instead of callback)
       const match = await bcrypt.compare(password, existUser.password);
 
       if (!match) {
          return res.json({ existMessage: "Password is Wrong" });
       }
-
-      // Success Response
-      req.session.user=existUser._id;
+      req.session.user = existUser._id;
       return res.json({ successMessage: "Login Successfully" });
 
    } catch (error) {
@@ -102,51 +97,50 @@ function generateOTP() {
 // signup
 const adduser = async (req, res) => {
    try {
-      const { firstName, lastName, email,phonenumber, password, confirmPassword } = req.body;
-      console.log(req.body)
-      if (firstName ===""  || firstName.trim() ==="") {
-         return res.json({ noFirst: "Firstname is required"});
+      const { firstName, lastName, email, phonenumber, password, confirmPassword } = req.body;
+      if (firstName === "" || firstName.trim() === "") {
+         return res.json({ noFirst: "Firstname is required" });
       }
-      if(!lastName || lastName.trim() === "" ){
-         return res.json({noLast: "Lastname is required"})
+      if (!lastName || lastName.trim() === "") {
+         return res.json({ noLast: "Lastname is required" })
       }
-      if(!phonenumber || phonenumber.trim() === ""){
-         return res.json({nophone: "PhoneNumber is required"})
-      }
-
-      if(!email || email.trim() === ""){
-         return res.json({noemail: "Email is required"})
-      }
-      if(!password || password.trim() === ""){
-         return res.json({nopassword: "Password is required"})
+      if (!phonenumber || phonenumber.trim() === "") {
+         return res.json({ nophone: "PhoneNumber is required" })
       }
 
-      if(!confirmPassword || confirmPassword.trim() === ""){
-         return res.json({noconfirm: "confirm password is required"})
+      if (!email || email.trim() === "") {
+         return res.json({ noemail: "Email is required" })
+      }
+      if (!password || password.trim() === "") {
+         return res.json({ nopassword: "Password is required" })
+      }
+
+      if (!confirmPassword || confirmPassword.trim() === "") {
+         return res.json({ noconfirm: "confirm password is required" })
       }
       if (password !== confirmPassword) {
-         return res.json({nomatch: "Password is not match "})
+         return res.json({ nomatch: "Password is not match " })
       }
       const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&#^()\-_=+{}[\]<>])[A-Za-z\d@$!%*?&#^()\-_=+{}[\]<>]{8,}$/;
       if (!passwordRegex.test(password)) {
-         return res.json({condition:"Password must include at least one uppercase letter, one lowercase letter, one number, one special character, and be at least 8 characters long."});
+         return res.json({ condition: "Password must include at least one uppercase letter, one lowercase letter, one number, one special character, and be at least 8 characters long." });
       }
       const numRegex = /^[0-9]{10}$/;
       if (!numRegex.test(phonenumber)) {
-         return res.json({conditionPhone:"Must enter valid phonenumber"})
+         return res.json({ conditionPhone: "Must enter valid phonenumber" })
       }
       const existuser = await userschema.findOne({ email });
 
       if (existuser) {
          if (existuser.is_blocked === true) {
-            return res.json({exist:"The user is blocked"});
+            return res.json({ exist: "The user is blocked" });
          } else {
-            return res.json({exit: "User already exists"});
+            return res.json({ exit: "User already exists" });
          }
       }
 
       const Otp = generateOTP();
-      console.log("OTP generated: ", Otp); // Log OTP
+      console.log("OTP generated: ", Otp);
       const emailSend = await sendverificationEmal(email, Otp);
 
 
@@ -156,11 +150,11 @@ const adduser = async (req, res) => {
       }
       req.session.userData = {
          email,
-         firstname:firstName,
-         lastname:lastName,
+         firstname: firstName,
+         lastname: lastName,
          phonenumber,
-         password:password,
-         Otp:Otp
+         password: password,
+         Otp: Otp
       }
 
       res.json({ redirect: "/user/verifyOTP" });
@@ -211,16 +205,14 @@ const verifyOTP = (req, res) => {
 
 const verifyOTPpost = async (req, res) => {
    try {
-      console.log(req.session.userData)
       const { otp } = req.body;
-      if(!otp && otp.trim()===""){
-         return res.json({error:"please enter OTP"})
+      if (!otp && otp.trim() === "") {
+         return res.json({ error: "please enter OTP" })
       }
 
-      if (req.session.userData.Otp == otp) {  
-         console.log("hai") 
+      if (req.session.userData.Otp == otp) {
          const salt = await bcrypt.genSalt(10);
-         const hashedPassword = await bcrypt.hash(req.session.userData.password,salt)
+         const hashedPassword = await bcrypt.hash(req.session.userData.password, salt)
          const newUser = new userschema({
             firstname: req.session.userData.firstname,
             lastname: req.session.userData.lastname,
@@ -228,14 +220,14 @@ const verifyOTPpost = async (req, res) => {
             email: req.session.userData.email,
             password: hashedPassword,
          });
-   
+
          await newUser.save();
-          res.json({successmessage:"User Created SuccessFully"}) 
-         
-      }else{
-         return res.json({error:"Otp is wrong"});
+         res.json({ successmessage: "User Created SuccessFully" })
+
+      } else {
+         return res.json({ error: "Otp is wrong" });
       }
-   
+
 
    } catch (error) {
       console.error('Error in OTP verification:', error);
@@ -246,10 +238,9 @@ const verifyOTPpost = async (req, res) => {
 
 const resendOTP = async (req, res) => {
    try {
-      console.log(req.session.userData)
       const email = req.session.userData.email
       const Otp = generateOTP();
-      console.log("OTP generated: ", Otp); // Log OTP
+      console.log("OTP generated: ", Otp);
       const emailSend = await sendverificationEmal(email, Otp);
       if (!emailSend) {
          req.flash("error", "OTP is not send");
@@ -423,7 +414,7 @@ const review = (req, res) => {
 const confirmorder = async (req, res) => {
    try {
 
-      const orderId=req.query.orderId
+      const orderId = req.query.orderId
       console.log(req.query)
       const userid = req.session.user
       const cartIds = req.query.cartIDS.split(',')
@@ -432,12 +423,12 @@ const confirmorder = async (req, res) => {
          await cartschema.findByIdAndUpdate({ _id: cartIds[i] }, { number: quantity[i] })
       }
       cartIds.forEach(element => new ObjectId(element));
-      const addressess = await addressschema.aggregate([{$match:{ user_id: new ObjectId(userid) }},{
-         $lookup:{
-            from :"locations",
-            localField:"location_id",
-            foreignField:"_id",
-            as:"locationDetails"
+      const addressess = await addressschema.aggregate([{ $match: { user_id: new ObjectId(userid) } }, {
+         $lookup: {
+            from: "locations",
+            localField: "location_id",
+            foreignField: "_id",
+            as: "locationDetails"
          }
       }])
       const Addresserror = req.flash('Addresserror')
@@ -450,15 +441,15 @@ const confirmorder = async (req, res) => {
       const coupons = await couponschema.findOne({ couponCode: couponCode })
       const users = await userschema.findOne({ _id: userid })
       const removeSuccess = req.flash('removeSuccess')
-      const orders=await orderSchema.find({user_id:userid})
-      const x = orders.map((element)=>element.couponId)
-  
-      const availCoupon=await couponschema.find({_id:{$nin:x}})
-      const availCoupons=availCoupon.map((element)=>{
-         const day=element.expiryDate.getDate()
-         const month=element.expiryDate.getMonth()+1
-         const year=element.expiryDate.getFullYear()
-         return { ...element, expiryDates: `${day}-${month}-${year}` };
+      const orders = await orderSchema.find({ user_id: userid })
+      const x = orders.map((element) => element.couponId)
+
+      const availCoupon = await couponschema.find({ _id: { $nin: x } })
+      const availCoupons = availCoupon.map((element) => {
+         const day = element.expiryDate.getDate()
+         const month = element.expiryDate.getMonth() + 1
+         const year = element.expiryDate.getFullYear()
+         return { ...element, expiryDates: `${ day }-${ month }-${ year }` };
       })
 
       const datas = await cartschema.aggregate([{ $match: { user_id: new ObjectId(userid), _id: { $in: cartIds.map(id => new ObjectId(id)) } } },
@@ -469,7 +460,7 @@ const confirmorder = async (req, res) => {
       { $lookup: { from: "varients", localField: "rateDetails.varient_id", foreignField: "_id", as: "varientDetails" } },
       { $lookup: { from: "categories", localField: "foodDetails.category_id", foreignField: "_id", as: "categoryDetails" } }
       ])
-      res.render('user/confirmorder', {Addresserror,orderId,availCoupon,failedMessage,availCoupons, removeSuccess, coupons, couponCode, couponCodestr, users, userid, errormessage, cartIds, couponsuccessmessage, addressess, datas, successmessage, searchmessage: "", searcheditemname: "" });
+      res.render('user/confirmorder', { Addresserror, orderId, availCoupon, failedMessage, availCoupons, removeSuccess, coupons, couponCode, couponCodestr, users, userid, errormessage, cartIds, couponsuccessmessage, addressess, datas, successmessage, searchmessage: "", searcheditemname: "" });
 
    } catch (error) {
       console.log(error)
@@ -484,68 +475,68 @@ const confirmorder = async (req, res) => {
 
 const orderSuccess = async (req, res) => {
    try {
-      const { orderId,addressSelect, cartId, numberofproduct, selectedPaymentMethod, couponId } = req.body;
-      if (!addressSelect && addressSelect=="") {
-         
+      const { orderId, addressSelect, cartId, numberofproduct, selectedPaymentMethod, couponId } = req.body;
+      if (!addressSelect && addressSelect == "") {
+
          req.flash("Addresserror", "Must Add Address");
          return res.redirect(`/user/confirmorder?cartIDS=${ cartId }&purchaseQty=${ numberofproduct }`)
       }
       console.log(req.body)
-    
+
 
       const userId = req.session.user;
 
-      const addresses=await addressschema.aggregate([{$match:{_id:new ObjectId(addressSelect)}},{
-         $lookup:{
-            from:"locations",
-            localField:"location_id",
-            foreignField:"_id",
-            as:"locationDetails"
+      const addresses = await addressschema.aggregate([{ $match: { _id: new ObjectId(addressSelect) } }, {
+         $lookup: {
+            from: "locations",
+            localField: "location_id",
+            foreignField: "_id",
+            as: "locationDetails"
          }
       }])
       console.log(addresses)
 
-      if(orderId && selectedPaymentMethod=="COD"){
-         await orderschema.findByIdAndUpdate({_id:orderId},{
-            paymentmethod:selectedPaymentMethod,
-            paidStatus:"pending",
-            address_id:addressSelect
+      if (orderId && selectedPaymentMethod == "COD") {
+         await orderschema.findByIdAndUpdate({ _id: orderId }, {
+            paymentmethod: selectedPaymentMethod,
+            paidStatus: "pending",
+            address_id: addressSelect
          })
          req.flash("success", "Order Placed Successfully");
          return res.redirect(`/user/confirmorder?cartIDS=${ cartId }&purchaseQty=${ numberofproduct }`);
 
       }
-      if(orderId && selectedPaymentMethod=="razorpay"){
-         await orderschema.findByIdAndUpdate({_id:orderId},{
-            paymentmethod:selectedPaymentMethod,
-            paidStatus:"completed",
-            address_id:addressSelect
+      if (orderId && selectedPaymentMethod == "razorpay") {
+         await orderschema.findByIdAndUpdate({ _id: orderId }, {
+            paymentmethod: selectedPaymentMethod,
+            paidStatus: "completed",
+            address_id: addressSelect
          })
          req.flash("success", "Order Placed Successfully");
          return res.redirect(`/user/confirmorder?cartIDS=${ cartId }&purchaseQty=${ numberofproduct }`);
       }
 
-      if(orderId && selectedPaymentMethod=="wallet"){
-         await orderschema.findByIdAndUpdate({_id:orderId},{
-            paymentmethod:selectedPaymentMethod,
-            paidStatus:"completed",
-            address_id:addressSelect
+      if (orderId && selectedPaymentMethod == "wallet") {
+         await orderschema.findByIdAndUpdate({ _id: orderId }, {
+            paymentmethod: selectedPaymentMethod,
+            paidStatus: "completed",
+            address_id: addressSelect
          })
          req.flash("success", "Order Placed Successfully");
          return res.redirect(`/user/confirmorder?cartIDS=${ cartId }&purchaseQty=${ numberofproduct }`);
       }
-      if(orderId && selectedPaymentMethod=="failedRazorpay"){
-         await orderschema.findByIdAndUpdate({_id:orderId},{
-            paymentmethod:selectedPaymentMethod,
-            paidStatus:"failed",
-            address_id:addressSelect
+      if (orderId && selectedPaymentMethod == "failedRazorpay") {
+         await orderschema.findByIdAndUpdate({ _id: orderId }, {
+            paymentmethod: selectedPaymentMethod,
+            paidStatus: "failed",
+            address_id: addressSelect
          })
          req.flash("success", "Order Placed Successfully");
          return res.redirect(`/user/confirmorder?cartIDS=${ cartId }&purchaseQty=${ numberofproduct }`);
       }
-  
-   
-   
+
+
+
 
       const cartIds = Array.isArray(cartId)
          ? cartId.map((item) => new ObjectId(item))
@@ -556,7 +547,7 @@ const orderSuccess = async (req, res) => {
          { $lookup: { from: "rates", localField: "rate_id", foreignField: "_id", as: "rateDetails" } },
       ]);
 
- 
+
 
       const items = await Promise.all(
          carts.map(async (cart) => {
@@ -586,31 +577,31 @@ const orderSuccess = async (req, res) => {
             item.quantity *
             (item.rate +
                item.rate * (item.gst_per / 100) +
-               item.rate * (item.packing_per / 100) );
+               item.rate * (item.packing_per / 100));
          return sum + itemTotal;
       }, 0);
 
       const totalOffer = items.reduce((sum, item) => {
          return sum + item.quantity * item.rate * (item.offer_per / 100);
       }, 0);
-      const couponsdata=await couponschema.findOne({_id:couponId})
-      
-      if(selectedPaymentMethod =="COD" && totalAmount-totalOffer>1000){
-         req.flash('error',"Above 100 Rs Cach On Delivery is not Possible")
+      const couponsdata = await couponschema.findOne({ _id: couponId })
+
+      if (selectedPaymentMethod == "COD" && totalAmount - totalOffer > 1000) {
+         req.flash('error', "Above 100 Rs Cach On Delivery is not Possible")
          return res.redirect(`/user/confirmorder?cartIDS=${ cartId }&purchaseQty=${ numberofproduct }`)
       }
-   
+
       const newOrder = new orderSchema({
          user_id: userId,
-         address_id:addressSelect ,
+         address_id: addressSelect,
          paymentmethod: selectedPaymentMethod,
-         deliveryAmount:addresses[0].locationDetails[0].deliveryCharge,
+         deliveryAmount: addresses[0].locationDetails[0].deliveryCharge,
          totalAmount,
          totalOffer,
          couponId,
          items
       });
-     
+
       const wallets = await walletSchema.find({})
       const sumofcredit = wallets.reduce((sum, element) => {
          if (element.type == "Credit") {
@@ -626,13 +617,13 @@ const orderSuccess = async (req, res) => {
       }, 0)
       const totalBalanceAmount = sumofcredit - sumofDebit
       if (selectedPaymentMethod == "wallet") {
-    
+
          if (totalAmount - totalOffer > totalBalanceAmount) {
             req.flash('error', `Available Balalnce is ${ totalBalanceAmount }`)
             return res.redirect(`/user/confirmorder?cartIDS=${ cartId }&purchaseQty=${ numberofproduct }`);
 
          } else {
-       
+
             const newWallet = new walletSchema({
                desription: "Order Payment",
                type: "Debit",
@@ -640,16 +631,16 @@ const orderSuccess = async (req, res) => {
                userId: userId
             })
             await newWallet.save()
-            const newOrders=new orderSchema({
+            const newOrders = new orderSchema({
                user_id: userId,
                address_id: addressSelect,
                paymentmethod: selectedPaymentMethod,
-               deliveryAmount:addresses[0].locationDetails[0].deliveryCharge,
+               deliveryAmount: addresses[0].locationDetails[0].deliveryCharge,
                totalAmount,
                totalOffer,
                couponId,
                items,
-               paidStatus:"completed"
+               paidStatus: "completed"
             });
             await newOrders.save()
             await cartschema.deleteMany({ _id: { $in: cartIds } });
@@ -668,17 +659,17 @@ const orderSuccess = async (req, res) => {
 
          }
 
-      } else if(selectedPaymentMethod=="razorpay") {
-         const newOrders=new orderSchema({
+      } else if (selectedPaymentMethod == "razorpay") {
+         const newOrders = new orderSchema({
             user_id: userId,
             address_id: addressSelect,
             paymentmethod: selectedPaymentMethod,
-            deliveryAmount:addresses[0].locationDetails[0].deliveryCharge,
+            deliveryAmount: addresses[0].locationDetails[0].deliveryCharge,
             totalAmount,
             totalOffer,
             couponId,
             items,
-            paidStatus:"completed"
+            paidStatus: "completed"
          });
          await newOrders.save()
          await cartschema.deleteMany({ _id: { $in: cartIds } });
@@ -689,31 +680,31 @@ const orderSuccess = async (req, res) => {
                update: { $inc: { stock: -numberofproduct[index] } },
             },
          }));
-         const address=await addressschema.findOne({_id:addressSelect})
-         const location = await locationSchema.findOne({_id:address.location_id})
-         const deliveryCharge=location.deliveryCharge
+         const address = await addressschema.findOne({ _id: addressSelect })
+         const location = await locationSchema.findOne({ _id: address.location_id })
+         const deliveryCharge = location.deliveryCharge
          await rateschema.bulkWrite(stockUpdates);
 
-         req.flash("success", `Order Placed Successfully Your DeliveryCharge Extra Added is ${deliveryCharge}`);
+         req.flash("success", `Order Placed Successfully Your DeliveryCharge Extra Added is ${ deliveryCharge }`);
          return res.redirect(`/user/confirmorder?cartIDS=${ cartId }&purchaseQty=${ numberofproduct }`);
 
-      }else if(selectedPaymentMethod=="failedRazorpay"){
-         const newOrders=new orderSchema({
+      } else if (selectedPaymentMethod == "failedRazorpay") {
+         const newOrders = new orderSchema({
             user_id: userId,
             address_id: addressSelect,
             paymentmethod: selectedPaymentMethod,
-            deliveryAmount:addresses[0].locationDetails[0].deliveryCharge,
+            deliveryAmount: addresses[0].locationDetails[0].deliveryCharge,
             totalAmount,
             totalOffer,
             couponId,
             items,
-            paidStatus:"failed"
+            paidStatus: "failed"
          });
          await newOrders.save()
          req.flash("failed", "Create The order with Failed Status");
          return res.redirect(`/user/confirmorder?cartIDS=${ cartId }&purchaseQty=${ numberofproduct }`);
 
-      }else{
+      } else {
          await newOrder.save();
          await cartschema.deleteMany({ _id: { $in: cartIds } });
 
@@ -725,12 +716,12 @@ const orderSuccess = async (req, res) => {
          }));
 
          await rateschema.bulkWrite(stockUpdates);
-         const address=await addressschema.findOne({_id:addressSelect})
-         const location = await locationSchema.findOne({_id:address.location_id})
-         const deliveryCharge=location.deliveryCharge
+         const address = await addressschema.findOne({ _id: addressSelect })
+         const location = await locationSchema.findOne({ _id: address.location_id })
+         const deliveryCharge = location.deliveryCharge
          await rateschema.bulkWrite(stockUpdates);
 
-         req.flash("success", `Order Placed Successfully Your DeliveryCharge Extra Added is ${deliveryCharge}`);
+         req.flash("success", `Order Placed Successfully Your DeliveryCharge Extra Added is ${ deliveryCharge }`);
          return res.redirect(`/user/confirmorder?cartIDS=${ cartId }&purchaseQty=${ numberofproduct }`);
 
       }
@@ -749,242 +740,242 @@ const orderSuccess = async (req, res) => {
 
 // Custom fonts and colors
 const COLORS = {
-    primary: '#2563eb',    // Blue
-    secondary: '#475569',  // Slate
-    accent: '#f97316',     // Orange
-    text: '#1e293b',      // Dark slate
-    lightGray: '#e2e8f0',
-    white: '#ffffff'
+   primary: '#2563eb',    // Blue
+   secondary: '#475569',  // Slate
+   accent: '#f97316',     // Orange
+   text: '#1e293b',      // Dark slate
+   lightGray: '#e2e8f0',
+   white: '#ffffff'
 };
 
 const downloadBill = async (req, res) => {
-    try {
-        const orderId = req.query.orderId;
-        if (!orderId) {
-            return res.status(400).json({ error: "Order ID is required" });
-        }
+   try {
+      const orderId = req.query.orderId;
+      if (!orderId) {
+         return res.status(400).json({ error: "Order ID is required" });
+      }
 
-        // Fetch order details with aggregation
-        const orders = await orderSchema.aggregate([
-            { $match: { _id: new ObjectId(orderId) } },
-            { $unwind: { path: "$items", preserveNullAndEmptyArrays: true } },
-            { 
-                $lookup: {
-                    from: "rates",
-                    localField: "items.rate_id",
-                    foreignField: "_id",
-                    as: "rateDetails"
-                }
-            },
-            { 
-                $lookup: {
-                    from: "foods",
-                    localField: "rateDetails.food_id",
-                    foreignField: "_id",
-                    as: "foodDetails"
-                }
-            },
-            { 
-                $lookup: {
-                    from: "users",
-                    localField: "user_id",
-                    foreignField: "_id",
-                    as: "userDetails"
-                }
-            },
-            {
-                $lookup: {
-                    from: "hotels",
-                    localField: "rateDetails.hotel_id",
-                    foreignField: "_id",
-                    as: "hotelDetails"
-                }
+      // Fetch order details with aggregation
+      const orders = await orderSchema.aggregate([
+         { $match: { _id: new ObjectId(orderId) } },
+         { $unwind: { path: "$items", preserveNullAndEmptyArrays: true } },
+         {
+            $lookup: {
+               from: "rates",
+               localField: "items.rate_id",
+               foreignField: "_id",
+               as: "rateDetails"
             }
-        ]);
+         },
+         {
+            $lookup: {
+               from: "foods",
+               localField: "rateDetails.food_id",
+               foreignField: "_id",
+               as: "foodDetails"
+            }
+         },
+         {
+            $lookup: {
+               from: "users",
+               localField: "user_id",
+               foreignField: "_id",
+               as: "userDetails"
+            }
+         },
+         {
+            $lookup: {
+               from: "hotels",
+               localField: "rateDetails.hotel_id",
+               foreignField: "_id",
+               as: "hotelDetails"
+            }
+         }
+      ]);
 
-        if (!orders || orders.length === 0) {
-            return res.status(404).json({ error: "Order not found" });
-        }
+      if (!orders || orders.length === 0) {
+         return res.status(404).json({ error: "Order not found" });
+      }
 
-  
-        const calculateCharges = (orders) => {
-            return {
-                gst: orders.reduce((sum, element) => 
-                    sum += (element.items.quantity * element.items.rate * element.items.gst_per / 100), 0),
-                packingCharge: orders.reduce((sum, element) => 
-                    sum += (element.items.quantity * element.items.rate * element.items.packing_per / 100), 0),
-                deliveryCharge: orders.reduce((sum, element) => 
-                    sum += element.deliveryAmount, 0),
-                TotalOffer :orders.reduce((sum,element)=>
-                  sum += element.totalOffer,0)
 
+      const calculateCharges = (orders) => {
+         return {
+            gst: orders.reduce((sum, element) =>
+               sum += (element.items.quantity * element.items.rate * element.items.gst_per / 100), 0),
+            packingCharge: orders.reduce((sum, element) =>
+               sum += (element.items.quantity * element.items.rate * element.items.packing_per / 100), 0),
+            deliveryCharge: orders.reduce((sum, element) =>
+               sum += element.deliveryAmount, 0),
+            TotalOffer: orders.reduce((sum, element) =>
+               sum += element.totalOffer, 0)
+
+         };
+      };
+
+      // Generate PDF with enhanced design
+      const generatePDF = async (orders, charges) => {
+         const order = orders[0];
+         const invoicePath = path.join(__dirname, `../invoices/invoice-${ orderId }.pdf`);
+         const doc = new PDFDocument({ margin: 50 });
+         const stream = fs.createWriteStream(invoicePath);
+
+         return new Promise((resolve, reject) => {
+            doc.pipe(stream);
+
+            // Helper function to draw background rectangles
+            const drawRect = (x, y, w, h, color) => {
+               doc.rect(x, y, w, h)
+                  .fill(color);
             };
-        };
 
-        // Generate PDF with enhanced design
-        const generatePDF = async (orders, charges) => {
-            const order = orders[0];
-            const invoicePath = path.join(__dirname, `../invoices/invoice-${orderId}.pdf`);
-            const doc = new PDFDocument({ margin: 50 });
-            const stream = fs.createWriteStream(invoicePath);
+            // Header Background
+            drawRect(0, 0, doc.page.width, 150, COLORS.primary);
 
-            return new Promise((resolve, reject) => {
-                doc.pipe(stream);
+            // Logo and Company Name
+            doc.fontSize(30)
+               .fillColor(COLORS.white)
+               .text('Taste Trial', 50, 50, { align: 'center' })
+               .fontSize(12)
+               .text('Delicious Food Delivered', 50, 90, { align: 'center' });
 
-                // Helper function to draw background rectangles
-                const drawRect = (x, y, w, h, color) => {
-                    doc.rect(x, y, w, h)
-                       .fill(color);
-                };
+            // Order Information Box
+            drawRect(50, 170, doc.page.width - 100, 100, COLORS.lightGray);
+            doc.fontSize(12)
+               .fillColor(COLORS.text)
+               .text('INVOICE DETAILS', 70, 185)
+               .fontSize(10)
+               .text(`Order ID: ${ order._id }`, 70, 210)
+               .text(`Date: ${ new Date(order.createdAt).toLocaleString() }`, 70, 230)
+               .fontSize(12)
+               .text('CUSTOMER DETAILS', doc.page.width - 250, 185)
+               .fontSize(10)
+               .text(`${ order.userDetails[0].firstname } ${ order.userDetails[0].lastname }`,
+                  doc.page.width - 250, 210);
 
-                // Header Background
-                drawRect(0, 0, doc.page.width, 150, COLORS.primary);
+            // Table Header
+            const drawTableHeader = () => {
+               const y = 300;
+               drawRect(50, y, doc.page.width - 100, 30, COLORS.primary);
+               doc.fillColor(COLORS.white)
+                  .fontSize(10);
 
-                // Logo and Company Name
-                doc.fontSize(30)
-                   .fillColor(COLORS.white)
-                   .text('Taste Trial', 50, 50, { align: 'center' })
-                   .fontSize(12)
-                   .text('Delicious Food Delivered', 50, 90, { align: 'center' });
+               const columns = [
+                  { x: 60, width: 30, text: "No." },
+                  { x: 100, width: 120, text: "Hotel" },
+                  { x: 230, width: 120, text: "Item" },
+                  { x: 360, width: 50, text: "Qty" },
+                  { x: 420, width: 70, text: "Rate" },
+                  { x: 500, width: 70, text: "Total" }
+               ];
 
-                // Order Information Box
-                drawRect(50, 170, doc.page.width - 100, 100, COLORS.lightGray);
-                doc.fontSize(12)
-                   .fillColor(COLORS.text)
-                   .text('INVOICE DETAILS', 70, 185)
-                   .fontSize(10)
-                   .text(`Order ID: ${order._id}`, 70, 210)
-                   .text(`Date: ${new Date(order.createdAt).toLocaleString()}`, 70, 230)
-                   .fontSize(12)
-                   .text('CUSTOMER DETAILS', doc.page.width - 250, 185)
-                   .fontSize(10)
-                   .text(`${order.userDetails[0].firstname} ${order.userDetails[0].lastname}`, 
-                         doc.page.width - 250, 210);
+               columns.forEach(col => {
+                  doc.text(col.text, col.x, y + 10, {
+                     width: col.width,
+                     align: col.text === "No." ? "center" : "left"
+                  });
+               });
+            };
 
-                // Table Header
-                const drawTableHeader = () => {
-                    const y = 300;
-                    drawRect(50, y, doc.page.width - 100, 30, COLORS.primary);
-                    doc.fillColor(COLORS.white)
-                       .fontSize(10);
+            drawTableHeader();
 
-                    const columns = [
-                        { x: 60, width: 30, text: "No." },
-                        { x: 100, width: 120, text: "Hotel" },
-                        { x: 230, width: 120, text: "Item" },
-                        { x: 360, width: 50, text: "Qty" },
-                        { x: 420, width: 70, text: "Rate" },
-                        { x: 500, width: 70, text: "Total" }
-                    ];
+            // Items
+            let y = 340;
+            orders.forEach((item, index) => {
+               const food = item.foodDetails[0];
+               const rate = item.rateDetails[0];
+               const hotel = item.hotelDetails[0];
+               const itemTotal = rate.rate * item.items.quantity;
 
-                    columns.forEach(col => {
-                        doc.text(col.text, col.x, y + 10, { 
-                            width: col.width, 
-                            align: col.text === "No." ? "center" : "left" 
-                        });
-                    });
-                };
+               // Alternate row background
+               if (index % 2 === 0) {
+                  drawRect(50, y - 5, doc.page.width - 100, 25, '#f8fafc');
+               }
 
-                drawTableHeader();
+               doc.fillColor(COLORS.text)
+                  .fontSize(9)
+                  .text(`${ index + 1 }`, 60, y, { width: 30, align: 'center' })
+                  .text(hotel.hotelname, 100, y, { width: 120 })
+                  .text(food.foodname, 230, y, { width: 120 })
+                  .text(item.items.quantity.toString(), 360, y, { width: 50 })
+                  .text(`${ rate.rate }`, 420, y, { width: 70 })
+                  .text(`${ itemTotal }`, 500, y, { width: 70 });
 
-                // Items
-                let y = 340;
-                orders.forEach((item, index) => {
-                    const food = item.foodDetails[0];
-                    const rate = item.rateDetails[0];
-                    const hotel = item.hotelDetails[0];
-                    const itemTotal = rate.rate * item.items.quantity;
-
-                    // Alternate row background
-                    if (index % 2 === 0) {
-                        drawRect(50, y - 5, doc.page.width - 100, 25, '#f8fafc');
-                    }
-
-                    doc.fillColor(COLORS.text)
-                       .fontSize(9)
-                       .text(`${index + 1}`, 60, y, { width: 30, align: 'center' })
-                       .text(hotel.hotelname, 100, y, { width: 120 })
-                       .text(food.foodname, 230, y, { width: 120 })
-                       .text(item.items.quantity.toString(), 360, y, { width: 50 })
-                       .text(`${rate.rate}`, 420, y, { width: 70 })
-                       .text(`${itemTotal}`, 500, y, { width: 70 });
-
-                    y += 25;
-                });
-
-
-                // Summary Box
-                const summaryY = y + 20;
-                drawRect(doc.page.width - 250, summaryY, 200, 150, COLORS.lightGray);
-                
-                const { gst, packingCharge, deliveryCharge,TotalOffer } = charges;
-                const totalAmount = orders.reduce((sum,element)=>{
-                  return sum+=element.items.rate*element.items.quantity
-                },0) ;
-                const grandTotal = totalAmount + packingCharge + deliveryCharge + gst - TotalOffer;
-
-                // Summary Details
-                doc.fontSize(10)
-                   .fillColor(COLORS.text)
-                   .text('Order Summary', doc.page.width - 230, summaryY + 10)
-                   .fontSize(9)
-                   .text('Subtotal:', doc.page.width - 230, summaryY + 35)
-                   .text(`${totalAmount}`, doc.page.width - 90, summaryY + 35)
-                   .text('Packing Charge:', doc.page.width - 230, summaryY + 55)
-                   .text(`${packingCharge}`, doc.page.width - 90, summaryY + 55)
-                   .text('Delivery Charge:', doc.page.width - 230, summaryY + 75)
-                   .text(`${deliveryCharge}`, doc.page.width - 90, summaryY + 75)
-                   .text('GST :', doc.page.width - 230, summaryY + 95)
-                   .text(`${gst}`, doc.page.width - 90, summaryY + 95)
-                   .text('Offer :', doc.page.width - 230, summaryY + 115)
-                   .text(`${TotalOffer}`, doc.page.width - 90, summaryY + 115);
-
-
-                // Grand Total
-                drawRect(doc.page.width - 250, summaryY + 135, 200, 30, COLORS.primary);
-                doc.fontSize(12)
-                   .fillColor(COLORS.white)
-                   .text('Grand Total:', doc.page.width - 210, summaryY + 150)
-                   .text(`${grandTotal.toFixed(2)}`, doc.page.width - 90, summaryY + 150);
-
-                // Footer
-                const footerY = doc.page.height - 100;
-                drawRect(0, footerY, doc.page.width, 100, COLORS.secondary);
-                doc.fontSize(10)
-                   .fillColor(COLORS.white)
-                   .text('Thank you for your order!', 50, footerY + 30, { align: 'center' })
-                   .fontSize(8)
-                   .text('For any issues, contact support@tastetrial.com | +91 1234567890', 50, footerY + 50, { align: 'center' })
-                   .text('© 2024 Taste Trial. All rights reserved.', 50, footerY + 65, { align: 'center' });
-
-                doc.end();
-                stream.on("finish", () => resolve(invoicePath));
-                stream.on("error", reject);
+               y += 25;
             });
-        };
 
-        // Execute PDF generation and send
-        const charges = calculateCharges(orders);
-        const invoicePath = await generatePDF(orders, charges);
 
-        res.download(invoicePath, `invoice-${orderId}.pdf`, (err) => {
-            if (err) {
-                console.error("Download error:", err);
-                return res.status(500).json({ error: "Error downloading the invoice" });
-            }
-            // Cleanup: Remove the file after sending
-            fs.unlink(invoicePath, (unlinkErr) => {
-                if (unlinkErr) console.error("Error removing temporary file:", unlinkErr);
-            });
-        });
+            // Summary Box
+            const summaryY = y + 20;
+            drawRect(doc.page.width - 250, summaryY, 200, 150, COLORS.lightGray);
 
-    } catch (error) {
-        console.error("Invoice generation error:", error);
-        res.status(500).json({ 
-            error: "Failed to generate invoice",
-            details: error.message 
-        });
-    }
+            const { gst, packingCharge, deliveryCharge, TotalOffer } = charges;
+            const totalAmount = orders.reduce((sum, element) => {
+               return sum += element.items.rate * element.items.quantity
+            }, 0);
+            const grandTotal = totalAmount + packingCharge + deliveryCharge + gst - TotalOffer;
+
+            // Summary Details
+            doc.fontSize(10)
+               .fillColor(COLORS.text)
+               .text('Order Summary', doc.page.width - 230, summaryY + 10)
+               .fontSize(9)
+               .text('Subtotal:', doc.page.width - 230, summaryY + 35)
+               .text(`${ totalAmount }`, doc.page.width - 90, summaryY + 35)
+               .text('Packing Charge:', doc.page.width - 230, summaryY + 55)
+               .text(`${ packingCharge }`, doc.page.width - 90, summaryY + 55)
+               .text('Delivery Charge:', doc.page.width - 230, summaryY + 75)
+               .text(`${ deliveryCharge }`, doc.page.width - 90, summaryY + 75)
+               .text('GST :', doc.page.width - 230, summaryY + 95)
+               .text(`${ gst }`, doc.page.width - 90, summaryY + 95)
+               .text('Offer :', doc.page.width - 230, summaryY + 115)
+               .text(`${ TotalOffer }`, doc.page.width - 90, summaryY + 115);
+
+
+            // Grand Total
+            drawRect(doc.page.width - 250, summaryY + 135, 200, 30, COLORS.primary);
+            doc.fontSize(12)
+               .fillColor(COLORS.white)
+               .text('Grand Total:', doc.page.width - 210, summaryY + 150)
+               .text(`${ grandTotal.toFixed(2) }`, doc.page.width - 90, summaryY + 150);
+
+            // Footer
+            const footerY = doc.page.height - 100;
+            drawRect(0, footerY, doc.page.width, 100, COLORS.secondary);
+            doc.fontSize(10)
+               .fillColor(COLORS.white)
+               .text('Thank you for your order!', 50, footerY + 30, { align: 'center' })
+               .fontSize(8)
+               .text('For any issues, contact support@tastetrial.com | +91 1234567890', 50, footerY + 50, { align: 'center' })
+               .text('© 2024 Taste Trial. All rights reserved.', 50, footerY + 65, { align: 'center' });
+
+            doc.end();
+            stream.on("finish", () => resolve(invoicePath));
+            stream.on("error", reject);
+         });
+      };
+
+      // Execute PDF generation and send
+      const charges = calculateCharges(orders);
+      const invoicePath = await generatePDF(orders, charges);
+
+      res.download(invoicePath, `invoice-${ orderId }.pdf`, (err) => {
+         if (err) {
+            console.error("Download error:", err);
+            return res.status(500).json({ error: "Error downloading the invoice" });
+         }
+         // Cleanup: Remove the file after sending
+         fs.unlink(invoicePath, (unlinkErr) => {
+            if (unlinkErr) console.error("Error removing temporary file:", unlinkErr);
+         });
+      });
+
+   } catch (error) {
+      console.error("Invoice generation error:", error);
+      res.status(500).json({
+         error: "Failed to generate invoice",
+         details: error.message
+      });
+   }
 };
 
 
@@ -1004,17 +995,17 @@ const applyCoupon = async (req, res) => {
          console.log("not exist")
          req.flash('error', "You Entered coupon is not available")
          return res.redirect(`/user/confirmorder?cartIDS=${ cartIDS }&purchaseQty=${ purchaseQty }`)
-      } 
-        const orders = await orderSchema.findOne({ user_id: new ObjectId(userId), couponId: existCoupon._id })
-         if (orders) {
+      }
+      const orders = await orderSchema.findOne({ user_id: new ObjectId(userId), couponId: existCoupon._id })
+      if (orders) {
          req.flash('error', "Coupon is Already Used")
          return res.redirect(`/user/confirmorder?cartIDS=${ cartIDS }&purchaseQty=${ purchaseQty }`)
       }
-         req.flash('couponCode', couponCode)
-         req.flash('couponsuccess', "coupon applied successfully")
-         res.redirect(`/user/confirmorder?cartIDS=${ cartIDS }&purchaseQty=${ purchaseQty }`)
+      req.flash('couponCode', couponCode)
+      req.flash('couponsuccess', "coupon applied successfully")
+      res.redirect(`/user/confirmorder?cartIDS=${ cartIDS }&purchaseQty=${ purchaseQty }`)
 
-      
+
 
    } catch (error) {
       console.log(error)
@@ -1061,13 +1052,13 @@ const logout = async (req, res) => {
 }
 
 
-const deleteAccount = async(req,res)=>{
+const deleteAccount = async (req, res) => {
    try {
-      const userId=req.session.user
-      await userschema.findByIdAndDelete({_id:userId})
-      return res.json({success:"SuccessFully Deleted The Account"})
+      const userId = req.session.user
+      await userschema.findByIdAndDelete({ _id: userId })
+      return res.json({ success: "SuccessFully Deleted The Account" })
    } catch (error) {
-     console.log(error) 
+      console.log(error)
    }
 }
 
@@ -1081,9 +1072,9 @@ module.exports = {
    adduser, verifyOTP, verifyOTPpost, resendOTP,
    showfoodDetail,
    forgotpassword, confirmpassword, emailverification, verify, verifypost, confirmPassword, resend,
-   profile,downloadBill,
+   profile, downloadBill,
    wallet,
    review,
    confirmorder, orderSuccess,
-   applyCoupon, removeCoupon,deleteAccount
+   applyCoupon, removeCoupon, deleteAccount
 }

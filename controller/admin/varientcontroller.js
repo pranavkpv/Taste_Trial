@@ -55,7 +55,7 @@ const varient = async (req, res) => {
    
       
       res.render('admin/varient', { varientss, foodss,
-         foods, existmessage, selectedfoodname,
+         foods, existmessage, selectedfoodname,selectedpage,
          successmessage, errormessage, editexistmessage, page, searchedvarientname,startIndex })
    } catch (error) {
          console.log(error)

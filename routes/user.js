@@ -1,136 +1,127 @@
-const express=require('express')
-const router=express.Router()
-const usercontroller=require("../controller/user/usercontroller")
-const userauth = require("../middleware/userauth")
+const express = require('express');
+const router = express.Router();
 const passport = require('passport');
-const loadcontroller = require('../controller/user/loadcontroller')
-const homecontroller = require('../controller/user/homecontroller')
-const productcontroller=require('../controller/user/productcontroller')
-const userhotelcontroller=require('../controller/user/userhotelcontroller')
-const uservarientcontroller=require('../controller/user/uservarientcontroller')
-const userproductDetailController=require('../controller/user/userproductDetail')
-const profilecontroller=require("../controller/user/profilecontroller")
-const categorycontroller=require("../controller/user/categorycontroller")
-const cartcontroller=require("../controller/user/cartcontroller")
-const wishlistcontroller=require("../controller/user/wishlistcontroller")
-const walletcontroller = require("../controller/user/walletController")
-const changePasswordController = require("../controller/user/changePassword")
-const failedController = require("../controller/user/failedOrder")
 
+const usercontroller = require("../controller/user/usercontroller");
+const userauth = require("../middleware/userauth");
+const loadcontroller = require('../controller/user/loadcontroller');
+const homecontroller = require('../controller/user/homecontroller');
+const productcontroller = require('../controller/user/productcontroller');
+const userhotelcontroller = require('../controller/user/userhotelcontroller');
+const uservarientcontroller = require('../controller/user/uservarientcontroller');
+const userproductDetailController = require('../controller/user/userproductDetail');
+const profilecontroller = require("../controller/user/profilecontroller");
+const categorycontroller = require("../controller/user/categorycontroller");
+const cartcontroller = require("../controller/user/cartcontroller");
+const wishlistcontroller = require("../controller/user/wishlistcontroller");
+const walletcontroller = require("../controller/user/walletController");
+const changePasswordController = require("../controller/user/changePassword");
+const failedController = require("../controller/user/failedOrder");
 
-// Route to start the Google OAuth login
+// ---------------------- PUBLIC ROUTES ----------------------
+
+// Google OAuth
 router.get('/auth/google', passport.authenticate('google', {
-   scope: ['profile', 'email']
- }));
- 
- // Google callback route to handle the redirect
-router.get('/load',loadcontroller.userload)
-//signup 
-router.get('/signup',usercontroller.usersignup)
-router.post('/verifyOTP',usercontroller.adduser)
-router.post('/resendOTP',usercontroller.resendOTP)
-//login
-router.post('/login',usercontroller.validuser)
+  scope: ['profile', 'email']
+}));
 
-// verifyOTP
-router.get('/verifyOTP',usercontroller.verifyOTP)
-router.post('/confirmOTP',usercontroller.verifyOTPpost)
-router.post('/resend',usercontroller.resend)
+// Google callback route
+router.get('/load', loadcontroller.userload);
 
+// Signup and OTP verification
+router.get('/signup', usercontroller.usersignup);
+router.post('/verifyOTP', usercontroller.adduser);
+router.post('/resendOTP', usercontroller.resendOTP);
 
-// userhome router
-router.get('/home',homecontroller.home)
+// Login
+router.post('/login', usercontroller.validuser);
 
-// user category list
-router.get('/category',categorycontroller.category)
+// OTP verification
+router.get('/verifyOTP', usercontroller.verifyOTP);
+router.post('/confirmOTP', usercontroller.verifyOTPpost);
+router.post('/resend', usercontroller.resend);
 
-//food
-router.get('/product',productcontroller.product)
-//get hotel
-router.get('/hotels',userhotelcontroller.hotel)
-//varient get
-router.get('/varient',uservarientcontroller.varient)
+// Forgot password process
+router.get('/emailverification', usercontroller.forgotpassword);
+router.post('/emailverification', usercontroller.emailverification);
+router.get('/verify', usercontroller.verify);
+router.post('/verifypost', usercontroller.verifypost);
+router.get('/confirmpassword', usercontroller.confirmpassword);
+router.post('/confirmPassword', usercontroller.confirmPassword);
 
-// forgot password
-router.get('/emailverification',usercontroller.forgotpassword)
-router.post('/emailverification',usercontroller.emailverification)
+// ---------------------- APPLY AUTH MIDDLEWARE GLOBALLY ----------------------
+router.use(userauth.noUser); // All routes below require authentication
 
-//verify
-router.get('/verify',usercontroller.verify)
-router.post('/verifypost',usercontroller.verifypost)
+// ---------------------- AUTHENTICATED ROUTES ----------------------
 
-//vonfirm password
-router.get('/confirmpassword',usercontroller.confirmpassword)
-router.post('/confirmPassword',usercontroller.confirmPassword)
-//profile
-router.get('/dashboard',userauth.noUser,profilecontroller.dashboard)
+// Home
+router.get('/home', homecontroller.home);
 
-// review
-router.get('/review',usercontroller.review)
+// Categories
+router.get('/category', categorycontroller.category);
 
-//address
-router.get('/address',userauth.noUser,profilecontroller.address)
-router.post('/addAddress',profilecontroller.addAddress)
-router.post('/editAddress',profilecontroller.editAddress)
-router.post('/deleteAddress',profilecontroller.deleteAddress)
+// Products
+router.get('/product', productcontroller.product);
+router.get('/productDetail', userproductDetailController.productDetail);
+router.post('/productcart', userproductDetailController.productcart);
 
-//AddTocart
-router.post('/productcart',userproductDetailController.productcart)
+// Hotels
+router.get('/hotels', userhotelcontroller.hotel);
 
+// Variants
+router.get('/varient', uservarientcontroller.varient);
 
-//cart
-router.get('/cart',userauth.noUser,cartcontroller.cart)
-router.post('/removeCart',cartcontroller.removeCart)
+// Profile & Dashboard
+router.get('/dashboard', profilecontroller.dashboard);
+router.get('/address', profilecontroller.address);
+router.post('/addAddress', profilecontroller.addAddress);
+router.post('/editAddress', profilecontroller.editAddress);
+router.post('/deleteAddress', profilecontroller.deleteAddress);
 
-//wishlist
-router.get('/wishlist',userauth.noUser,wishlistcontroller.wishlist)
-router.post('/addToWishlist',userauth.noUser,wishlistcontroller.addToWishlist)
-router.post('/removeWishlist',userauth.noUser,wishlistcontroller.removeWishlist)
-router.post('/removeWishData',userauth.noUser,wishlistcontroller.removeWishData)
-router.post('/AddToCart',userauth.noUser,wishlistcontroller.AddToCart)
-router.post('/addToWishlist',wishlistcontroller.addToWishlist)
-router.post('/removeWishlist',wishlistcontroller.removeWishlist)
-router.post('/removeWishData',wishlistcontroller.removeWishData)
-router.post('/AddToCart',wishlistcontroller.AddToCart)
+// Cart
+router.get('/cart', cartcontroller.cart);
+router.post('/removeCart', cartcontroller.removeCart);
 
+// Wishlist
+router.get('/wishlist', wishlistcontroller.wishlist);
+router.post('/addToWishlist', wishlistcontroller.addToWishlist);
+router.post('/removeWishlist', wishlistcontroller.removeWishlist);
+router.post('/removeWishData', wishlistcontroller.removeWishData);
+router.post('/AddToCart', wishlistcontroller.AddToCart);
 
+// Wallet
+router.get('/wallet', usercontroller.wallet);
+router.get('/wallethistory', walletcontroller.wallet);
 
+// Orders
+router.get('/order', profilecontroller.order);
+router.post('/orderCancel', profilecontroller.orderCancel);
+router.post('/orderReturn', profilecontroller.orderReturn);
+router.get('/orderDetails', profilecontroller.orderDetails);
+router.get("/failedOrder", failedController.failedOrder);
 
-//wallet
-router.get('/wallet',userauth.noUser,usercontroller.wallet)
+// Checkout and Confirmation
+router.get('/confirmOrder', usercontroller.confirmorder);
+router.post('/orderSuccess', usercontroller.orderSuccess);
 
-//change account
-router.get('/changepassword',userauth.noUser,changePasswordController.change)
-router.post('/changepassword',changePasswordController.changepassword)
+// Account & Password
+router.get('/changepassword', changePasswordController.change);
+router.post('/changepassword', changePasswordController.changepassword);
+router.get('/changeAccount', profilecontroller.changeAccount);
+router.post('/updateAction', profilecontroller.updateAction);
+router.post('/deleteAccount', usercontroller.deleteAccount);
 
-//product Detail
-router.get('/productDetail',userproductDetailController.productDetail)
+// Coupon
+router.post('/applyCoupon', usercontroller.applyCoupon);
+router.post('/removeCoupon', usercontroller.removeCoupon);
 
-//confirm order
-router.get('/confirmOrder',usercontroller.confirmorder)
-router.post('/orderSuccess',usercontroller.orderSuccess)
+// Invoice
+router.get('/download-invoice', usercontroller.downloadBill);
 
+// Review
+router.get('/review', usercontroller.review);
 
-//checkout
-router.get('/changeAccount',userauth.noUser,profilecontroller.changeAccount)
-router.post('/updateAction',profilecontroller.updateAction)
-router.get("/failedOrder",failedController.failedOrder)
+// Logout
+router.get('/logout', usercontroller.logout);
 
-//order
-router.get('/order',userauth.noUser,profilecontroller.order)
-router.post('/orderCancel',profilecontroller.orderCancel)
-router.post('/orderReturn',profilecontroller.orderReturn)
-router.get('/orderDetails',userauth.noUser,profilecontroller.orderDetails)
-
-router.post('/applyCoupon',usercontroller.applyCoupon)
-router.post('/removeCoupon',usercontroller.removeCoupon)
-
-
-router.get('/wallethistory',userauth.noUser,walletcontroller.wallet)
-router.get('/download-invoice',userauth.noUser,usercontroller.downloadBill)
-
-router.post('/deleteAccount',usercontroller.deleteAccount)
-
-router.get('/logout',usercontroller.logout)
-
-module.exports=router
+module.exports = router;

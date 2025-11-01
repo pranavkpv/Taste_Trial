@@ -481,8 +481,6 @@ const orderSuccess = async (req, res) => {
          req.flash("Addresserror", "Must Add Address");
          return res.redirect(`/user/confirmorder?cartIDS=${ cartId }&purchaseQty=${ numberofproduct }`)
       }
-      console.log(req.body)
-
 
       const userId = req.session.user;
 
@@ -494,8 +492,6 @@ const orderSuccess = async (req, res) => {
             as: "locationDetails"
          }
       }])
-      console.log(addresses)
-
       if (orderId && selectedPaymentMethod == "COD") {
          await orderschema.findByIdAndUpdate({ _id: orderId }, {
             paymentmethod: selectedPaymentMethod,
@@ -714,8 +710,6 @@ const orderSuccess = async (req, res) => {
                update: { $inc: { stock: -numberofproduct[index] } },
             },
          }));
-
-         await rateschema.bulkWrite(stockUpdates);
          const address = await addressschema.findOne({ _id: addressSelect })
          const location = await locationSchema.findOne({ _id: address.location_id })
          const deliveryCharge = location.deliveryCharge

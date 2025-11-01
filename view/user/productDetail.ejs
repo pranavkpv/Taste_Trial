@@ -397,10 +397,6 @@
         <button class="btn text-dark btn-wishlist" id="wishlistButton" style="border-color: red;width:650px">
           Add to Wishlist
         </button>
-<<<<<<< HEAD
-      
-=======
->>>>>>> 63499e0410abb3105660c1ee9323d3ade75246d9
       </div>
 
       <div class="delivery-info">
@@ -414,22 +410,7 @@
     </div>
   </div>
 
-<<<<<<< HEAD
-
-  
-=======
-  <!-- Reviews Section -->
->>>>>>> 63499e0410abb3105660c1ee9323d3ade75246d9
 </div>
-
-
-
-
-
-
-
-
-
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -514,10 +495,8 @@
   document.addEventListener("DOMContentLoaded", function () {
   const wishlistButton = document.getElementById("wishlistButton");
 
-  // Check if the item is already in the wishlist
-  let isInWishlist = false; // This should be set dynamically based on server response
+  let isInWishlist = false;
 
-  // Function to update button appearance & action
   function updateButton() {
     if (isInWishlist) {
       wishlistButton.textContent = "Remove from Wishlist";

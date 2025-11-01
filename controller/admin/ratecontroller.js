@@ -57,7 +57,8 @@ const rate = async (req, res) => {
       varients,
       ratecollections,
       TotalPage,
-      startIndex
+      startIndex,
+      selectedPage
     });
 
   } catch (error) {

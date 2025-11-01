@@ -1,16 +1,12 @@
-
 const addressSchema = require('../../model/addressschema')
-const cartSchema = require('../../model/cartschema')
 const varientschema = require('../../model/varientschema')
 const userschema = require('../../model/usershema')
 const rateschema = require('../../model/rateschema')
 const hotelschema = require("../../model/hotelschema")
 const foodschema = require('../../model/foodschema')
-const cartschema = require('../../model/cartschema')
 const mongoose = require('mongoose');
 const orderschema = require('../../model/orderschema')
 const categoryschema = require('../../model/categoryschema')
-const couponschema = require('../../model/couponschema')
 const walletschema = require('../../model/walletSchema')
 const locationSchema = require('../../model/locationSchema')
 const ObjectId = mongoose.Types.ObjectId;
@@ -27,6 +23,7 @@ const dashboard = async (req, res) => {
 const address = async (req, res) => {
    try {
       const successmessage = req.flash('success')
+      const errormessage = req.flash('failure')
       const userid = req.session.user
       const locations = await locationSchema.find()
       const addressess = await addressSchema.aggregate([{ $match: { user_id: new ObjectId(userid) } },
@@ -39,7 +36,10 @@ const address = async (req, res) => {
          }
       }
       ])
-      res.render('user/address', { userid, successmessage, locations, addressess, searchmessage: "", searcheditemname: "" })
+      res.render('user/address', {
+         userid, successmessage, locations, addressess, searchmessage: "",
+         searcheditemname: "", errormessage
+      })
    } catch (error) {
       console.log(error)
    }
@@ -49,6 +49,15 @@ const addAddress = async (req, res) => {
    try {
 
       const { userid, addresstype, locationId, city, state, pincode, landmark, mobilenumber, alternativenumber } = req.body
+      if (!city || !state || !pincode || !landmark || !mobilenumber || !addresstype || !locationId) {
+         req.flash('failure', 'Must Required All Fields')
+         return
+      }
+      let existAddress = await addressSchema.findOne({ user_id: userid, location_id: locationId, city, state, pin_code: pincode })
+      if (existAddress) {
+         req.flash('failure', 'Address Already Exist')
+         return
+      }
       const newaddress = new addressSchema({
          user_id: userid,
          city,
@@ -76,10 +85,14 @@ const editAddress = async (req, res) => {
 
       const userid = req.session.user
       const { editids, addresstype, editNearByLocation, city, state, pin, landmark, mobile, alternative } = req.body
-      if(!city || !state || !pin || !landmark || !mobile || !alternative ){
-        return res.json({need:"Must Required All Fields"})
+      if (!city || !state || !pin || !landmark || !mobile) {
+         return res.json({ need: "Must Required All Fields" })
       }
-   
+      let existAddress = await addressSchema.findOne({ _id: { $ne: editids }, user_id: userid, location_id: locationId, city, state, pin_code: pincode })
+      if (existAddress) {
+         res.json({ need: 'Address Already Exist' })
+         return
+      }
 
       await addressSchema.findByIdAndUpdate({ _id: editids }, {
          user_id: userid,
@@ -92,7 +105,7 @@ const editAddress = async (req, res) => {
          addresstype,
          location_id: new ObjectId(editNearByLocation)
       })
-      res.json({success: 'Address Edited Successfully'})
+      res.json({ success: 'Address Edited Successfully' })
 
    } catch (error) {
       console.log(error)
@@ -125,24 +138,24 @@ const changeAccount = async (req, res) => {
 
 const updateAction = async (req, res) => {
    try {
-      const userId=req.session.user
-     const {firstName,lastName,phoneNumber,email}=req.body
-     console.log(req.body)
-      if(!firstName || firstName==""){
-         return res.json({nofirstName:"This field is required"})
+      const userId = req.session.user
+      const { firstName, lastName, phoneNumber, email } = req.body
+      console.log(req.body)
+      if (!firstName || firstName == "") {
+         return res.json({ nofirstName: "This field is required" })
       }
-      if(!lastName || lastName==""){
-         return res.json({nolastName:"This field is required"})
+      if (!lastName || lastName == "") {
+         return res.json({ nolastName: "This field is required" })
       }
-      if(!phoneNumber || phoneNumber==""){
-         return res.json({noPhone:"This field is required"})
+      if (!phoneNumber || phoneNumber == "") {
+         return res.json({ noPhone: "This field is required" })
       }
-      if(!email || email==""){
-         return res.json({noEmail:"This field is required"})
+      if (!email || email == "") {
+         return res.json({ noEmail: "This field is required" })
       }
-      const existEmail=await userschema.findOne({_id:{$ne:userId},email:email})
-      if(existEmail){
-         return res.json({existUser:"User Already Exist"})
+      const existEmail = await userschema.findOne({ _id: { $ne: userId }, email: email })
+      if (existEmail) {
+         return res.json({ existUser: "User Already Exist" })
       }
       await userschema.updateOne({ email: email }, {
          firstname: firstName,
@@ -150,7 +163,7 @@ const updateAction = async (req, res) => {
          phonenumber: phoneNumber,
          email: email
       })
-       res.json({success:"SuccessFully Addedd the Account"})
+      res.json({ success: "SuccessFully Addedd the Account" })
    } catch (error) {
       console.log(error)
    }
@@ -287,7 +300,7 @@ const orderCancel = async (req, res) => {
                }
             );
             await orderschema.updateOne({ _id: req.body.orderid }, { $inc: { totalAmount: -minusAmount, totalOffer: -minusOffer } })
-            await orderschema.updateOne({ _id: req.body.orderid }, {deliveryAmount:0})
+            await orderschema.updateOne({ _id: req.body.orderid }, { deliveryAmount: 0 })
 
 
             req.flash('success', "The order was cancelled successfully.");

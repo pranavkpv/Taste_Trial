@@ -513,7 +513,7 @@ datas.forEach(element => {
                   text: data.address,
                   icon: "warning",
                   showConfirmButton: true,
-                  showCancelButton: true,  // ✅ Added Cancel button
+                  showCancelButton: true, 
                   confirmButtonText: "Go to Address",
                   cancelButtonText: "Cancel"
                }).then((result) => {
@@ -543,6 +543,7 @@ datas.forEach(element => {
                   }).then(() => {
                      const form = document.querySelector('#checkout_form');
                      document.getElementById('payment_id').value = response.razorpay_payment_id;
+                      window.location.href = '/user/order'
                      form.submit();
                   });
                },

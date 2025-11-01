@@ -2,124 +2,151 @@
 <html lang="en">
 
 <head>
-	<meta charset="UTF-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<title>Taste Trial - Admin</title>
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
-	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Taste Trial - Admin</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
-<body class="bg-light d-flex align-items-center min-vh-100">
-	<div class="container">
-		<div class="row justify-content-center">
-			<div class="col-12 col-md-6 col-lg-4">
-				<div class="card shadow rounded-4 p-4">
-					<div class="text-center mb-4">
-						<i class="fa fa-user-o fs-1 text-primary"></i>
-					</div>
-					<form class="login-form  rounded-4 shadow-sm bg-white"
-						onsubmit="return loginSuccess(event)" novalidate style="max-width: 400px; margin: auto;">
-						<h1 class="mb-4 text-center fw-bold">Admin Login</h1>
+<body>
+  <div class="container-fluid vh-100 p-0 d-flex flex-column flex-lg-row overflow-hidden">
+    <!-- Left Section with Branding -->
+    <div class="d-flex flex-grow-1 justify-content-center align-items-center text-white position-relative p-4"
+      style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); flex-basis: 50%;">
+      <div class="position-absolute top-0 start-0 w-100 h-100 opacity-25"
+        style="background: url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=80') center center / cover no-repeat; z-index: 0;">
+      </div>
+      <div class="text-center position-relative" style="z-index: 1; max-width: 500px;">
+        <div class="mb-4 fs-1" style="text-shadow: 2px 2px 10px rgba(0,0,0,0.3);">
+          <i class="fas fa-utensils"></i>
+        </div>
+        <h1 class="display-4 fw-bold mb-3" style="text-shadow: 2px 2px 10px rgba(0,0,0,0.3);">Taste Trial</h1>
+        <p class="lead mb-5" style="opacity: 0.95; text-shadow: 1px 1px 5px rgba(0,0,0,0.3);">
+          Discover the finest flavors delivered to your doorstep. Your culinary adventure starts here.
+        </p>
+        <div class="d-flex justify-content-center gap-4 fs-3 opacity-75">
+          <i class="fas fa-pizza-slice"></i>
+          <i class="fas fa-burger"></i>
+          <i class="fas fa-ice-cream"></i>
+        </div>
+      </div>
+    </div>
 
-						<input type="text" name="email" autocomplete="username" hidden />
-						<input type="password" name="password" autocomplete="current-password" hidden />
+    <!-- Right Section with Login Form -->
+    <div class="d-flex flex-grow-1 justify-content-center align-items-center bg-white p-4" style="flex-basis: 50%;">
+      <div class="w-100" style="max-width: 450px;">
+        <div class="text-center mb-4">
+          <div class="mx-auto mb-3 rounded-circle d-flex justify-content-center align-items-center"
+            style="width: 80px; height: 80px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);">
+            <i class="fas fa-user-shield text-white fs-4"></i>
+          </div>
+          <h1 class="h3 fw-bold text-dark mb-1">Admin Login</h1>
+          <p class="text-muted mb-0">Welcome back! Please login to your account</p>
+        </div>
 
-						<div class="mb-3">
-							<label for="username" class="form-label visually-hidden">Username</label>
-							<input type="text" class="form-control rounded-pill" placeholder="Username" name="username"
-								id="username" />
-							<div id="username-error" class="form-text text-danger"></div>
-						</div>
+        <form onsubmit="return loginSuccess(event)" novalidate>
+          <input type="text" name="email" autocomplete="username" hidden />
+          <input type="password" name="password" autocomplete="current-password" hidden />
 
-						<div class="mb-3 position-relative">
-							<label for="password" class="form-label visually-hidden">Password</label>
-							<input type="password" class="form-control rounded-pill pe-5" placeholder="Password"
-								name="password" id="password" />
-							<button type="button"
-								class="btn position-absolute top-50 end-0 translate-middle-y me-3 p-0 border-0 bg-transparent"
-								id="togglePassword" tabindex="-1" aria-label="Toggle password visibility" style="height: 2rem;">
-								<i class="fa fa-eye-slash text-secondary fs-5"></i>
-							</button>
-							<div id="password-error" class="form-text text-danger"></div>
-						</div>
+          <div class="mb-4">
+            <label for="username" class="form-label fw-semibold">Username</label>
+            <input type="text" class="form-control rounded-pill" placeholder="Enter your username" name="username"
+              id="username" />
+            <div id="username-error" class="form-text text-danger mt-2"></div>
+          </div>
 
-						<div class="d-grid mt-4">
-							<button type="submit" class="btn btn-primary rounded-pill py-3 fw-bold">Get Started</button>
-						</div>
-					</form>
-				</div>
-			</div>
-		</div>
-	</div>
+          <div class="mb-4 position-relative">
+            <label for="password" class="form-label fw-semibold">Password</label>
+            <input type="password" class="form-control rounded-pill pe-5" placeholder="Enter your password"
+              name="password" id="password" />
+            <button type="button"
+              class="btn position-absolute top-50 end-0 translate-middle-y me-3 p-0 border-0 bg-transparent toggle-password-btn"
+              id="togglePassword" tabindex="-1" aria-label="Toggle password visibility" style="margin-top: 12px;">
+              <i class="fa fa-eye-slash text-secondary fs-5"></i>
+            </button>
+            <div id="password-error" class="form-text text-danger mt-2"></div>
+          </div>
 
-	<script>
-		async function loginSuccess(event) {
-			event.preventDefault();
-			const username = document.getElementById('username').value.trim();
-			const password = document.getElementById('password').value.trim();
-			document.getElementById('username-error').innerText = '';
-			document.getElementById('password-error').innerText = '';
+          <div class="d-grid mt-4">
+            <button type="submit" class="btn btn-primary rounded-pill fw-bold"
+              style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
+              Login to Dashboard
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 
-			try {
-				const response = await fetch('/admin/login', {
-					method: 'POST',
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ username, password })
-				});
+  <script>
+    async function loginSuccess(event) {
+      event.preventDefault();
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+      document.getElementById('username-error').innerText = '';
+      document.getElementById('password-error').innerText = '';
 
-				const data = await response.json();
+      try {
+        const response = await fetch('/admin/login', {
+          method: 'POST',
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password })
+        });
 
+        const data = await response.json();
 
-				if (!data.success) {
-					const errorMessages = data.message.split(',');
-					if (errorMessages.includes("Username Is Required")) {
-						document.getElementById('username-error').innerText = "Username is required.";
-					}
-					if (errorMessages.includes("Password Is Required")) {
-						document.getElementById('password-error').innerText = "Password is required.";
-					}
-					if (errorMessages.includes("Username Is Wrong")) {
-						document.getElementById('username-error').innerText = "Username is incorrect.";
-					}
-					if (errorMessages.includes("Password Is Wrong")) {
-						document.getElementById('password-error').innerText = "Password is incorrect.";
-					}
-					return
-				} else {
-					Swal.fire({
-						title: data.message,
-						icon: "success",
-						draggable: true,
-						confirmButtonText: "OK"
-					}).then((result) => {
-						if (result.isConfirmed) {
-							window.location.href = "/admin/dashboard";
-						}
-					});
-				}
-			} catch (error) {
-				console.error("Error:", error);
-				alert("There was an error processing your request. Please try again.");
-			}
-		}
+        if (!data.success) {
+          const errorMessages = data.message.split(',');
+          if (errorMessages.includes("Username Is Required")) {
+            document.getElementById('username-error').innerText = "Username is required.";
+          }
+          if (errorMessages.includes("Password Is Required")) {
+            document.getElementById('password-error').innerText = "Password is required.";
+          }
+          if (errorMessages.includes("Username Is Wrong")) {
+            document.getElementById('username-error').innerText = "Username is incorrect.";
+          }
+          if (errorMessages.includes("Password Is Wrong")) {
+            document.getElementById('password-error').innerText = "Password is incorrect.";
+          }
+          return;
+        } else {
+          Swal.fire({
+            title: data.message,
+            icon: "success",
+            draggable: true,
+            confirmButtonText: "OK"
+          }).then((result) => {
+            if (result.isConfirmed) {
+              window.location.href = "/admin/dashboard";
+            }
+          });
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        alert("There was an error processing your request. Please try again.");
+      }
+    }
 
-		document.getElementById("togglePassword").addEventListener("click", function () {
-			const passwordInput = document.getElementById("password");
-			const icon = this.querySelector("i");
-			if (passwordInput.type === "password") {
-				passwordInput.type = "text";
-				icon.classList.remove("fa-eye-slash");
-				icon.classList.add("fa-eye");
-			} else {
-				passwordInput.type = "password";
-				icon.classList.remove("fa-eye");
-				icon.classList.add("fa-eye-slash");
-			}
-		});
-	</script>
+    document.getElementById("togglePassword").addEventListener("click", function () {
+      const passwordInput = document.getElementById("password");
+      const icon = this.querySelector("i");
+      if (passwordInput.type === "password") {
+        passwordInput.type = "text";
+        icon.classList.remove("fa-eye-slash");
+        icon.classList.add("fa-eye");
+      } else {
+        passwordInput.type = "password";
+        icon.classList.remove("fa-eye");
+        icon.classList.add("fa-eye-slash");
+      }
+    });
+  </script>
 
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

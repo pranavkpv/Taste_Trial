@@ -3,6 +3,7 @@ const express = require("express");
 const router = express.Router();
 const addressSchema=require('../model/addressschema')
 const locationSchema=require('../model/locationSchema')
+const userauth = require("../middleware/userauth");
 
 const razorpayInstance = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID, // Replace with your Key ID
@@ -10,6 +11,7 @@ const razorpayInstance = new Razorpay({
 });
 
 // Route to create an order
+router.use(userauth.noUser); 
 router.post("/create-order", async (req, res) => {
 
     try {

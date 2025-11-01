@@ -4,9 +4,6 @@ const foodschema = require('../../model/foodschema')
 const varientschema = require('../../model/varientschema')
 const userschema = require('../../model/usershema')
 const addressschema = require('../../model/addressschema')
-const categoryschema = require('../../model/categoryschema')
-const hotelschema = require('../../model/hotelschema')
-const { ObjectId } = require('mongodb');
 const couponschema =require('../../model/couponschema')
 const locationSchema = require('../../model/locationSchema')
 
@@ -88,10 +85,6 @@ const order = async (req, res) => {
             : null;
 
       })
-
-      
-
-
       res.render('admin/order', { orders, startIndex, page, selectedpage, searchedinvoice,selectedStatus });
    } catch (error) {
       console.error("Error fetching orders:", error);
@@ -103,7 +96,6 @@ const updateStatus = async (req, res) => {
 
    try {
       const { orderId, itemId, newStatus } = req.body;
-      console.log(req.body)
       const orders=await orderschema.findOne({_id:orderId})
 
       if(newStatus == "delivered" && orders.items.length == 1){
@@ -130,7 +122,6 @@ const orderDetails = async (req, res) => {
    try {
       const {orderid,rateid}=req.query
       const orders = await orderschema.findOne({_id:orderid})
-      console.log(orders)
       const rates = await rateschema.findOne({_id:rateid})
       const foods = await foodschema.findOne({_id:rates.food_id})
       const varients = await varientschema.findOne({_id:rates.varient_id})
@@ -140,7 +131,6 @@ const orderDetails = async (req, res) => {
         return  element.rate_id=rateid
       })
       const coupons = await couponschema.findOne({_id:orders.couponId})
-      console.log(coupons)
       const locations = await locationSchema.findOne({_id:addresses.location_id})
      
       res.render('admin/orderDetails',{orders,rates,foods,varients,users,addresses,selectedData,coupons,locations})

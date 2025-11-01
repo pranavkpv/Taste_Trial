@@ -243,138 +243,174 @@
 </div>
 <!-- addmodal -->
 <div class="modal fade" id="addAddressModal" tabindex="-1" aria-labelledby="addAddressModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="addAddressModalLabel">Add New Address</h5>
+
+      <div class="modal-header border-bottom-0">
+        <h5 class="modal-title fw-bold" id="addAddressModalLabel">Add New Address</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
+
       <div class="modal-body">
         <form action="/user/addAddress" method="post" onsubmit="return validateForm()">
-          <div class="mb-3">
-            <input type="hidden" value="<%= userid %>" name="userid">
-            <label for="addressType" class="form-label">Address Type</label>
-            <select class="form-select" id="addressType" name="addresstype">
-              <option value="home">Home</option>
-              <option value="office">Office</option>
-              <option value="other">Other</option>
-            </select>
+          <input type="hidden" value="<%= userid %>" name="userid" />
+
+          <div class="container-fluid">
+            <div class="row g-3">
+              <!-- Left side fields -->
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="addressType" class="form-label fw-semibold">Address Type</label>
+                  <select class="form-select" id="addressType" name="addresstype" required>
+                    <option value="home">Home</option>
+                    <option value="office">Office</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+
+                <div class="mb-3">
+                  <label for="NearByLocation" class="form-label fw-semibold">Near By Location</label>
+                  <select class="form-select" id="NearByLocation" name="locationId" required>
+                    <option value="" selected disabled>Select</option>
+                    <% locations.forEach(element => { %>
+                    <option value="<%= element._id %>"><%= element.location %></option>
+                    <% }) %>
+                  </select>
+                </div>
+
+                <div class="mb-3">
+                  <label for="city" class="form-label fw-semibold">City</label>
+                  <input type="text" class="form-control" id="city" placeholder="Enter your city" name="city" required>
+                  <div class="invalid-feedback" id="hiddencity">Enter your city</div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="state" class="form-label fw-semibold">State</label>
+                  <input type="text" class="form-control" id="state" placeholder="Enter your state" name="state" required>
+                  <div class="invalid-feedback" id="hiddenstate">Enter your state</div>
+                </div>
+              </div>
+
+              <!-- Right side fields -->
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="pincode" class="form-label fw-semibold">PIN CODE</label>
+                  <input type="text" class="form-control" id="pincode" placeholder="Enter your pincode" name="pincode" required>
+                  <div class="invalid-feedback" id="hiddenpincode">Enter your pincode</div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="landmark" class="form-label fw-semibold">Landmark</label>
+                  <input type="text" class="form-control" id="landmark" placeholder="Enter your landmark" name="landmark" required>
+                  <div class="invalid-feedback" id="hiddenlandmark">Enter your landmark</div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="mobilenumber" class="form-label fw-semibold">Mobile Number</label>
+                  <input type="tel" class="form-control" id="mobilenumber" placeholder="Enter your mobile number" name="mobilenumber" required>
+                  <div class="invalid-feedback" id="hiddenmobilenumber">Enter your mobile number</div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="alternativenumber" class="form-label fw-semibold">Alternative Number</label>
+                  <input type="tel" class="form-control" id="alternativenumber" placeholder="Enter your alternative number" name="alternativenumber">
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="mb-3">
-            <label for="NearByLocation" class="form-label">Near By Location</label>
-            <select class="form-select" id="NearByLocation" name="locationId">
-              <option value="home">select</option>
-              <% locations.forEach(element => { %>
-              <option value="<%= element._id %>" id="location" name="locationId"><%= element.location %></option>
-              <% }) %>
-            </select>
-          </div>
-          <div class="mb-3">
-            <label for="city" class="form-label">City</label>
-            <input type="text" class="form-control" id="city" placeholder="Enter your city" name="city">
-            <p class="text-danger d-none" id="hiddencity">Enter your city</p>
-          </div>
-          <div class="mb-3">
-            <label for="state" class="form-label">State</label>
-            <input type="text" class="form-control" id="state" placeholder="Enter your state" name="state">
-            <p class="text-danger d-none" id="hiddenstate">Enter your state</p>
-          </div>
-          <div class="mb-3">
-            <label for="pincode" class="form-label">PIN CODE</label>
-            <input type="text" class="form-control" id="pincode" placeholder="Enter your pincode" name="pincode">
-            <p class="text-danger d-none" id="hiddenpincode">Enter your pincode</p>
-          </div>
-          <div class="mb-3">
-            <label for="landmark" class="form-label">Land Mark</label>
-            <input type="text" class="form-control" id="landmark" placeholder="Enter your landmark" name="landmark">
-            <p class="text-danger d-none" id="hiddenlandmark">Enter your Landmark</p>
-          </div>
-          <div class="mb-3">
-            <label for="landmark" class="form-label">Mobile Number</label>
-            <input type="text" class="form-control" id="mobilenumber" placeholder="Enter your mobile number"
-              name="mobilenumber">
-            <p class="text-danger d-none" id="hiddenmobilenumber">Enter your Mobile Number</p>
-          </div>
-          <div class="mb-3">
-            <label for="alternativenumber" class="form-label">Alternative Number</label>
-            <input type="text" class="form-control" id="alternativenumber" placeholder="Enter your alternative number"
-              name="alternativenumber">
-          </div>
-          <button type="submit" class="btn btn-primary w-100">Add Address</button>
+
+          <button type="submit" class="btn btn-primary w-100 mt-3">Add Address</button>
         </form>
       </div>
+
     </div>
   </div>
 </div>
-
 
 <!-- editaddress -->
 <div class="modal fade" id="editAddressModal" tabindex="-1" aria-labelledby="editAddressModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="addAddressModalLabel">Edit The Address</h5>
+
+      <div class="modal-header border-bottom-0">
+        <h5 class="modal-title fw-bold" id="editAddressModalLabel">Edit The Address</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
+
       <div class="modal-body">
         <form id="editForm">
-          <input type="hidden" id="editid" >
+          <input type="hidden" id="editid" name="editid" />
 
-          <div class="mb-3">
+          <div class="container-fluid">
+            <div class="row g-3">
+              <!-- Left column -->
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editaddressType" class="form-label fw-semibold">Address Type</label>
+                  <select class="form-select" id="editaddressType" name="editaddressType" required>
+                    <option value="home">Home</option>
+                    <option value="office">Office</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
 
-            <label for="editaddressType" class="form-label">Address Type</label>
-            <select class="form-select" id="editaddressType" >
-              <option value="home">Home</option>
-              <option value="office">Office</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-          <div class="mb-3">
+                <div class="mb-3">
+                  <label for="editNearByLocation" class="form-label fw-semibold">Near By Location</label>
+                  <select class="form-select" id="editNearByLocation" name="editNearByLocation" required>
+                    <% locations.forEach(element => { %>
+                    <option value="<%= element._id %>"><%= element.location %></option>
+                    <% }) %>
+                  </select>
+                </div>
 
-            <input type="hidden" id="editid" name="editid">
-            <label for="editNearByLocation" class="form-label">Near By Location</label>
-            <select class="form-select" id="editNearByLocation" >
-              <% locations.forEach(element => { %>
-              <option value="<%= element._id %>"><%= element.location %></option>
-              <% }) %>
-            </select>
+                <div class="mb-3">
+                  <label for="editcity" class="form-label fw-semibold">City</label>
+                  <input type="text" class="form-control" id="editcity" name="editcity" placeholder="Enter your city" required>
+                  <div class="invalid-feedback d-none">Enter your city</div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="editstate" class="form-label fw-semibold">State</label>
+                  <input type="text" class="form-control" id="editstate" name="editstate" placeholder="Enter your state" required>
+                  <div class="invalid-feedback d-none">Enter your state</div>
+                </div>
+              </div>
+
+              <!-- Right column -->
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editpincode" class="form-label fw-semibold">PIN CODE</label>
+                  <input type="text" class="form-control" id="editpincode" name="editpincode" placeholder="Enter your pincode" required>
+                </div>
+
+                <div class="mb-3">
+                  <label for="editlandmark" class="form-label fw-semibold">Landmark</label>
+                  <input type="text" class="form-control" id="editlandmark" name="editlandmark" placeholder="Enter your landmark" required>
+                  <div class="invalid-feedback d-none">Enter your landmark</div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="editmobile" class="form-label fw-semibold">Mobile Number</label>
+                  <input type="tel" class="form-control" id="editmobile" name="editmobile" placeholder="Enter your mobile number" required>
+                  <div class="invalid-feedback d-none">Enter your mobile number</div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="editalternativenumber" class="form-label fw-semibold">Alternative Number</label>
+                  <input type="tel" class="form-control" id="editalternativenumber" name="editalternativenumber" placeholder="Enter your alternative number">
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="mb-3">
-            <label for="editcity" class="form-label">City</label>
-            <input type="text" class="form-control" id="editcity" placeholder="Enter your city" >
-            <p class="text-danger d-none">Enter your city</p>
-          </div>
-          <div class="mb-3">
-            <label for="editstate" class="form-label">State</label>
-            <input type="text" class="form-control" id="editstate" placeholder="Enter your state" >
-            <p class="text-danger d-none">Enter your state</p>
-          </div>
-          <div class="mb-3">
-            <label for="editpincode" class="form-label">PIN CODE</label>
-            <input type="text" class="form-control" id="editpincode" placeholder="Enter your pincode" >
-          </div>
-          <div class="mb-3">
-            <label for="editlandmark" class="form-label">Land Mark</label>
-            <input type="text" class="form-control" id="editlandmark" placeholder="Enter your landmark" >
-            <p class="text-danger d-none">Enter your Landmark</p>
-          </div>
-          <div class="mb-3">
-            <label for="editmobile" class="form-label">Mobile Number</label>
-            <input type="text" class="form-control" id="editmobile" placeholder="Enter your mobile number"
-             >
-            <p class="text-danger d-none">Enter your Mobile Number</p>
-          </div>
-          <div class="mb-3">
-            <label for="editalternativenumber" class="form-label">Alternative Number</label>
-            <input type="text" class="form-control" id="editalternativenumber"
-              placeholder="Enter your alternative number">
-          </div>
-          <button type="submit" class="btn btn-primary w-100">Edit Address</button>
+
+          <button type="submit" class="btn btn-primary w-100 mt-3">Edit Address</button>
         </form>
       </div>
+
     </div>
   </div>
 </div>
+
 
 <!-- delete address modal -->
 <div class="modal fade" id="deleteAddressModal" tabindex="-1" aria-labelledby="deleteHotelModalLabel"
@@ -407,6 +443,15 @@
   Swal.fire({
     text: "<%= successmessage %>",
     icon: "success"
+  });
+</script>
+<% } %>
+
+<% if (errormessage && errormessage.length>0) { %>
+<script>
+  Swal.fire({
+    text: "<%= errormessage %>",
+    icon: "error"
   });
 </script>
 <% } %>
@@ -504,7 +549,7 @@
       body: JSON.stringify({ editids, addresstype, editNearByLocation, city, state, pin, landmark, mobile, alternative })
     })
     const data = await response.json()
-    console.log(data)
+
     if (data.need) {
       Swal.fire({
         title: "required",

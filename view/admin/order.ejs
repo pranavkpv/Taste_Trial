@@ -1,220 +1,178 @@
 <%- include('partials/admin') %>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-   integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
+<div class="mt-5 w-75" style="margin-left:15%;">
+  <div class="container-fluid px-4 py-4">
 
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+      <h3 class="mb-0">Order Management</h3>
+    </div>
 
-
-<link rel="stylesheet" href="/order.css">
-<div class="content">
-   <div class="d-flex justify-content-between align-items-center mb-4">
-      <h3 class="">Order Management</h3>
-   </div>
-
-
-
-   <!-- Table -->
-   <div class="row search-bar">
-      <div class="col-md-6 ">
-         <div class="input-group">
-            <span class="input-group-text bg-secondary text-light"><i class="fas fa-search"></i></span>
-            <input type="text" id="searchInput" oninput="searchInvoice(this.value)" class="form-control"
-               placeholder="Search by Invoice Number..." value="">
-         </div>
+    <!-- Search and Status Filter -->
+    <div class="row mb-3">
+      <div class="col-md-6 col-sm-12 mb-2 mb-md-0">
+        <div class="input-group">
+          <span class="input-group-text bg-success text-light">
+            <i class="fas fa-search"></i>
+          </span>
+          <input type="text" id="searchInput" oninput="searchInvoice(this.value)" class="form-control"
+            placeholder="Search by Invoice Number..." value="">
+        </div>
       </div>
-      <div class="col-md-6">
-         <div class="input-group">
-            <select name="" id="status" class="form-control" onchange="status()">
-               <option value=""><% if (selectedStatus ) { %>
-                  <%= selectedStatus %>
-                  <% } else { %>
-                  select
-                  <% } %></option>
-               <option value="cancelled">Cancelled</option>
-               <option value="delivered">Delivered</option>
-               <option value="processing">Processing</option>
-               <option value="packing">Packing</option>
-               <option value="onTheWay">onTheWay</option>
-               <option value="returned">returned</option>
-               <option value="All">All</option>
-            </select>
-         </div>
+      <div class="col-md-6 col-sm-12">
+        <select id="status" class="form-select w-50" onchange="status()">
+          <option value="">
+            <% if (selectedStatus) { %><%= selectedStatus %><% } else { %>Select<% } %>
+          </option>
+          <option value="cancelled">Cancelled</option>
+          <option value="delivered">Delivered</option>
+          <option value="processing">Processing</option>
+          <option value="packing">Packing</option>
+          <option value="onTheWay">On The Way</option>
+          <option value="returned">Returned</option>
+          <option value="All">All</option>
+        </select>
       </div>
-   </div>
-   <div class="table-responsive">
-      <table class="table table-bordered table-hover text-center">
-         <thead class="table-dark">
-            <tr>
-               <th scope="col">Date</th>
-               <th scope="col">Invoice Number</th>
-               <th scope="col">Client Name</th>
-               <th scope="col">Product Name</th>
-               <th scope="col">Rate</th>
-               <th scope="col">Status</th>
-               <th scope="col">View</th>
-            </tr>
-         </thead>
-         <tbody>
-            <% orders.forEach(element => { %>
-            <tr>
-               <td><%= element.createdAtFormatted %></td>
-               <td>INV-<%= element._id %></td>
-               <td><%= element.userDetails[0].firstname %></td>
-               <td><img src="<%= element.rateDetails[0].images[0] %>" alt=""><br>
-                  <p><%= element.foodDetails[0].foodname %></p>
-               </td>
-               <% if (element.couponDetails.length > 0) { %>
-               <td>
-                  <%= (element.items.quantity * (element.items.rate+element.items.rate*element.items.gst_per/100+element.items.rate*element.items.packing_per/100-element.items.rate*element.items.offer_per/100)-
-               element.items.quantity * (element.items.rate+element.items.rate*element.items.gst_per/100+element.items.rate*element.items.packing_per/100-element.items.rate*element.items.offer_per/100)*element.couponDetails[0].discount_per/100).toFixed(2) %>
-               </td>
-               <% } else { %>
-               <td>
-                  <%= (element.items.quantity * (element.items.rate+element.items.rate*element.items.gst_per/100+element.items.rate*element.items.packing_per/100-element.items.rate*element.items.offer_per/100)).toFixed(2) %>
-               </td>
-               <% } %>
+    </div>
 
+    <!-- Orders Table -->
+    <div class="table-responsive">
+      <table class="table table-hover text-center align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Date</th>
+            <th>Invoice Number</th>
+            <th>Client Name</th>
+            <th>Product Name</th>
+            <th>Rate</th>
+            <th>Status</th>
+            <th style="width: 100px;">View</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% orders.forEach(element => { %>
+          <tr>
+            <td class="tabledata"><%= element.createdAtFormatted %></td>
+            <td class="tabledata">INV-<%= element._id %></td>
+            <td class="tabledata"><%= element.userDetails[0].firstname %></td>
+            <td class="tabledata">
+              <img src="<%= element.rateDetails[0].images[0] %>" alt="Product Image" class="img-thumbnail mb-1"
+                style="height:50px; max-width:80px; object-fit: cover;" />
+              <p class="mb-0"><%= element.foodDetails[0].foodname %></p>
+            </td>
+            <td class="tabledata">
+              <% if (element.couponDetails.length > 0) { %>
+                <%= (element.items.quantity * (element.items.rate + element.items.rate * element.items.gst_per / 100 + element.items.rate * element.items.packing_per / 100 - element.items.rate * element.items.offer_per / 100) - element.items.quantity * (element.items.rate + element.items.rate * element.items.gst_per / 100 + element.items.rate * element.items.packing_per / 100 - element.items.rate * element.items.offer_per / 100) * element.couponDetails[0].discount_per / 100).toFixed(2) %>
+              <% } else { %>
+                <%= (element.items.quantity * (element.items.rate + element.items.rate * element.items.gst_per / 100 + element.items.rate * element.items.packing_per / 100 - element.items.rate * element.items.offer_per / 100)).toFixed(2) %>
+              <% } %>
+            </td>
+            <td class="tabledata">
+              <div class="dropdown">
+                <button class="btn dropdown-toggle 
+                  <% if (element.items.status == "processing") { %>btn-warning
+                  <% } else if (element.items.status == "packing") { %>btn-info
+                  <% } else if (element.items.status == "onTheWay") { %>btn-secondary
+                  <% } else if (element.items.status == "delivered") { %>btn-success
+                  <% } else if (element.items.status == "cancelled") { %>btn-danger
+                  <% } else { %>btn-danger
+                  <% } %>" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  <%= element.items.status %>
+                </button>
 
-               <td>
-                  <div class="dropdown">
-                     <button class="btn dropdown-toggle <% if (element.items.status=="processing") { %>
-                      btn-warning
-                     <% } else if (element.items.status=="packing") { %>
-                      btn-info
-                      <% } else if(element.items.status=="onTheWay") { %>
-                        btn-secondary
-                        <% } else if (element.items.status=="delivered") { %>
-                         btn-success
-                         <% } else if (element.items.status=="cancelled") { %>
-                          btn-danger
-                          <% } else { %>
-                           btn-danger
-                     <% } %>" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <%= element.items.status %>
-                     </button>
+                <% if (["cancelled", "delivered", "waiting for approval", "returned"].includes(element.items.status)) { %>
+                <ul class="dropdown-menu d-none"></ul>
+                <% } else { %>
+                <ul class="dropdown-menu">
+                  <% if (element.items.status == "processing") { %>
+                  <li><a class="dropdown-item" href="#" onclick="updateStatus('<%= element._id %>', '<%= element.items._id %>', 'packing')">Packing</a></li>
+                  <li><a class="dropdown-item" href="#" onclick="updateStatus('<%= element._id %>', '<%= element.items._id %>', 'onTheWay')">On the Way</a></li>
+                  <li><a class="dropdown-item" href="#" onclick="updateStatus('<%= element._id %>', '<%= element.items._id %>', 'delivered')">Delivered</a></li>
+                  <% } else if (element.items.status == "packing") { %>
+                  <li><a class="dropdown-item" href="#" onclick="updateStatus('<%= element._id %>', '<%= element.items._id %>', 'onTheWay')">On the Way</a></li>
+                  <li><a class="dropdown-item" href="#" onclick="updateStatus('<%= element._id %>', '<%= element.items._id %>', 'delivered')">Delivered</a></li>
+                  <% } else if (element.items.status == "onTheWay") { %>
+                  <li><a class="dropdown-item" href="#" onclick="updateStatus('<%= element._id %>', '<%= element.items._id %>', 'delivered')">Delivered</a></li>
+                  <% } %>
+                </ul>
+                <% } %>
+              </div>
+            </td>
 
-
-                     <% if (element.items.status === "cancelled" || element.items.status === "delivered" || element.items.status === "waiting for approval" || element.items.status === "returned") { %>
-                     <!-- Dropdown hidden for 'cancelled' and 'delivered' -->
-                     <ul class="dropdown-menu d-none">
-                     </ul>
-                     <% } else { %>
-                     <ul class="dropdown-menu">
-                        <% if (element.items.status === "processing") { %>
-                        <li><a class="dropdown-item" href="#"
-                              onclick="updateStatus('<%= element._id %>','<%= element.items._id %>' ,'packing')">Packing</a>
-                        </li>
-                        <li><a class="dropdown-item" href="#"
-                              onclick="updateStatus('<%= element._id %>','<%= element.items._id %>', 'onTheWay')">On the
-                              Way</a></li>
-                        <li><a class="dropdown-item" href="#"
-                              onclick="updateStatus('<%= element._id %>','<%= element.items._id %>', 'delivered')">Delivered</a>
-                        </li>
-                        <% } else if (element.items.status === "packing") { %>
-                        <li><a class="dropdown-item" href="#"
-                              onclick="updateStatus('<%= element._id %>','<%= element.items._id %>', 'onTheWay')">On the
-                              Way</a></li>
-                        <li><a class="dropdown-item" href="#"
-                              onclick="updateStatus('<%= element._id %>','<%= element.items._id %>', 'delivered')">Delivered</a>
-                        </li>
-                        <% } else if (element.items.status === "onTheWay") { %>
-                        <li><a class="dropdown-item" href="#"
-                              onclick="updateStatus('<%= element._id %>','<%= element.items._id %>', 'delivered')">Delivered</a>
-                        </li>
-                        <% } %>
-                     </ul>
-                     <% } %>
-                  </div>
-               </td>
-               <td>
-                  <form action="/admin/orderDetails">
-                     <input type="hidden" value="<%= element._id %>" name="orderid">
-                     <input type="hidden" value="<%= element.items.rate_id %>" name="rateid">
-                     <button type="submit" class="btn btn-primary">View</button>
-                  </form>
-               </td>
-
-
-            </tr>
-            <% }) %>
-         </tbody>
+            <td class="tabledata">
+              <form action="/admin/orderDetails" method="GET" class="m-0">
+                <input type="hidden" name="orderid" value="<%= element._id %>">
+                <input type="hidden" name="rateid" value="<%= element.items.rate_id %>">
+                <button type="submit" class="btn btn-success btn-sm">View</button>
+              </form>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
       </table>
-      <div id="pagination" style="text-align: center; margin-bottom: 20px;">
-         <% for (let i = 1; i <= page; i++) { %>
-         <button onclick="loadPage('<%= i %>')" class="btn btn-success">
-            <%= i %>
-         </button>
-         <% } %>
-      </div>
-   </div>
+    </div>
 
+    <!-- Pagination -->
+    <nav aria-label="Order pagination" class="d-flex justify-content-center mt-4">
+      <ul class="pagination pagination-sm">
+        <% for (let i = 1; i <= page; i++) { %>
+        <li class="page-item <%= i === selectedpage ? 'active' : '' %>">
+          <button class="page-link <%= i === selectedpage ? 'bg-success text-white' : '' %>" onclick="loadPage('<%= i %>')"><%= i %></button>
+        </li>
+        <% } %>
+      </ul>
+    </nav>
+
+  </div>
 </div>
 
 <%- include('partials/footer') %>
-<!-- Bootstrap JS Bundle (Includes Popper.js) -->
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-   integrity="sha384-Zj0jHA9aU3xw8pZTGrt/5ZxnAq8X+ZdkrRek+6hsoTL9P1c2rNphthY9gLh7z81C" crossorigin="anonymous"></script>
+  integrity="sha384-Zj0jHA9aU3xw8pZTGrt/5ZxnAq8X+ZdkrRek+6hsoTL9P1c2rNphthY9gLh7z81C" crossorigin="anonymous"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
+  function updateStatus(orderId, itemId, newStatus) {
+    fetch('/admin/updateStatus', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ orderId, itemId, newStatus }),
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        Swal.fire({ text: "Status changed successfully", icon: "success", timer: 3000, showConfirmButton: false });
+        setTimeout(() => location.reload(), 3000);
+      } else {
+        Swal.fire({ text: "Failed to update status. Please try again.", icon: "error", timer: 3000, showConfirmButton: false });
+      }
+    })
+    .catch(error => console.error('Error:', error));
+  }
 
+  let debounceTimer;
 
-   function updateStatus(orderId, itemId, newStatus) {
-      fetch('/admin/updateStatus', {
-         method: 'POST',
-         headers: {
-            'Content-Type': 'application/json',
-         },
-         body: JSON.stringify({ orderId, itemId, newStatus }),
-      })
-         .then(response => response.json())
-         .then(data => {
-            if (data.success) {
-               Swal.fire({
-                  text: "Status changed successfully",
-                  icon: "success",
-                  timer: 3000, // Adjust duration here
-                  showConfirmButton: false,
-               });
-               setTimeout(() => {
-                  location.reload(); // Reload the page to reflect changes
-               }, 3000); // Match the timer duration
-            } else {
-               Swal.fire({
-                  text: "Failed to update status. Please try again.",
-                  icon: "error",
-                  timer: 3000,
-                  showConfirmButton: false,
-               });
-            }
-         })
-         .catch(error => console.error('Error:', error));
-   }
-
-
-   let debounceTimer;
-
-   function searchInvoice(value) {
-      clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(() => {
-         const currentPage = 1; // Reset to the first page for a new search
-         const statusValue = document.getElementById('status').value || '';
-         window.location.href = `/admin/order?pagenumber=${ currentPage }&invoice=${ encodeURIComponent(value) }&status=${ statusValue }`;
-      }, 700); // Adjust delay (in milliseconds) as needed
-   }
-
-   function loadPage(pageNumber) {
-      const searchValue = document.getElementById('searchInput').value || '';
-      const statusValue = document.getElementById('status').value || '';
-      window.location.href = `/admin/order?pagenumber=${ pageNumber }&invoice=${ encodeURIComponent(searchValue) }&status=${ statusValue }`;
-   }
-
-   function status() {
+  function searchInvoice(value) {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
       const currentPage = 1;
-      const searchValue = document.getElementById('searchInput').value || '';
       const statusValue = document.getElementById('status').value || '';
-      window.location.href = `/admin/order?pagenumber=${ currentPage }&invoice=${ encodeURIComponent(searchValue) }&status=${ statusValue }`
-   }
+      window.location.href = `/admin/order?pagenumber=${currentPage}&invoice=${encodeURIComponent(value)}&status=${statusValue}`;
+    }, 700);
+  }
 
+  function loadPage(pageNumber) {
+    const searchValue = document.getElementById('searchInput').value || '';
+    const statusValue = document.getElementById('status').value || '';
+    window.location.href = `/admin/order?pagenumber=${pageNumber}&invoice=${encodeURIComponent(searchValue)}&status=${statusValue}`;
+  }
+
+  function status() {
+    const currentPage = 1;
+    const searchValue = document.getElementById('searchInput').value || '';
+    const statusValue = document.getElementById('status').value || '';
+    window.location.href = `/admin/order?pagenumber=${currentPage}&invoice=${encodeURIComponent(searchValue)}&status=${statusValue}`;
+  }
 </script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

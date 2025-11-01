@@ -2,463 +2,155 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<style>
-   :root {
-      --primary-color: #ff4757;
-      --secondary-color: #2ed573;
-   }
-
-   .product-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 2rem;
-      padding: 2rem;
-   }
-
-   .product-card {
-      background: white;
-      border-radius: 15px;
-      overflow: hidden;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-      transition: transform 0.3s ease;
-      position: relative;
-   }
-
-   .product-card:hover {
-      transform: translateY(-5px);
-   }
-
-   .product-image {
-      position: relative;
-      height: 200px;
-      overflow: hidden;
-   }
-
-   .product-image img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform 0.5s ease;
-   }
-
-   .product-card:hover .product-image img {
-      transform: scale(1.1);
-   }
-
-   .food-type {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      padding: 5px 10px;
-      border-radius: 20px;
-      color: white;
-      font-size: 0.8rem;
-      font-weight: 600;
-      z-index: 1;
-   }
-
-   .veg {
-      background-color: var(--secondary-color);
-   }
-
-   .non-veg {
-      background-color: var(--primary-color);
-   }
-
-   .wishlist-btn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: white;
-      border: none;
-      width: 35px;
-      height: 35px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      z-index: 1;
-   }
-
-   .wishlist-btn:hover {
-      transform: scale(1.1);
-   }
-
-   .wishlist-btn i {
-      color: var(--primary-color);
-      font-size: 1.2rem;
-   }
-
-   .product-details {
-      padding: 1.5rem;
-   }
-
-   .hotel-name {
-      color: #666;
-      font-size: 0.9rem;
-      margin-bottom: 0.5rem;
-   }
-
-   .product-name {
-      font-size: 1.2rem;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-      color: #333;
-   }
-
-   .rating {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
-   }
-
-   .stars {
-      color: #ffd700;
-   }
-
-   .review-count {
-      color: #666;
-      font-size: 0.9rem;
-   }
-
-   .duration {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      color: #666;
-      font-size: 0.9rem;
-      margin-bottom: 1rem;
-   }
-
-   .product-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1rem 1.5rem;
-      border-top: 1px solid #eee;
-   }
-
-   .price {
-      font-size: 1.2rem;
-      font-weight: 600;
-      color: #333;
-   }
-
-   .cart-btn {
-      background: var(--primary-color);
-      color: white;
-      border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 25px;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-   }
-
-   .cart-btn:hover {
-      background: #ff6b81;
-      transform: translateY(-2px);
-   }
-
-   .variants {
-      display: flex;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
-   }
-
-   .variant {
-      padding: 0.3rem 0.8rem;
-      border: 1px solid #ddd;
-      border-radius: 15px;
-      font-size: 0.9rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-   }
-
-   .variant.active {
-      background: var(--primary-color);
-      color: white;
-      border-color: var(--primary-color);
-   }
-<<<<<<< HEAD
-   .offerbox{
-      border-radius: 20px;
-   }
-=======
-   .breadcrumb-item + .breadcrumb-item::before {
-    display: inline-block;
-    vertical-align: middle; /* Ensures proper alignment */
-    margin-top: 10px; /* Adjust if needed */
-    transform: rotate(0deg); /* Prevents unwanted rotation */
-}
->>>>>>> 63499e0410abb3105660c1ee9323d3ade75246d9
-</style>
 
 <%- include('partials/userheader') %>
-<%- include('partials/userheader') %>
-<nav
-   style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='%236c757d'/%3E%3C/svg%3E&#34;); margin-top: 100;"
-   aria-label="breadcrumb">
-   <ol class="breadcrumb">
-      <li class="breadcrumb-item"><a href="/user/home">Home</a></li>
-      <li class="breadcrumb-item active" aria-current="page">Shop Page</li>
-   </ol>
+
+<nav aria-label="breadcrumb" class="mt-5">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/user/home">Home</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Shop Page</li>
+  </ol>
 </nav>
-<div class="product-grid" style="margin-top:81px">
-   <% rates.forEach(element => { %>
-   <div class="product-card">
-      <div class="product-image">
-         <span class="food-type <%= element.foodDetails[0].is_veg === 'veg' ? 'veg' : 'non-veg' %>">
-            <%= element.foodDetails[0].is_veg === 'veg' ? 'Veg' : 'Non-Veg' %>
-         </span>
-         <button class="wishlist-btn" data-rate-id="<%= element._id %>" data-user-id="<%= userId %>"
+
+<div class="container-fluid mt-5 mb-5">
+  <div class="row g-4">
+    <% rates.forEach(element => { %>
+      <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+        <div class="card h-100 shadow-sm product-card position-relative">
+          <div class="position-absolute top-0 start-0 m-2">
+            <span class="badge <%= element.foodDetails[0]?.is_veg === 'veg' ? 'bg-success' : 'bg-danger' %> fs-6">
+              <%= element.foodDetails[0]?.is_veg === 'veg' ? 'Veg' : 'Non-Veg' %>
+            </span>
+          </div>
+
+          <button class="btn btn-sm btn-light position-absolute top-0 end-0 m-2 wishlist-btn"
+            data-rate-id="<%= element._id %>"
+            data-user-id="<%= userId %>"
             data-is-in-wishlist="<%= element.isInWishlist %>">
-            <i class="<%= element.isInWishlist ? 'fas' : 'far' %> fa-heart "
-               style="color: '<%= element.isInWishlist ? '#ff4757' : '#666' %>';"></i>
-         </button>
-         <img src="<%= element.images[0] %>" alt="Food Item">
+            <i class="<%= element.isInWishlist ? 'fas' : 'far' %> fa-heart text-danger fs-5"></i>
+          </button>
+
+          <img src="<%= element.images[0] %>" alt="Food Item" class="card-img-top img-fluid" style="object-fit: cover; height: 180px;">
+
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title mb-1 text-truncate" title="<%= element.foodDetails[0]?.foodname %>">
+              <%= element.foodDetails[0]?.foodname || 'Unknown Food' %>
+              <small class="text-muted">(<%= element.varientDetails[0]?.varientname || '' %>)</small>
+            </h5>
+
+            <p class="card-subtitle mb-1 text-primary fw-semibold text-truncate" title="<%= element.hotelDetails[0]?.hotelname %>">
+              <i class="fas fa-hotel me-1"></i> <%= element.hotelDetails[0]?.hotelname || 'Unknown Hotel' %>
+            </p>
+
+            <p class="mb-2 text-muted small">
+              <i class="far fa-clock me-1"></i><%= element.foodDetails[0]?.duration_time %> mins
+            </p>
+
+            <% 
+              const catOffer = element.CategoryDetails[0]?.offer || 0;
+              const foodOffer = element.foodDetails[0]?.offer || 0;
+              const bestOffer = catOffer >= foodOffer ? catOffer : foodOffer;
+            %>
+            <% if (bestOffer > 0) { %>
+              <span class="badge bg-success mb-2 align-self-start px-3 py-1 fs-6">
+                <%= bestOffer %>% Offer
+              </span>
+            <% } %>
+
+            <div class="mt-auto d-flex justify-content-between align-items-center">
+              <h6 class="text-danger mb-0">₹ <%= element.rate %></h6>
+              <button class="btn btn-primary btn-sm addTocart"
+                data-rate-id="<%= element._id %>"
+                data-hotel-id="<%= element.hotelDetails[0]?._id %>"
+                data-food-id="<%= element.foodDetails[0]?._id %>"
+                data-varient-id="<%= element.varientDetails[0]?._id %>">
+                <i class="fas fa-shopping-cart me-1"></i> Add to Cart
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
-      <!-- Rest of your product card HTML remains the same -->
-      <div class="product-details">
-         <div class="hotel-name">
-            <i class="fas fa-hotel"></i> <%= element.hotelDetails[0].hotelname %>
-         </div>
-         <h3 class="product-name"><%= element.foodDetails[0].foodname %>(<%= element.varientDetails[0].varientname %>)
-         </h3>
-         <div class="duration">
-            <i class="far fa-clock"></i>
-            <span><%= element.foodDetails[0].duration_time %> mins</span>
-         </div>
-
-
-
-         <% if (element.CategoryDetails[0].offer >0 || element.foodDetails[0].offer >0) { %>
-         <% if (element.CategoryDetails[0].offer > element.foodDetails[0].offer) { %>
-         <div class="Offer">
-<<<<<<< HEAD
-            <span class="offerbox bg-success p-2 text-white" ><%= element.CategoryDetails[0].offer %> % Offer</span>
-         </div>
-         <% } else { %>
-         <div class="Offer">
-            <span class="offerbox bg-success p-2 text-white"><%= element.foodDetails[0].offer %> % Offer</span>
-=======
-            <span class="offer bg-success p-2 text-white"style= "border-radius: 20px;" ><%= element.CategoryDetails[0].offer %> % Offer</span>
-         </div>
-         <% } else { %>
-         <div class="Offer">
-            <span class="offer bg-success p-2 text-white"style="border-radius: 20px;"><%= element.foodDetails[0].offer %> % Offer</span>
->>>>>>> 63499e0410abb3105660c1ee9323d3ade75246d9
-         </div>
-         <% } %>
-         <% } %>
-
-
-
-      </div>
-      <div class="product-footer">
-         <div class="price">₹ <%= element.rate %></div>
-         <button class="cart-btn addTocart" data-rate-id="<%= element._id %>"
-            data-hotel-id="<%=element.hotelDetails[0]._id %>" data-food-id="<%= element.foodDetails[0]._id %> "
-            data-varient-id="<%= element.varientDetails[0]._id %>">
-            <i class="fas fa-shopping-cart"></i>
-            Add to Cart
-         </button>
-      </div>
-   </div>
-   <% }) %>
+    <% }) %>
+  </div>
 </div>
 
 <%- include('partials/userfooter') %>
 
-
-
 <script>
-     let debounceTimer;
+document.addEventListener('DOMContentLoaded', () => {
 
-function searchItem(value) {
-   clearTimeout(debounceTimer);
-   debounceTimer = setTimeout(() => {
-      window.location.href = `/user/category?product=${ encodeURIComponent(value) }`;
-   }, 700);
-}
+  // Wishlist toggle
+  document.querySelectorAll('.wishlist-btn').forEach(button => {
+    button.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const rateid = button.dataset.rateId;
+      const userid = button.dataset.userId;
+      const isInWishlist = button.dataset.isInWishlist === 'true';
+      const icon = button.querySelector('i');
 
+      try {
+        const url = isInWishlist ? '/user/removeWishData' : '/user/addToWishlist';
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ rateid, userid })
+        });
+        const result = await response.json();
 
+        if (result.error) {
+          Swal.fire({ title: result.error, icon: 'error' }).then(() => location.href = "/user/logout");
+          return;
+        }
 
-document.addEventListener('DOMContentLoaded', function () {
-   const wishlistButtons = document.querySelectorAll('.wishlist-btn');
+        // Toggle UI
+        button.dataset.isInWishlist = (!isInWishlist).toString();
+        icon.className = !isInWishlist ? 'fas fa-heart text-danger' : 'far fa-heart text-danger';
 
-   wishlistButtons.forEach(button => {
-      let isProcessing = false;
+        Swal.fire({
+          title: !isInWishlist ? 'Added to Wishlist!' : 'Removed from Wishlist!',
+          icon: 'success',
+          toast: true,
+          position: 'top-end',
+          timer: 1500,
+          showConfirmButton: false
+        });
+      } catch (err) {
+        Swal.fire({ title: 'Error', text: 'Something went wrong!', icon: 'error' });
+      }
+    });
+  });
 
-      button.addEventListener('click', async function (e) {
-         e.preventDefault();
+  // Add to cart
+  document.querySelectorAll('.addTocart').forEach(button => {
+    button.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const rateId = button.dataset.rateId;
+      const hotelid = button.dataset.hotelId;
+      const foodid = button.dataset.foodId;
+      const varientid = button.dataset.varientId;
 
-         if (isProcessing) return;
-         isProcessing = true;
+      try {
+        const response = await fetch('/user/AddToCart', {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ rateId, hotelid, foodid, varientid, numberofstock: 1 })
+        });
+        const data = await response.json();
 
-         const rateid = this.getAttribute('data-rate-id');
-         const userid = this.getAttribute('data-user-id');
-         const isInWishlist = this.getAttribute('data-is-in-wishlist') === 'true';
-         const icon = this.querySelector('i');
+        if (data.error) {
+          Swal.fire({ title: 'Error', text: data.error, icon: 'error' }).then(() => location.href = '/user/logout');
+        } else if (data.exist) {
+          Swal.fire({ title: 'Info', text: data.exist, icon: 'info' });
+        } else if (data.stock) {
+          Swal.fire({ title: 'Limit', text: data.stock, icon: 'info' });
+        } else if (data.success) {
+          Swal.fire({ title: 'Success', text: data.success, icon: 'success' });
+        }
+      } catch (error) {
+        Swal.fire({ title: 'Error', text: 'Something went wrong!', icon: 'error' });
+      }
+    });
+  });
 
-         try {
-            const url = isInWishlist ? '/user/removeWishData' : '/user/addToWishlist';
-            const response = await fetch(url, {
-               method: 'POST',
-               headers: {
-                  'Content-Type': 'application/json'
-               },
-               body: JSON.stringify({ rateid, userid })
-            });
-
-            if (!response.ok) throw new Error('Network response was not ok');
-
-<<<<<<< HEAD
-            const result = await response.json();
-=======
-               const result = await response.json();
-               if(result.error){
-                  Swal.fire({
-                     title:result.error ,
-                     icon: 'error',
-                     showConfirmButton: true
-                  }).then(()=>{
-                     window.location.href="/user/logout"
-                  })
-               }
->>>>>>> 63499e0410abb3105660c1ee9323d3ade75246d9
-
-            if (result.successWishlist || result.removeMessage) {
-               // Toggle wishlist state
-               const newWishlistState = !isInWishlist;
-               this.setAttribute('data-is-in-wishlist', newWishlistState);
-
-               // Update icon
-               icon.className = newWishlistState ? 'fas fa-heart' : 'far fa-heart';
-               icon.style.color = newWishlistState ? '#ff4757' : '#666';
-
-               // Show success message
-               Swal.fire({
-                  title: newWishlistState ? 'Added to Wishlist!' : 'Removed from Wishlist!',
-                  icon: 'success',
-                  position: 'top-end',
-                  toast: true,
-                  timer: 1500,
-                  showConfirmButton: false
-               });
-            }
-         } catch (error) {
-            console.error('Error:', error);
-            Swal.fire({
-               title: 'Error',
-               text: 'Something went wrong!',
-               icon: 'error',
-               confirmButtonText: 'OK'
-            });
-         } finally {
-            isProcessing = false;
-         }
-      });
-   });
-   const addTocartButton = document.querySelectorAll('.addTocart');
-   addTocartButton.forEach((button) => {
-      button.addEventListener('click', async function (e) {
-         e.preventDefault()
-         const rateId = this.getAttribute('data-rate-id');
-         const hotelid = this.getAttribute('data-hotel-id');
-         const foodid = this.getAttribute('data-food-id');
-         const varientid = this.getAttribute('data-varient-id');
-         try {
-            const response = await fetch('/user/AddToCart', {
-               method: "POST",
-               headers: { "Content-Type": "application/json" },
-               body: JSON.stringify({
-                  rateId, hotelid, foodid, varientid,
-                  numberofstock: 1
-               })
-<<<<<<< HEAD
-            })
-            const data = await response.json()
-            if (data.exist) {
-=======
-
-               const data = await response.json()
-               if(data.error){
-                  Swal.fire({
-                     title: 'error',
-                     text: data.error,
-                     icon: 'error',
-                     confirmButtonText: 'OK'
-                  }).then(()=>{
-                     window.location.href='/user/logout'
-                  })
-               }
-               if (data.exist) {
-                  Swal.fire({
-                     title: 'Exist',
-                     text: data.exist,
-                     icon: 'info',
-                     confirmButtonText: 'OK'
-                  });
-               }
-               if (data.stock) {
-                  Swal.fire({
-                     title: 'limit',
-                     text: data.stock,
-                     icon: 'info',
-                     confirmButtonText: 'OK'
-                  });
-               }
-               if (data.success) {
-                  Swal.fire({
-                     title: 'success',
-                     text: data.success,
-                     icon: 'success',
-                     confirmButtonText: 'OK'
-                  });
-               }
-            } catch (error) {
-               console.error('Error:', error);
->>>>>>> 63499e0410abb3105660c1ee9323d3ade75246d9
-               Swal.fire({
-                  title: 'Exist',
-                  text: data.exist,
-                  icon: 'info',
-                  confirmButtonText: 'OK'
-               });
-            }
-            if (data.stock) {
-               Swal.fire({
-                  title: 'limit',
-                  text: data.stock,
-                  icon: 'info',
-                  confirmButtonText: 'OK'
-               });
-            }
-            if (data.success) {
-               Swal.fire({
-                  title: 'success',
-                  text: data.success,
-                  icon: 'success',
-                  confirmButtonText: 'OK'
-               });
-            }
-         } catch (error) {
-            console.error('Error:', error);
-            Swal.fire({
-               title: 'Error',
-               text: 'Something went wrong!',
-               icon: 'error',
-               confirmButtonText: 'OK'
-            });
-         }
-      })
-   })
 });
 </script>

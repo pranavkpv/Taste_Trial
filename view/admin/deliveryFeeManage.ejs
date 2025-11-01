@@ -1,273 +1,217 @@
 <%- include('partials/admin') %>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-<link rel="stylesheet" href="/return.css">
-<div class="content">
-   <div class="d-flex justify-content-between align-items-center mb-4">
-      <h3 class="">Delivery Fee Management</h3>
-      <button class=" addItem" onclick="addItem()" data-bs-toggle="modal" data-bs-target="#addLocationModal"> + Add
-         Item</button>
-   </div>
 
+<div class="mt-5 w-75" style="margin-left:15%;">
+  <div class="container-fluid px-4 py-4">
 
+    <!-- Header with title and Add button -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+      <h3 class="mb-0">Delivery Fee Management</h3>
+      <button class="btn btn-success addItem" onclick="addItem()" data-bs-toggle="modal" data-bs-target="#addLocationModal">
+        <i class="fas fa-plus me-1"></i> Add Item
+      </button>
+    </div>
 
-   <!-- Table -->
-   <div class="row search-bar">
-      <div class="col-md-6 ">
-         <div class="input-group">
-            <span class="input-group-text bg-secondary text-light"><i class="fas fa-search"></i></span>
-            <input type="text" id="searchInput" oninput="searchInvoice(this.value)" class="form-control"
-               placeholder="Search by Loaction..." value="<%= location %>">
-
-         </div>
-
+    <!-- Search Bar -->
+    <div class="row mb-3">
+      <div class="col-md-6 col-sm-12">
+        <div class="input-group">
+          <span class="input-group-text bg-success text-light">
+            <i class="fas fa-search"></i>
+          </span>
+          <input type="text" id="searchInput" oninput="searchInvoice(this.value)" class="form-control"
+            placeholder="Search by Location..." value="<%= location %>">
+        </div>
       </div>
-   </div>
-   <div class="table-responsive">
-      <table class="table table-bordered text-center">
-         <thead class="table-dark">
-            <tr>
-               <th scope="col">Sl No</th>
-               <th scope="col">Location Address</th>
-               <th scope="col">Delivery Charge</th>
-               <th scope="col">Actions</th>
-            </tr>
-         </thead>
-         <tbody>
+    </div>
 
-            <% locations.forEach((element,index) => { %>
-            <tr style="text-align: center;">
-               <td>
-                  <p class="mt-4"><%= selectedIndex+index %></p>
-               </td>
-               <td>
-                  <p class="mt-4"><%= element.location %></p>
-               </td>
-               <td>
-                  <p class="mt-4"><%= element.deliveryCharge %></p>
-               </td>
-               <td class="action-icons">
-                  <a class="text-dark" href="" data-bs-toggle="modal" data-bs-target="#editDeliveryModal"
-                     onclick="editFun('<%= element.location %>','<%= element.deliveryCharge %>','<%= element._id %>')"><i
-                        class="bi bi-pencil-square"></i></a>
-                  <a class="text-dark" href="" data-bs-toggle="modal" data-bs-target="#deleteLocation"
-                     onclick="deleteFun('<%= element._id %>')"><i class="bi bi-trash3-fill"></i></a>
-               </td>
-            </tr>
-            <% }) %>
-
-
-         </tbody>
+    <!-- Locations Table -->
+    <div class="table-responsive">
+      <table class="table table-hover text-center align-middle table-striped">
+        <thead class="table-light">
+          <tr>
+            <th scope="col">Sl No</th>
+            <th scope="col">Location Address</th>
+            <th scope="col">Delivery Charge</th>
+            <th scope="col" style="width: 120px;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% locations.forEach((element, index) => { %>
+          <tr>
+            <td class="tableindex"><%= selectedIndex + index %></td>
+            <td class="tabledata"><%= element.location %></td>
+            <td class="tabledata"><%= element.deliveryCharge %></td>
+            <td class="tabledata">
+              <a href="#" class="text-success me-3 cursor-pointer" data-bs-toggle="modal" data-bs-target="#editDeliveryModal"
+                onclick="editFun('<%= element.location %>', '<%= element.deliveryCharge %>', '<%= element._id %>')" title="Edit">
+                <i class="bi bi-pencil-square fs-5"></i>
+              </a>
+              <a href="#" class="text-danger cursor-pointer" data-bs-toggle="modal" data-bs-target="#deleteLocation"
+                onclick="deleteFun('<%= element._id %>')" title="Delete">
+                <i class="bi bi-trash3-fill fs-5"></i>
+              </a>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
       </table>
-      <div id="pagination" style="text-align: center; margin-bottom: 20px;">
-         <% for (let i = 1; i <= pages; i++) { %>
-        
-         <button onclick="loadPage('<%= i %>')" class="btn <% if (i==selectedPage) { %>
-          btn-danger
-          <% } else { %>
-           btn-success
-         <% } %>">
-            <%= i %>
-         </button>
-         <% } %>
-      </div>
-   </div>
-</div>
-<!-- Delete Location -->
-<div class="modal fade" id="deleteLocation" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-   <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-         <div class="modal-header">
-            <h1 class="modal-title fs-4" id="exampleModalLabel">Are You Sure ?</h1>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-         </div>
-         <form action="/admin/deleteLocation" method="POST">
-            <input type="hidden" id="deleteId" name="locationId">
-            <div class="modal-body">
-               <p>Do You Want To Delete</p>
-            </div>
-            <div class="modal-footer">
-               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-               <button type="submit" class="btn btn-success">Delete</button>
-            </div>
-         </form>
-      </div>
-   </div>
+    </div>
+
+    <!-- Pagination -->
+    <nav aria-label="Location pagination" class="d-flex justify-content-center mt-4">
+      <ul class="pagination pagination-sm">
+        <% for (let i = 1; i <= pages; i++) { %>
+          <li class="page-item <%= i === selectedPage ? 'active' : '' %>">
+            <button class="page-link <%= i === selectedPage ? 'bg-success text-white' : '' %>" onclick="loadPage('<%= i %>')"><%= i %></button>
+          </li>
+        <% } %>
+      </ul>
+    </nav>
+
+  </div>
 </div>
 
-<!-- Edit location -->
-
-<div class="modal fade" id="editDeliveryModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
-   <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-         <form id="editLocationForm">
-            <input type="hidden" id="editlocationId">
-            <div class="modal-body">
-               <div class="mb-3">
-                  <h2>Edit Location</h2>
-                  <label for="location" class="form-label">Enter Location</label>
-                  <input type="text" class="form-control" id="editlocation" placeholder="Enter location">
-                  <p class="text-danger  error-message" id="locationhidden"></p>
-               </div>
-               <div class="mb-3">
-                  <label for="deliveryCharge" class="form-label">Enter Delivery Charge</label>
-                  <input type="number" class="form-control" id="editdeliveryCharge" min="0"
-                     placeholder="Enter deliveryCharge" value="0">
-                  <p class="text-danger d-none error-message" id="deliveryChargehidden">Please Enter Delivery Charge %!
-                  </p>
-               </div>
-            </div>
-            <div class="modal-footer">
-               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-               <button type="submit" id="addLocation" class="btn btn-success">Save</button>
-            </div>
-         </form>
-      </div>
-   </div>
+<!-- Delete Location Modal -->
+<div class="modal fade" id="deleteLocation" tabindex="-1" aria-labelledby="deleteLocationLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form action="/admin/deleteLocation" method="POST">
+        <input type="hidden" id="deleteId" name="locationId" />
+        <div class="modal-body">
+          <p>Do you want to delete this location?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-success">Delete</button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
 
-
-
-<!-- add location -->
-<div class="modal fade" id="addLocationModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
-   <div class="modal-dialog modal-dialog-centered custom-modal-width">
-      <div class="modal-content">
-         <form id="addLocationForm">
-            <div class="modal-body">
-               <div class="mb-3">
-                  <h2>Add Location</h2>
-                  <label for="location" class="form-label">Enter Location</label>
-                  <input type="text" class="form-control" id="location" placeholder="Enter location">
-                  <p class="text-danger  error-message" id="locationhidden"></p>
-               </div>
-               <div class="mb-3">
-                  <label for="deliveryCharge" class="form-label">Enter Delivery Charge</label>
-                  <input type="number" class="form-control" id="deliveryCharge" min="0"
-                     placeholder="Enter deliveryCharge" value="0">
-                  <p class="text-danger d-none error-message" id="deliveryChargehidden">Please Enter Delivery Charge %!
-                  </p>
-               </div>
-            </div>
-            <div class="modal-footer">
-               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-               <button type="submit" id="addLocation" class="btn btn-success">Save</button>
-            </div>
-         </form>
-      </div>
-   </div>
+<!-- Edit Location Modal -->
+<div class="modal fade" id="editDeliveryModal" tabindex="-1" aria-labelledby="editDeliveryModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form id="editLocationForm">
+        <input type="hidden" id="editlocationId" />
+        <div class="modal-body">
+          <h2 class="mb-3">Edit Location</h2>
+          <div class="mb-3">
+            <label for="editlocation" class="form-label">Enter Location</label>
+            <input type="text" class="form-control" id="editlocation" placeholder="Enter location" />
+            <p class="text-danger error-message d-none" id="locationhidden"></p>
+          </div>
+          <div class="mb-3">
+            <label for="editdeliveryCharge" class="form-label">Enter Delivery Charge</label>
+            <input type="number" class="form-control" id="editdeliveryCharge" min="0" placeholder="Enter delivery charge" value="0" />
+            <p class="text-danger error-message d-none" id="deliveryChargehidden">Please enter delivery charge!</p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" id="saveEditLocation" class="btn btn-success">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
+
+<!-- Add Location Modal -->
+<div class="modal fade" id="addLocationModal" tabindex="-1" aria-labelledby="addLocationModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered custom-modal-width">
+    <div class="modal-content">
+      <form id="addLocationForm">
+        <div class="modal-body">
+          <h2 class="mb-3">Add Location</h2>
+          <div class="mb-3">
+            <label for="location" class="form-label">Enter Location</label>
+            <input type="text" class="form-control" id="location" placeholder="Enter location" />
+            <p class="text-danger error-message d-none" id="locationhidden"></p>
+          </div>
+          <div class="mb-3">
+            <label for="deliveryCharge" class="form-label">Enter Delivery Charge</label>
+            <input type="number" class="form-control" id="deliveryCharge" min="0" placeholder="Enter delivery charge" value="0" />
+            <p class="text-danger error-message d-none" id="deliveryChargehidden">Please enter delivery charge!</p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" id="addLocation" class="btn btn-success">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 <%- include('partials/footer') %>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-
-<% if (successmessage && successmessage.length>0) { %>
-<script>
-   Swal.fire({
-      text: "<%= successmessage %>",
-      icon: "success"
-   });
-</script>
-<% } %>
-
-<script>
-   let debounceTimer
-
-   function searchInvoice(value) {
-      clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(() => {
-         const currentPage = 1
-         window.location.href = `/admin/delivery?location=${ encodeURIComponent(value) }&pages=${ currentPage }`
-      }, 700)
-   }
-
-   function loadPage(value) {
-      const location = document.getElementById('searchInput').value
-      window.location.href = `/admin/delivery?location=${ encodeURIComponent(location) }&page=${ value }`
-   }
-
-
-
-
-
-   document.getElementById('addLocationForm').addEventListener('submit', async function (e) {
-      e.preventDefault()
-      const location = document.getElementById('location').value
-      const deliveryCharge = document.getElementById('deliveryCharge').value
-      const response = await fetch('/admin/addLocation', {
-         method: "POST",
-         headers: { "Content-Type": "application/json" },
-         body: JSON.stringify({ location, deliveryCharge })
-      })
-      const data = await response.json()
-      if (data.needLocation) {
-         const locationHidden = document.getElementById('locationhidden');
-         if (locationHidden) {
-            locationHidden.innerText = data.needLocation;
-         }
-      }
-      if (data.existError) {
-         Swal.fire({
-            title: "Exist",
-            text: data.existError,
-            icon: "warning"
-         });
-      }
-      if (data.success) {
-         Swal.fire({
-            text: data.success,
-            icon: "success",
-            timer: 3000,
-         }).then(() => {
-            e.target.submit();
-         });
-      }
-   })
-
-   document.getElementById('editLocationForm').addEventListener('submit', async function (e) {
-      e.preventDefault()
-      const location = document.getElementById('editlocation').value
-      const deliveryCharge = document.getElementById('editdeliveryCharge').value
-      const Id = document.getElementById('editlocationId').value
-      const response = await fetch('/admin/editLocation', {
-         method: "POST",
-         headers: { "Content-Type": "application/json" },
-         body: JSON.stringify({
-            location, deliveryCharge, Id
-         })
-      })
-      const data = await response.json()
-      if(data.exist){
-         Swal.fire({
-            title: "Exist",
-            text: data.exist,
-            icon: "warning"
-         });
-      }
-      if (data.success) {
-         Swal.fire({
-            text: data.success,
-            icon: "success",
-            timer: 3000,
-         }).then(() => {
-            e.target.submit();
-         });
-      }
-   })
-
-
-
-
-   function editFun(location, charge, id) {
-      document.getElementById('editlocation').value = location
-      document.getElementById('editdeliveryCharge').value = charge
-      document.getElementById('editlocationId').value = id
-   }
-
-   function deleteFun(id) {
-      document.getElementById('deleteId').value = id
-   }
-
-
-</script>
-
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+  let debounceTimer;
+
+  function searchInvoice(value) {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      const currentPage = 1;
+      window.location.href = `/admin/delivery?location=${encodeURIComponent(value)}&pages=${currentPage}`;
+    }, 700);
+  }
+
+  function loadPage(page) {
+    const location = document.getElementById('searchInput').value;
+    window.location.href = `/admin/delivery?location=${encodeURIComponent(location)}&page=${page}`;
+  }
+
+  document.getElementById('addLocationForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const location = document.getElementById('location').value.trim();
+    const deliveryCharge = document.getElementById('deliveryCharge').value.trim();
+    const response = await fetch('/admin/addLocation', {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ location, deliveryCharge }),
+    });
+    const data = await response.json();
+    if (data.needLocation) {
+      document.getElementById('locationhidden').innerText = data.needLocation;
+      document.getElementById('locationhidden').classList.remove('d-none');
+    }
+    if (data.existError) {
+      Swal.fire({ title: "Exist", text: data.existError, icon: "warning" });
+    }
+    if (data.success) {
+      Swal.fire({ text: data.success, icon: "success", timer: 3000 }).then(() => e.target.submit());
+    }
+  });
+
+  document.getElementById('editLocationForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const location = document.getElementById('editlocation').value.trim();
+    const deliveryCharge = document.getElementById('editdeliveryCharge').value.trim();
+    const Id = document.getElementById('editlocationId').value;
+    const response = await fetch('/admin/editLocation', {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ location, deliveryCharge, Id }),
+    });
+    const data = await response.json();
+    if (data.exist) {
+      Swal.fire({ title: "Exist", text: data.exist, icon: "warning" });
+    }
+    if (data.success) {
+      Swal.fire({ text: data.success, icon: "success", timer: 3000 }).then(() => e.target.submit());
+    }
+  });
+
+  function editFun(location, charge, id) {
+    document.getElementById('editlocation').value = location;
+    document.getElementById('editdeliveryCharge').value = charge;
+    document.getElementById('editlocationId').value = id;
+  }
+
+  function deleteFun(id) {
+    document.getElementById('deleteId').value = id;
+  }
+</script>

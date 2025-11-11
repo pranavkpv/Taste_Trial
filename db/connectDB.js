@@ -21,8 +21,7 @@ async function updateOffer(){
 
 const connectDB=async()=>{
    try {
-      await mongoose.connect("mongodb://localhost:27017/tastetrial")
-      // const connect=await mongoose.connect("mongodb+srv://User:User%40123@cluster0.xholv.mongodb.net/tastetrial"
+      const connect=await mongoose.connect("mongodb+srv://User:User%40123@cluster0.xholv.mongodb.net/tastetrial")
       console.log("connect database")
       updateOffer()
    } catch (error) {

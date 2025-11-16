@@ -24,9 +24,6 @@ const wallet=async(req,res)=>{
          return sum
        },0) 
        const balanceAmount=sumofcredit-sumofDebit
-       console.log(sumofcredit)
-       console.log(sumofDebit)
-      console.log(wallets)   
       res.render('user/wallet',{userid,searchmessage:"",searcheditemname :"",wallets,balanceAmount})
    } catch (error) {
       console.log(error)

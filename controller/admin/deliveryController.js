@@ -1,4 +1,5 @@
 const locationSchema=require('../../model/locationSchema')
+
 const delivery = async(req,res)=>{
    try {
       const location = req.query.location
@@ -30,7 +31,7 @@ const addLocation = async(req,res)=>{
       if(!location && location===""){
         return res.json({needLocation:"Required Location"})
       }
-      const existlocation=await locationSchema.findOne({location})
+      const existlocation=await locationSchema.findOne({location:{$regex:location,$options:"i"}})
       if(existlocation){
          return res.json({existError:"The Product Already Exist"})
       }
@@ -49,7 +50,7 @@ const addLocation = async(req,res)=>{
 const editLocation=async(req,res)=>{
    try {
       const {location,deliveryCharge,Id}=req.body
-      const existLocation=await locationSchema.find({_id:{$ne:Id},location})
+      const existLocation=await locationSchema.find({_id:{$ne:Id},location:{$regex:location,$options:"i"}})
       if(existLocation.length>0){
       return res.json({exist:"Location is Already Exist"})
       }else{

@@ -37,8 +37,6 @@ const addHotel = async (req, res) => {
    try {
       const { hotelname, hoteladdress, contactnumber, alternativenumber ,foodname} = req.body;
       const file = req.file;
-      const foodIds=await foodschema.find({foodname:{$in:foodname}},{_id:1})
-      const foodIdArray=foodIds.map((value=>value._id))
       const existingHotel = await hotelschema.findOne({ hotelname });
       if (existingHotel) {
          req.flash("exist", "Hotel Already Exists");
@@ -53,7 +51,7 @@ const addHotel = async (req, res) => {
          contact_no:contactnumber,
          alternative_no:alternativenumber,
          image,
-         food_items:foodIdArray
+         food_items:foodname
       });
 
       await newHotel.save();

@@ -154,7 +154,9 @@
           <!-- Expiry Date -->
           <div class="mb-3">
             <label for="expiryDate" class="form-label">Select Expiry Date</label>
-            <input type="date" class="form-control" id="expiryDate" name="expirydate" />
+            <input type="date" class="form-control" id="expiryDate" name="expirydate" 
+            min="<%= new Date().toISOString().split('T')[0] %>"
+            />
           </div>
           <!-- Food Image -->
           <div class="mb-3">
@@ -231,7 +233,9 @@
           <!-- Expiry Date -->
           <div class="mb-3">
             <label for="editexpiryDate" class="form-label">Select Expiry Date</label>
-            <input type="date" class="form-control" id="editexpiryDate" name="expirydate" />
+            <input type="date" class="form-control" id="editexpiryDate" name="expirydate" 
+            min="<%= new Date().toISOString().split('T')[0] %>"
+            />
           </div>
           <!-- Food Image -->
           <div class="mb-3">

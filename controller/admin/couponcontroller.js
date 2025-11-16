@@ -35,7 +35,7 @@ const coupon = async (req, res) => {
 const addcoupon = async (req, res) => {
    try {
       const { couponCode, discount, expirydate } = req.body
-      const existCoupon=await couponschema.findOne({couponCode})
+      const existCoupon=await couponschema.findOne({couponCode:{$regex:couponCode,$options:"i"}})
       if(existCoupon){
          req.flash('exist',"The Coupon is Already Addedd")
          res.redirect('/admin/coupon')
@@ -57,7 +57,7 @@ const addcoupon = async (req, res) => {
 const editCoupon = async(req,res)=>{
    try {
       const {couponId,couponCode,discount,expirydate}=req.body
-      const existCoupon=await couponschema.findOne({_id:{$ne:couponId},couponCode:couponCode})
+      const existCoupon=await couponschema.findOne({_id:{$ne:couponId},couponCode:{$regex:couponCode,$options:"i"}})
       if(existCoupon){
         req.flash('editExist',"The Coupon Is Already Exist")
         res.redirect('/admin/coupon')

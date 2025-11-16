@@ -81,9 +81,6 @@ const failedOrder = async (req, res) => {
          return sum + ((element.totalAmount || 0) - (element.totalOffer || 0));
       }, 0);
 
-      console.log(cartIDS);
-      console.log(purchaseQty);
-
       res.render('user/failedOrder', { searchmessage: "", searcheditemname: "", orders, items, FinalAmount, cartIDS, purchaseQty });
    } catch (error) {
       console.log("Error in failedOrder:", error);

@@ -39,7 +39,7 @@
       top: 53px;
       position: fixed;
       height: 100vh;
-    
+
     }
 
     .sidebar .logo {
@@ -64,7 +64,7 @@
       color: #1e293b;
     }
 
-   
+
 
     .nav-link {
       display: flex;
@@ -271,12 +271,12 @@
           <i class="fas fa-undo"></i>
           Return Order Management
         </a>
-        <div class="nav-item" style="margin-left:-3px">
+        <div  class="nav-item" >
           <a href="/admin/delivery" class="nav-link">
             <i class="bi bi-truck"></i>
             Delivery Fee Management
           </a>
-      </div>
+        </div>
     </nav>
   </div>
 
@@ -342,12 +342,11 @@
     });
 
     function logout() {
-  console.log("hai");
-  var myModal = new bootstrap.Modal(document.getElementById('logout'));  
-  myModal.show();  // Correct way to show the modal
-}
-function logoutfun(){
-  window.location.href='/admin/login'
-}
+      var myModal = new bootstrap.Modal(document.getElementById('logout'));
+      myModal.show();  // Correct way to show the modal
+    }
+    function logoutfun() {
+      window.location.href = '/admin/login'
+    }
 
   </script>

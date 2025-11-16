@@ -119,7 +119,7 @@ const deleteAddress = async (req, res) => {
       req.flash('success', 'Address Deleted Successfully')
       res.redirect(`/user/address`)
    } catch (error) {
-      console.log(console.error)
+      console.log(error)
    }
 }
 
@@ -140,7 +140,6 @@ const updateAction = async (req, res) => {
    try {
       const userId = req.session.user
       const { firstName, lastName, phoneNumber, email } = req.body
-      console.log(req.body)
       if (!firstName || firstName == "") {
          return res.json({ nofirstName: "This field is required" })
       }
@@ -374,7 +373,6 @@ const orderReturn = async (req, res) => {
    try {
 
       const { orderId, rateId } = req.body
-      console.log("orderReturn-", req.body)
       await orderschema.updateOne(
          {
             _id: orderId,

@@ -2,82 +2,86 @@
 
 <div class="mt-5 w-75" style="margin-left:15%;">
   <div class="container-fluid px-4 py-4">
-  <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
-    <h3 class="mb-0">Category Management</h3>
-    <button class="btn btn-success" onclick="addItem()" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
-      <i class="fas fa-plus me-1"></i> Add Item
-    </button>
-  </div>
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+      <h3 class="mb-0">Category Management</h3>
+      <button class="btn btn-success" onclick="addItem()" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+        <i class="fas fa-plus me-1"></i> Add Item
+      </button>
+    </div>
 
-  <!-- Search Bar -->
-  <div class="row mb-3">
-    <div class="col-md-6 col-sm-12">
-      <div class="input-group">
-        <span class="input-group-text bg-success text-white"><i class="fas fa-search"></i></span>
-        <input type="text" id="searchInput" oninput="searchCategory(this.value)" class="form-control" placeholder="Search by Category..." value="<%= searchedcategoryname || '' %>">
+    <!-- Search Bar -->
+    <div class="row mb-3">
+      <div class="col-md-6 col-sm-12">
+        <div class="input-group">
+          <span class="input-group-text bg-success text-white"><i class="fas fa-search"></i></span>
+          <input type="text" id="searchInput" oninput="searchCategory(this.value)" class="form-control"
+            placeholder="Search by Category..." value="<%= searchedcategoryname || '' %>">
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- Categories Table -->
-  <div class="table-responsive">
-    <table class="table table-hover text-center align-middle" id="categorylist">
-      <thead class="table-light">
-        <tr>
-          <th scope="col">Sl No</th>
-          <th scope="col">Title</th>
-          <th scope="col">Offer %</th>
-          <th scope="col">Expiry Date</th>
-          <th scope="col">Image</th>
-          <th scope="col" style="width: 140px;">Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% categories.forEach((element, index) => { %>
+    <!-- Categories Table -->
+    <div class="table-responsive">
+      <table class="table table-hover text-center align-middle" id="categorylist">
+        <thead class="table-light">
+          <tr>
+            <th scope="col">Sl No</th>
+            <th scope="col">Title</th>
+            <th scope="col">Offer %</th>
+            <th scope="col">Expiry Date</th>
+            <th scope="col">Image</th>
+            <th scope="col" style="width: 140px;">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% categories.forEach((element, index) => { %>
           <tr class="<%= element.isdeleted ? 'text-muted' : '' %>">
             <td class="tableindex"><%= startIndex + index %></td>
             <td class="tabledata"><%= element.categoryname %></td>
             <td class="tableoffer"><%= element.offer %></td>
             <td class="tablexpDate"><%= element.formattedExpiryDate %></td>
-            <td><img src="<%= element.image %>" alt="Category Image" class="img-thumbnail" style="height:50px; max-width: 80px; object-fit: cover;"></td>
+            <td><img src="<%= element.image %>" alt="Category Image" class="img-thumbnail"
+                style="height:50px; max-width: 80px; object-fit: cover;"></td>
             <td class="action-icons">
               <a href="#" class="text-success me-2" data-bs-toggle="modal" data-bs-target="#editCategoryModal"
-                 onclick="editfun('<%= element.categoryname %>', '<%= element.image %>', '<%= element._id %>', '<%= element.offer %>', '<%= element.formattedExpiryDate %>')" title="Edit">
+                onclick="editfun('<%= element.categoryname %>', '<%= element.image %>', '<%= element._id %>', '<%= element.offer %>', '<%= element.formattedExpiryDate %>')"
+                title="Edit">
                 <i class="bi bi-pencil-square fs-5"></i>
               </a>
               <a href="#" class="text-danger me-2" data-bs-toggle="modal" data-bs-target="#deleteCategoryModal"
-                 onclick="deletefun('<%= element._id %>')" title="Delete">
+                onclick="deletefun('<%= element._id %>')" title="Delete">
                 <i class="bi bi-trash3-fill fs-5"></i>
               </a>
               <% if (element.isdeleted) { %>
-                <a href="#" class="text-success" data-bs-toggle="modal" data-bs-target="#unblockCategoryModal"
-                   onclick="unhidefun('<%= element._id %>')" title="Unblock">
-                  <i class="bi bi-eye fs-5"></i>
-                </a>
+              <a href="#" class="text-success" data-bs-toggle="modal" data-bs-target="#unblockCategoryModal"
+                onclick="unhidefun('<%= element._id %>')" title="Unblock">
+                <i class="bi bi-eye fs-5"></i>
+              </a>
               <% } else { %>
-                <a href="#" class="text-secondary" data-bs-toggle="modal" data-bs-target="#blockCategoryModal"
-                   onclick="hidefun('<%= element._id %>')" title="Block">
-                  <i class="bi bi-eye-slash fs-5"></i>
-                </a>
+              <a href="#" class="text-secondary" data-bs-toggle="modal" data-bs-target="#blockCategoryModal"
+                onclick="hidefun('<%= element._id %>')" title="Block">
+                <i class="bi bi-eye-slash fs-5"></i>
+              </a>
               <% } %>
             </td>
           </tr>
-        <% }) %>
-      </tbody>
-    </table>
-  </div>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
 
-  <!-- Pagination -->
-  <nav aria-label="Category pagination" class="d-flex justify-content-center mt-4">
-    <ul class="pagination pagination-sm">
-      <% for (let i = 1; i <= page; i++) { %>
+    <!-- Pagination -->
+    <nav aria-label="Category pagination" class="d-flex justify-content-center mt-4">
+      <ul class="pagination pagination-sm">
+        <% for (let i = 1; i <= page; i++) { %>
         <li class="page-item <%= i === selectedpage ? 'active' : '' %>">
-          <button class="page-link <%= i === selectedpage ? 'bg-success' : '' %>" onclick="loadPage('<%= i %>')"><%= i %></button>
+          <button class="page-link <%= i === selectedpage ? 'bg-success' : '' %>"
+            onclick="loadPage('<%= i %>')"><%= i %></button>
         </li>
-      <% } %>
-    </ul>
-  </nav>
-</div>
+        <% } %>
+      </ul>
+    </nav>
+  </div>
 </div>
 
 <!-- Add, Edit, Block, Unblock, Delete Modals -->
@@ -85,7 +89,8 @@
 <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
-      <form action="/admin/addcategory" method="post" onsubmit="return validateForm()" enctype="multipart/form-data" novalidate>
+      <form action="/admin/addcategory" method="post" onsubmit="return validateForm()" enctype="multipart/form-data"
+        novalidate>
         <div class="modal-header">
           <h5 class="modal-title" id="addCategoryModalLabel">Add Category</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -93,21 +98,25 @@
         <div class="modal-body">
           <div class="mb-3">
             <label for="categoryTitle" class="form-label">Enter Category Name</label>
-            <input type="text" class="form-control" id="categoryTitle" name="categoryname" placeholder="Enter title" required>
+            <input type="text" class="form-control" id="categoryTitle" name="categoryname" placeholder="Enter title"
+              required>
             <div class="invalid-feedback">Please enter a category.</div>
           </div>
           <div class="mb-3">
             <label for="Offer" class="form-label">Enter Offer %</label>
-            <input type="number" min="0" class="form-control" id="Offer" name="offer" placeholder="Enter offer" value="0" required>
+            <input type="number" min="0" class="form-control" id="Offer" name="offer" placeholder="Enter offer"
+              value="0" required>
             <div class="invalid-feedback">Please enter valid offer %.</div>
           </div>
           <div class="mb-3">
             <label for="expiryDate" class="form-label">Select Expiry Date</label>
-            <input type="date" class="form-control" id="expiryDate" name="expirydate">
+            <input type="date" class="form-control" id="expiryDate" name="expirydate"
+              min="<%= new Date().toISOString().split('T')[0] %>">
           </div>
           <div class="mb-3">
             <label for="categoryImage" class="form-label">Upload Image</label>
-            <input type="file" class="form-control" id="categoryImage" name="image" accept="image/*" onchange="previewImage(event)" required>
+            <input type="file" class="form-control" id="categoryImage" name="image" accept="image/*"
+              onchange="previewImage(event)" required>
             <div class="invalid-feedback">Please upload an image.</div>
           </div>
           <div class="text-center mb-3">
@@ -124,10 +133,12 @@
 </div>
 
 <!-- Edit Category Modal -->
-<div class="modal fade" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
+<div class="modal fade" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModalLabel"
+  aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
-      <form action="/admin/editcategory" method="post" onsubmit="return editvalidateForm()" enctype="multipart/form-data" novalidate>
+      <form action="/admin/editcategory" method="post" onsubmit="return editvalidateForm()"
+        enctype="multipart/form-data" novalidate>
         <div class="modal-header">
           <h5 class="modal-title" id="editCategoryModalLabel">Edit Category</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -136,21 +147,25 @@
           <input type="hidden" id="editid" name="editid">
           <div class="mb-3">
             <label for="editcategoryTitle" class="form-label">Enter Category Name</label>
-            <input type="text" class="form-control" id="editcategoryTitle" name="categoryname" placeholder="Enter Category" required>
+            <input type="text" class="form-control" id="editcategoryTitle" name="categoryname"
+              placeholder="Enter Category" required>
             <div class="invalid-feedback">Please enter a category.</div>
           </div>
           <div class="mb-3">
             <label for="editOffer" class="form-label">Enter Offer %</label>
-            <input type="number" min="0" class="form-control" id="editOffer" name="offer" placeholder="Enter offer" required>
+            <input type="number" min="0" class="form-control" id="editOffer" name="offer" placeholder="Enter offer"
+              required>
             <div class="invalid-feedback">Please enter a valid offer %.</div>
           </div>
           <div class="mb-3">
             <label for="editexpiryDate" class="form-label">Select Expiry Date</label>
-            <input type="date" class="form-control" id="editexpiryDate" name="expirydate">
+            <input type="date" class="form-control" id="editexpiryDate" name="expirydate"
+              min="<%= new Date().toISOString().split('T')[0] %>">
           </div>
           <div class="mb-3">
             <label for="editcategoryImage" class="form-label">Upload Image</label>
-            <input type="file" class="form-control" id="editcategoryImage" name="image" accept="image/*" onchange="previewImage(event)">
+            <input type="file" class="form-control" id="editcategoryImage" name="image" accept="image/*"
+              onchange="previewImage(event)">
           </div>
           <div class="text-center mb-3">
             <img id="editimagePreview" src="" alt="Image Preview" class="img-thumbnail" style="max-width: 200px;">
@@ -166,7 +181,8 @@
 </div>
 
 <!-- Block Category Modal -->
-<div class="modal fade" id="blockCategoryModal" tabindex="-1" aria-labelledby="blockCategoryModalLabel" aria-hidden="true">
+<div class="modal fade" id="blockCategoryModal" tabindex="-1" aria-labelledby="blockCategoryModalLabel"
+  aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <form action="/admin/hidecategory" method="post">
@@ -184,7 +200,8 @@
 </div>
 
 <!-- Unblock Category Modal -->
-<div class="modal fade" id="unblockCategoryModal" tabindex="-1" aria-labelledby="unblockCategoryModalLabel" aria-hidden="true">
+<div class="modal fade" id="unblockCategoryModal" tabindex="-1" aria-labelledby="unblockCategoryModalLabel"
+  aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <form action="/admin/unhidecategory" method="post">
@@ -202,7 +219,8 @@
 </div>
 
 <!-- Delete Category Modal -->
-<div class="modal fade" id="deleteCategoryModal" tabindex="-1" aria-labelledby="deleteCategoryModalLabel" aria-hidden="true">
+<div class="modal fade" id="deleteCategoryModal" tabindex="-1" aria-labelledby="deleteCategoryModalLabel"
+  aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <form action="/admin/deletecategory" method="post">
@@ -283,7 +301,7 @@
   function reverseDate(date) {
     // Assuming date format dd-mm-yyyy, converts to yyyy-mm-dd for input[type=date]
     const [day, month, year] = date.split('-');
-    return `${year}-${month}-${day}`;
+    return `${ year }-${ month }-${ day }`;
   }
 
   function editfun(title, image, id, offer, expdate) {
@@ -311,13 +329,13 @@
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => {
       const currentPage = 1;
-      window.location.href = `/admin/category?pagenumber=${currentPage}&category=${encodeURIComponent(value)}`;
+      window.location.href = `/admin/category?pagenumber=${ currentPage }&category=${ encodeURIComponent(value) }`;
     }, 700);
   }
 
   function loadPage(pageNumber) {
     const searchValue = document.getElementById('searchInput').value || '';
-    window.location.href = `/admin/category?pagenumber=${pageNumber}&category=${encodeURIComponent(searchValue)}`;
+    window.location.href = `/admin/category?pagenumber=${ pageNumber }&category=${ encodeURIComponent(searchValue) }`;
   }
 </script>
 

@@ -37,7 +37,8 @@
             <td class="tabledata"><%= element.rate %></td>
             <td>
               <a href="#" class="text-success me-2" data-bs-toggle="modal" data-bs-target="#editrateModal"
-                onclick="editFun('<%= element.hotelDetails[0].hotelname %>', '<%= element.foodDetails[0].foodname %>', '<%= element.varientDetails[0].varientname %>', '<%= element.rate %>', '<%= element.gst_per %>', '<%= element.packing_per %>', '<%= element.delivery_time %>', '<%= element.images[0] %>', '<%= element.images[1] %>', '<%= element.images[2] %>', '<%= element._id %>', '<%= element.stock %>', '<%= element.files[0] %>', '<%= element.files[1] %>', '<%= element.files[2] %>')" title="Edit">
+                onclick="editFun('<%= element.hotelDetails[0].hotelname %>', '<%= element.foodDetails[0].foodname %>', '<%= element.varientDetails[0].varientname %>', '<%= element.rate %>', '<%= element.gst_per %>', '<%= element.packing_per %>', '<%= element.delivery_time %>', '<%= element.images[0] %>', '<%= element.images[1] %>', '<%= element.images[2] %>', '<%= element._id %>', '<%= element.stock %>', '<%= element.files[0] %>', '<%= element.files[1] %>', '<%= element.files[2] %>')"
+                title="Edit">
                 <i class="bi bi-pencil-square fs-5"></i>
               </a>
               <a href="#" class="text-danger" data-bs-toggle="modal" data-bs-target="#deleterateModal"
@@ -55,9 +56,10 @@
     <nav aria-label="Rate pagination" class="d-flex justify-content-center mt-4">
       <ul class="pagination pagination-sm">
         <% for (let i = 1; i <= TotalPage; i++) { %>
-          <li class="page-item <%= i === selectedPage ? 'active' : '' %>">
-            <button class="page-link <%= i === selectedPage ? 'bg-success text-white' : '' %>" onclick="loadPage('<%= i %>')"><%= i %></button>
-          </li>
+        <li class="page-item <%= i === selectedPage ? 'active' : '' %>">
+          <button class="page-link <%= i === selectedPage ? 'bg-success text-white' : '' %>"
+            onclick="loadPage('<%= i %>')"><%= i %></button>
+        </li>
         <% } %>
       </ul>
     </nav>
@@ -68,7 +70,8 @@
 <div class="modal fade" id="addRateModal" tabindex="-1" aria-labelledby="addRateModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-xl">
     <div class="modal-content p-3">
-      <form action="/admin/addrate" id="addform" method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
+      <form action="/admin/addrate" id="addform" method="post" enctype="multipart/form-data"
+        onsubmit="return validateForm()">
         <h3 class="mb-3">Add Rate</h3>
         <div class="row">
           <!-- Left Column -->
@@ -108,13 +111,15 @@
 
             <div class="mb-3">
               <label for="addRateinput" class="form-label">Rate</label>
-              <input class="form-control" value="0" type="number" name="rate" id="addRateinput" placeholder="Enter Rate">
+              <input class="form-control" value="0" type="number" name="rate" id="addRateinput"
+                placeholder="Enter Rate">
               <p class="text-danger d-none" id="addRateinputpop">Please Enter Rate!</p>
             </div>
 
             <div class="mb-3">
               <label for="addgstperinput" class="form-label">Gst %</label>
-              <input class="form-control" value="0" type="number" name="gst_per" id="addgstperinput" placeholder="Enter Gst%">
+              <input class="form-control" value="0" type="number" name="gst_per" id="addgstperinput"
+                placeholder="Enter Gst%">
               <p class="text-danger d-none" id="addgstperinputpop">Please Enter Gst%!</p>
             </div>
 
@@ -137,7 +142,8 @@
               </div>
 
               <div id="previewContainer1" style="margin-top: 10px; display: none;">
-                <img id="previewImage1" class="preview mt-3" style="max-width: 100%; height: auto;" alt="Preview Image" />
+                <img id="previewImage1" class="preview mt-3" style="max-width: 100%; height: auto;"
+                  alt="Preview Image" />
               </div>
 
               <input type="hidden" id="hiddenInput1" name="croppedImageData1" />
@@ -157,7 +163,8 @@
               </div>
 
               <div id="previewContainer2" style="margin-top: 10px; display: none;">
-                <img id="previewImage2" class="preview mt-3" style="max-width: 100%; height: auto;" alt="Preview Image" />
+                <img id="previewImage2" class="preview mt-3" style="max-width: 100%; height: auto;"
+                  alt="Preview Image" />
               </div>
 
               <input type="hidden" id="hiddenInput2" name="croppedImageData2" />
@@ -168,7 +175,8 @@
           <div class="col-md-6">
             <div class="mb-3">
               <label for="packingper" class="form-label">Packing Charge %</label>
-              <input class="form-control" value="0" type="number" name="packing_per" id="packingper" placeholder="Enter packing charge %" />
+              <input class="form-control" value="0" type="number" name="packing_per" id="packingper"
+                placeholder="Enter packing charge %" />
               <p class="text-danger d-none" id="packingperpop">Please Enter Packing%!</p>
             </div>
 
@@ -184,13 +192,15 @@
 
             <div class="mb-3">
               <label for="deliverytime" class="form-label">Delivery Time (minutes)</label>
-              <input class="form-control" value="0" type="text" name="delivery_time" id="deliverytime" placeholder="Enter delivery time" />
+              <input class="form-control" value="0" type="text" name="delivery_time" id="deliverytime"
+                placeholder="Enter delivery time" />
               <p class="text-danger d-none" id="deliverytimepop">Please Enter Delivery Time!</p>
             </div>
 
             <div class="mb-3">
               <label for="stock" class="form-label">Stock</label>
-              <input class="form-control" value="0" type="number" name="stock" id="addstock" placeholder="Enter stock" />
+              <input class="form-control" value="0" type="number" name="stock" id="addstock"
+                placeholder="Enter stock" />
               <p class="text-danger d-none" id="deliverytimepop">Please Enter valid stock</p>
             </div>
 
@@ -208,7 +218,8 @@
               </div>
 
               <div id="previewContainer3" style="margin-top: 10px; display: none;">
-                <img id="previewImage3" class="preview mt-3" style="max-width: 100%; height: auto;" alt="Preview Image" />
+                <img id="previewImage3" class="preview mt-3" style="max-width: 100%; height: auto;"
+                  alt="Preview Image" />
               </div>
 
               <input type="hidden" id="hiddenInput3" name="croppedImageData3" />
@@ -289,7 +300,8 @@
             <div class="mb-3">
               <label for="editfirstImage" class="form-label">Upload First Image</label>
               <input class="form-control" type="file" id="editfirstImage" accept="image/*"
-                onchange="initCropper(event, 'editcroppedImage1', 'editcropContainer1','editfirstfilename')" name="images" />
+                onchange="initCropper(event, 'editcroppedImage1', 'editcropContainer1','editfirstfilename')"
+                name="images" />
               <input type="hidden" id="editfirstfilename" name="editfirstfilename" />
 
               <div id="editcropContainer1" style="display: none; margin-top: 10px;">
@@ -299,7 +311,8 @@
               </div>
 
               <div id="editpreviewContainer1" style="margin-top: 10px;">
-                <img id="editpreviewImage1" class="preview mt-3" style="max-width: 100%; height: auto;" alt="Preview Image" />
+                <img id="editpreviewImage1" class="preview mt-3" style="max-width: 100%; height: auto;"
+                  alt="Preview Image" />
               </div>
 
               <input type="hidden" id="edithiddenInput1" name="editcroppedImageData1" />
@@ -309,7 +322,8 @@
             <div class="mb-3">
               <label for="editsecondImage" class="form-label">Upload Second Image</label>
               <input class="form-control" type="file" id="editsecondImage" accept="image/*"
-                onchange="initCropper(event, 'editcroppedImage2', 'editcropContainer2','editsecondfilename')" name="images" />
+                onchange="initCropper(event, 'editcroppedImage2', 'editcropContainer2','editsecondfilename')"
+                name="images" />
               <input type="hidden" id="editsecondfilename" name="editsecondfilename" />
 
               <div id="editcropContainer2" style="display: none; margin-top: 10px;">
@@ -319,7 +333,8 @@
               </div>
 
               <div id="editpreviewContainer2" style="margin-top: 10px;">
-                <img id="editpreviewImage2" class="preview mt-3" style="max-width: 100%; height: auto;" alt="Preview Image" />
+                <img id="editpreviewImage2" class="preview mt-3" style="max-width: 100%; height: auto;"
+                  alt="Preview Image" />
               </div>
 
               <input type="hidden" id="edithiddenInput2" name="editcroppedImageData2" />
@@ -330,7 +345,8 @@
           <div class="col-md-6">
             <div class="mb-3">
               <label for="editpackingper" class="form-label">Packing Charge %</label>
-              <input class="form-control" type="number" name="packing_per" id="editpackingper" placeholder="Enter packing charge %" />
+              <input class="form-control" type="number" name="packing_per" id="editpackingper"
+                placeholder="Enter packing charge %" />
               <p class="text-danger d-none" id="editpackingperpop">Please Enter Packing Charge%!</p>
             </div>
 
@@ -346,7 +362,8 @@
 
             <div class="mb-3">
               <label for="editdeliverytime" class="form-label">Delivery Time (minutes)</label>
-              <input class="form-control" type="text" name="delivery_time" id="editdeliverytime" placeholder="Enter delivery time" />
+              <input class="form-control" type="text" name="delivery_time" id="editdeliverytime"
+                placeholder="Enter delivery time" />
               <p class="text-danger d-none" id="editdeliverytimepop">Please Enter Delivery Time!</p>
             </div>
 
@@ -360,7 +377,8 @@
             <div class="mb-3">
               <label for="editthirdImage" class="form-label">Upload Third Image</label>
               <input class="form-control" type="file" id="editthirdImage" accept="image/*"
-                onchange="initCropper(event, 'editcroppedImage3', 'editcropContainer3','editthirdfilename')" name="images" />
+                onchange="initCropper(event, 'editcroppedImage3', 'editcropContainer3','editthirdfilename')"
+                name="images" />
               <input type="hidden" id="editthirdfilename" name="editthirdfilename" />
 
               <div id="editcropContainer3" style="display: none; margin-top: 10px;">
@@ -370,7 +388,8 @@
               </div>
 
               <div id="editpreviewContainer3" style="margin-top: 10px;">
-                <img id="editpreviewImage3" class="preview mt-3" style="max-width: 100%; height: auto;" alt="Preview Image" />
+                <img id="editpreviewImage3" class="preview mt-3" style="max-width: 100%; height: auto;"
+                  alt="Preview Image" />
               </div>
 
               <input type="hidden" id="edithiddenInput3" name="editcroppedImageData3" />
@@ -444,8 +463,137 @@
 <%- include('partials/footer') %>
 
 <script>
-// Your existing JS validates, event handlers, cropper logic, and other scripts untouched
+
+  // ---------------------- GLOBAL CROPPER ----------------------
+  let cropper = null;
+
+  function initCropper(event, imgId, containerId, filenameId) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    document.getElementById(filenameId).value = file.name;
+
+    const img = document.getElementById(imgId);
+    const container = document.getElementById(containerId);
+
+    img.src = URL.createObjectURL(file);
+    container.style.display = "block";
+
+    if (cropper) cropper.destroy();
+
+    cropper = new Cropper(img, {
+      aspectRatio: 1,
+      viewMode: 1,
+      scalable: true,
+      zoomable: true
+    });
+  }
+
+  function saveCroppedImage(imgId, containerId, previewId, previewContainerId, hiddenInputId) {
+    if (!cropper) return;
+
+    let canvas = cropper.getCroppedCanvas({
+      width: 300,
+      height: 300
+    });
+
+    let croppedData = canvas.toDataURL("image/jpeg");
+
+    document.getElementById(previewId).src = croppedData;
+    document.getElementById(previewContainerId).style.display = "block";
+    document.getElementById(hiddenInputId).value = croppedData;
+
+    document.getElementById(containerId).style.display = "none";
+
+    cropper.destroy();
+    cropper = null;
+  }
+
+  // ---------------------- AUTO CALCULATION ----------------------
+
+  function autoCalculate(rateId, gstId, gstAmountId, packingId, packingAmountId, totalId) {
+    let rate = parseFloat(document.getElementById(rateId).value) || 0;
+    let gst = parseFloat(document.getElementById(gstId).value) || 0;
+    let packing = parseFloat(document.getElementById(packingId).value) || 0;
+
+    let gstAmount = (rate * gst) / 100;
+    let packingCharge = (rate * packing) / 100;
+    let totalRate = rate + gstAmount + packingCharge;
+
+    document.getElementById(gstAmountId).value = gstAmount.toFixed(2);
+    document.getElementById(packingAmountId).value = packingCharge.toFixed(2);
+    document.getElementById(totalId).value = totalRate.toFixed(2);
+  }
+
+  // ADD MODE
+  document.getElementById("addRateinput").addEventListener("input", () =>
+    autoCalculate("addRateinput", "addgstperinput", "addgstamntinput", "packingper", "packingcharge", "totalRate")
+  );
+  document.getElementById("addgstperinput").addEventListener("input", () =>
+    autoCalculate("addRateinput", "addgstperinput", "addgstamntinput", "packingper", "packingcharge", "totalRate")
+  );
+  document.getElementById("packingper").addEventListener("input", () =>
+    autoCalculate("addRateinput", "addgstperinput", "addgstamntinput", "packingper", "packingcharge", "totalRate")
+  );
+
+  // EDIT MODE
+  document.getElementById("editRateinput").addEventListener("input", () =>
+    autoCalculate("editRateinput", "editgstperinput", "editgstamount", "editpackingper", "editpackingamount", "edittotalrate")
+  );
+  document.getElementById("editgstperinput").addEventListener("input", () =>
+    autoCalculate("editRateinput", "editgstperinput", "editgstamount", "editpackingper", "editpackingamount", "edittotalrate")
+  );
+  document.getElementById("editpackingper").addEventListener("input", () =>
+    autoCalculate("editRateinput", "editgstperinput", "editgstamount", "editpackingper", "editpackingamount", "edittotalrate")
+  );
+
+  // ---------------------- EDIT FUNCTION ----------------------
+
+  function editFun(hotelname, foodname, varientname, rate, gst, packing, delivery, img1, img2, img3, id, stock, file1, file2, file3) {
+
+    // Assign ID
+    document.getElementById("editid").value = id;
+
+    // Set select values
+    document.getElementById("edithotel").value = hotelname;
+    document.getElementById("editfoodname").value = foodname;
+    document.getElementById("editvarientname").value = varientname;
+
+    // Set numeric & text values
+    document.getElementById("editRateinput").value = rate;
+    document.getElementById("editgstperinput").value = gst;
+    document.getElementById("editpackingper").value = packing;
+    document.getElementById("editdeliverytime").value = delivery;
+    document.getElementById("editstock").value = stock;
+
+    // Auto calculation
+    autoCalculate("editRateinput", "editgstperinput", "editgstamount", "editpackingper", "editpackingamount", "edittotalrate");
+
+    // --------- LOAD EXISTING IMAGES IN EDIT PREVIEW ---------
+    document.getElementById("editpreviewImage1").src = img1;
+    document.getElementById("editpreviewImage2").src = img2;
+    document.getElementById("editpreviewImage3").src = img3;
+
+    document.getElementById("editpreviewContainer1").style.display = "block";
+    document.getElementById("editpreviewContainer2").style.display = "block";
+    document.getElementById("editpreviewContainer3").style.display = "block";
+
+    // Reset crop containers
+    ["editcropContainer1", "editcropContainer2", "editcropContainer3"].forEach(id => {
+      document.getElementById(id).style.display = "none";
+    });
+
+    if (cropper) cropper.destroy();
+  }
+
+  // ---------------------- DELETE FUNCTION ----------------------
+
+  function deletefun(id) {
+    document.getElementById("deleteid").value = id;
+  }
+
 </script>
+
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 

@@ -288,14 +288,6 @@ const dashboard = async (req, res) => {
    const deliveredCount=countofPending.filter((element)=>element._id="delivered").reduce((sum,element)=>{return sum+=element.countOfeach},0)
    const returnedCount=countofPending.filter((element)=>element._id="returned").reduce((sum,element)=>{return sum+=element.countOfeach},0)
 
-
-
-   console.log(countofPending)
-
-
-
-
-
       res.render('admin/dashboard', {
          orderNumber, totalOrderAmount, totalOfferAmount, couponSum,
          usersCount, blockUserCount, unblockUserCount, arrayDate: JSON.stringify(arrayDate), fromDate, toDate,

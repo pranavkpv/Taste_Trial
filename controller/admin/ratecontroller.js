@@ -40,9 +40,7 @@ const rate = async (req, res) => {
       { $skip: skip },
       { $limit: 5 }
     ]);
-    const foodss=await foodschema.find({is_blocked:false});
-    console.log(foodss)
-
+    const foodss = await foodschema.find({ is_blocked: false });
     const noOfDoc = await rateschema.countDocuments();
     const TotalPage = Math.ceil(noOfDoc / 5);
     const startIndex = skip + 1;
@@ -73,7 +71,7 @@ const rate = async (req, res) => {
 const addrate = async (req, res) => {
   try {
     const { hotel_id, food_id, varient_id, rate, gst_per, delivery_per, packing_per, delivery_time, stock } = req.body
-    const [file1,file2,file3] = req.files
+    const [file1, file2, file3] = req.files
     const existdata = await rateschema.findOne({ hotel_id, food_id, varient_id })
     if (existdata) {
       req.flash('exist', "Rate Already input")
@@ -83,8 +81,8 @@ const addrate = async (req, res) => {
         req.flash('question', "Please Upload 3 images")
         res.redirect('/admin/rate')
       } else {
-        const images = [`/uploads/${file1.filename}`,`/uploads/${file2.filename}`,`/uploads/${file3.filename}`]
-        const files=[file1.filename,file2.filename,file3.filename]
+        const images = [`/uploads/${ file1.filename }`, `/uploads/${ file2.filename }`, `/uploads/${ file3.filename }`]
+        const files = [file1.filename, file2.filename, file3.filename]
         const newdata = new rateschema({
           hotel_id,
           food_id,
@@ -121,28 +119,21 @@ const editrate = async (req, res) => {
       packing_per,
       delivery_time,
       editid,
-      stock,editfirstfilename,editsecondfilename,editthirdfilename
+      stock, editfirstfilename, editsecondfilename, editthirdfilename
     } = req.body;
-    console.log(req.body)
-    const [file1,file2,file3] = req.files;
-    const files=[editfirstfilename,editsecondfilename,editthirdfilename]
-    const existfiles=await rateschema.findById({_id:editid},{files:1,_id:0})
-    let i;
-    for( i=0;i<files.length;i++){
-      if(existfiles.files[i] !== files[i]){
-        existfiles.files.splice(i,1)
-        files.splice(i,1)
-        i--
-      }
+    const existfiles = await rateschema.findById({ _id: editid }, { files: 1, _id: 0 })
+    let images = []
+    let editFile = []
+    if (req.files.length == 0) {
+      images = [`/uploads/${ existfiles.files[0] }`, `/uploads/${ existfiles.files[1] }`, `/uploads/${ existfiles.files[2] }`]
+      editFile = existfiles.files
+    } else {
+      images = req.files.map((element) => `/uploads/${ element.filename }`)
+      editFile = req.files.map((element)=>element.filename)
     }
-    for(let j=0;j<req.files.length;j++){
-      existfiles.files.push(req.files[j].filename)
-    }
-    console.log(existfiles)
-    const images=[`/uploads/${existfiles.files[0]}`,`/uploads/${existfiles.files[1]}`,`/uploads/${existfiles.files[2]}`]
-    req.flash('success',"Data Edited Successfully")
+    req.flash('success', "Data Edited Successfully")
     res.redirect('/admin/rate')
-    await rateschema.findByIdAndUpdate({_id:editid},{
+    await rateschema.findByIdAndUpdate({ _id: editid }, {
       hotel_id,
       food_id,
       varient_id,
@@ -152,13 +143,12 @@ const editrate = async (req, res) => {
       delivery_time,
       stock,
       images,
-      files:existfiles.files
-
+      files: editFile
     })
 
-   
-    
-}
+
+
+  }
   catch (error) {
     console.error('Error in editrate function:', error);
     req.flash('error', 'An Error Occurred');
@@ -166,11 +156,11 @@ const editrate = async (req, res) => {
   }
 }
 
-const deleterate = async(req,res)=>{
+const deleterate = async (req, res) => {
   try {
-    const {deleteId}=req.body
-    await rateschema.findByIdAndDelete({_id:deleteId})
-    req.flash('success',"Data Deleted SuccessFully")
+    const { deleteId } = req.body
+    await rateschema.findByIdAndDelete({ _id: deleteId })
+    req.flash('success', "Data Deleted SuccessFully")
     res.redirect('/admin/rate')
   } catch (error) {
     console.log(error)
@@ -181,4 +171,4 @@ const deleterate = async(req,res)=>{
 
 
 
-module.exports = { rate, addrate, editrate,deleterate }
+module.exports = { rate, addrate, editrate, deleterate }

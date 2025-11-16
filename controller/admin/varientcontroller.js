@@ -5,10 +5,10 @@ const { ObjectId }=require('mongodb')
 const varient = async (req, res) => {
    try {
       const selectedfoodname = req.query.food
-      const searchedvarientname = req.query.varient || ''; // Get the search query
-      const selectedpage = Number(req.query.pagenumber) || 1; // Get the page number
-      const limit = 5; // Number of categories per page
-      const skip = (selectedpage - 1) * limit; // Calculate the skip value
+      const searchedvarientname = req.query.varient || ''; 
+      const selectedpage = Number(req.query.pagenumber) || 1; 
+      const limit = 5; 
+      const skip = (selectedpage - 1) * limit; 
       
 
       // Search filter
@@ -65,10 +65,10 @@ const varient = async (req, res) => {
 const addvarient = async (req, res) => {
    try {
       const { food_id, varientname } = req.body
-      const existvarient = await varientschema.findOne({ food_id, varientname })
+      const existvarient = await varientschema.findOne({ food_id, varientname:{$regex:varientname,$options:"i"} })
       if (existvarient) {
          req.flash('exist', "Varient Already Exist in that foodname")
-         res.render('/admin/varient')
+         res.redirect('/admin/varient')
       } else {
          const newvarient = new varientschema({
             food_id,

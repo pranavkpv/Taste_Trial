@@ -38,7 +38,6 @@ const razorpayInstance = new Razorpay({
 const validuser = async (req, res) => {
    try {
       const { email, password } = req.body;
-       console.log(req.body)
       if (!email || email.trim() === "") {
          return res.json({ messageEmail: "Email is required" });
       }
@@ -296,7 +295,7 @@ const emailverification = async (req, res) => {
                Otp: Otp,
                email: email
             }
-            console.log(req.session.userData)
+  
             res.redirect('/user/verify')
          }
       }
@@ -309,7 +308,6 @@ const emailverification = async (req, res) => {
 
 const resend = async (req, res) => {
    try {
-      console.log(req.session.userData)
       const Otp = generateOTP();
       console.log("OTP generated: ", Otp); // Log OTP
       const emailSend = await sendverificationEmal(req.session.userData.email, Otp);
@@ -335,8 +333,6 @@ const verify = async (req, res) => {
 }
 const verifypost = async (req, res) => {
    try {
-      console.log(req.body)
-      console.log(req.session.userData)
       if (req.body.Otp !== req.session.userData.Otp) {
          req.flash('error', "Entered OTP is wrong try again")
          res.redirect('/user/verify')
@@ -370,15 +366,12 @@ const confirmPassword = async (req, res) => {
       const { newpassword, confirmpassword } = req.body
       const userEmail = req.session.userData.email
 
-      console.log(req.body)
       if (newpassword == confirmpassword) {
-         console.log("Hello")
          await userschema.updateOne({ email: userEmail }, { password: newpassword })
          return res.json({ success: "SuccessFully Changed the message" })
 
 
       } else {
-         console.log("Hai")
          return res.json({ nomatch: "Password is not match" })
       }
 
@@ -415,7 +408,6 @@ const confirmorder = async (req, res) => {
    try {
 
       const orderId = req.query.orderId
-      console.log(req.query)
       const userid = req.session.user
       const cartIds = req.query.cartIDS.split(',')
       const quantity = req.query.purchaseQty.split(',')
@@ -583,7 +575,7 @@ const orderSuccess = async (req, res) => {
       const couponsdata = await couponschema.findOne({ _id: couponId })
 
       if (selectedPaymentMethod == "COD" && totalAmount - totalOffer > 1000) {
-         req.flash('error', "Above 100 Rs Cach On Delivery is not Possible")
+         req.flash('error', "Above 1000 Rs Cach On Delivery is not Possible")
          return res.redirect(`/user/confirmorder?cartIDS=${ cartId }&purchaseQty=${ numberofproduct }`)
       }
 
@@ -981,12 +973,9 @@ const applyCoupon = async (req, res) => {
    try {
       const { couponCode, cartIDS, purchaseQty } = req.body
       const userId = req.session.user
-      console.log(req.body)
-      console.log(userId)
       const existCoupon = await couponschema.findOne({ couponCode: couponCode })
       const orderss = await orderSchema.find({})
       if (!existCoupon) {
-         console.log("not exist")
          req.flash('error', "You Entered coupon is not available")
          return res.redirect(`/user/confirmorder?cartIDS=${ cartIDS }&purchaseQty=${ purchaseQty }`)
       }

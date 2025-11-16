@@ -101,7 +101,6 @@ app.get('/auth/google/callback', passport.authenticate('google', {
   const foods = await foodschema.find({})
   req.flash('success',"User Login SuccessFully")
   req.session.user=users._id
-  console.log(req.session.user)
   res.redirect('/user/home'); 
 });
 

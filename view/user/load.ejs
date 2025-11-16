@@ -443,6 +443,20 @@
             icon.classList.add("fa-eye-slash");
          }
       });
+      //login password Toggle
+       document.getElementById("toggleLoginPassword").addEventListener("click", function () {
+         let passwordInput = document.getElementById("logpassword");
+         let icon = this.querySelector("i");
+         if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+            icon.classList.remove("fa-eye-slash");
+            icon.classList.add("fa-eye");
+         } else {
+            passwordInput.type = "password";
+            icon.classList.remove("fa-eye");
+            icon.classList.add("fa-eye-slash");
+         }
+      });
 
       // Login Form AJAX
       document.getElementById('loginForm').addEventListener('submit', async function (e) {

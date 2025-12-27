@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-
+const mongoUrl = process.env.MONGODB_URL
 const food=require('../model/foodschema')
 const category=require('../model/categoryschema')
 async function updateOffer(){
@@ -21,7 +21,7 @@ async function updateOffer(){
 
 const connectDB=async()=>{
    try {
-      await mongoose.connect("mongodb+srv://User:User%40123@cluster0.xholv.mongodb.net/tastetrial")
+      await mongoose.connect(mongoUrl)
       console.log("connect database")
       updateOffer()
    } catch (error) {

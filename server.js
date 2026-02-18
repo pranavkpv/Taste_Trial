@@ -47,7 +47,7 @@ app.use((req, res, next) => {
   clientID : process.env.GOOGLE_CLIENT_ID,
   clientSecret : process.env.GOOGLE_CLIENT_SECRET,
   // callbackURL : "http://localhost:3000/auth/google/callback"
-  callbackURL:"http://tastetrial.info/auth/google/callback"
+  callbackURL:"http://tastetrial.shop/auth/google/callback"
  },
 
  async (accessToken, refreshToken, profile, done) => {
